@@ -1,13 +1,18 @@
 /**
- * RASHX Corporate Website — Foundation & Design System Showcase
+ * RASHX Corporate Website — Official Brand Identity Showcase & Verification Hub
  *
- * Phase 2.1: Brand Foundations & Core Design System (Quality Review & Corrections)
+ * Single Source of Truth: rashx-brand/
+ * Approved by Founder: Eng. Mohamed Abdo Rashad El-Bahy
+ *
  * Features:
- * - Direct verification of all 9 Core UI Primitives
- * - Visual review of the 3 Brand Mark Explorations across 3 backgrounds & multiple sizes (16px, 32px, 48px)
- * - Recalculated WCAG 2.2 AA/AAA Contrast Matrix
- * - Safe External Link testing with explicit openInNewTab control
- * - High-Legibility Bilingual Typography Showcase (Noto Kufi Arabic + Inter)
+ * 1. Official Vector Logos (Bilingual Lockup, English Wordmark, Arabic Wordmark, Rx Symbol)
+ * 2. Official Brand Palette (Warm Peach, Dusty Blue, White, Soft Cream, Ink)
+ * 3. Logo on Color Variations & Background Pairing Verification
+ * 4. Multi-Size Matrix (16px minimum screen, 24px, 32px, 48px, 64px, 120px)
+ * 5. Official Ping AR + LT Typography Showcase (Regular 400, Medium 500, Bold 700, Extra Bold 800)
+ * 6. WCAG 2.2 AA / AAA Contrast Matrix
+ * 7. Correct vs Prohibited Logo Usage Rules
+ * 8. Core UI Primitives Harmonized with Official Brand Tokens
  */
 
 import type { Metadata } from 'next';
@@ -26,23 +31,26 @@ import {
   SectionContainer,
 } from '@rashx/ui';
 import {
-  ConceptAnchor,
-  ConceptMonolith,
-  ConceptNexus,
+  RashxSymbol,
+  RashxWordmark,
+  RashxLockupBilingual,
+  RashxMonogram,
   Globe,
   CheckCircle2,
-  Building2,
+  AlertTriangle,
   ArrowRight,
   ArrowLeft,
-  Search,
-  Filter,
+  Sparkles,
+  Layers,
+  FileText,
+  ShieldCheck,
 } from '@rashx/icons';
 
 export async function generateMetadata(): Promise<Metadata> {
   return generatePageMetadata({
-    title: 'RASHX | راش إكس — نظام التشغيل الرقمي لصالونات التجميل',
+    title: 'RASHX | راش إكس — الهوية الرسمية المعتمدة ونظام التشغيل الرقمي',
     description:
-      'نظام التشغيل الرقمي المتكامل لصالونات التجميل ومراكز العناية والسبا في المملكة العربية السعودية. إدارة، حجوزات، CRM، مبيعات، وتجربة رقمية متكاملة.',
+      'الهوية البصرية الرسمية المعتمدة لشركة راش إكس (RASHX) — نظام التشغيل الرقمي المتكامل لصالونات التجميل ومراكز العناية والسبا في المملكة العربية السعودية.',
     path: '/',
   });
 }
@@ -56,30 +64,23 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
-      {/* ── Top Corporate Bar ────────────────────────────────────────── */}
-      <header className="border-b border-[--surface-border] bg-[--surface-card] py-4">
-        <PageContainer size="xl" className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1B1030] text-[#7C3AED] shadow-sm">
-              <ConceptAnchor size={24} />
-            </div>
-            <div>
-              <Typography variant="h5" className="font-bold tracking-tight">
-                {t.metadata.siteName}
-              </Typography>
-              <Typography variant="caption" color="muted">
-                {isAr ? 'المملكة العربية السعودية' : 'Kingdom of Saudi Arabia'}
-              </Typography>
-            </div>
+      {/* ── Top Corporate Header ───────────────────────────────────── */}
+      <header className="sticky top-0 z-50 border-b border-[--surface-border] bg-[--surface-card]/95 backdrop-blur-md">
+        <PageContainer size="xl" className="flex items-center justify-between py-3.5">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="inline-flex items-center gap-3">
+              <RashxLockupBilingual height={36} color="ink" />
+              <span className="sr-only">{t.metadata.siteName}</span>
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">
-            <Badge variant="brand" dot size="sm">
-              Phase 2.1 Verified Core
+            <Badge variant="outline" size="sm" className="hidden sm:inline-flex border-[#54453D]/20 text-[#54453D]">
+              {isAr ? 'الهوية الرسمية المعتمدة' : 'Official Approved Identity'}
             </Badge>
             <Link
               href={isAr ? '/?lang=en' : '/'}
-              className="inline-flex items-center gap-1.5 rounded-md border border-[--surface-border] px-3 py-1.5 text-xs font-semibold hover:bg-[--surface-muted]"
+              className="inline-flex items-center gap-1.5 rounded-md border border-[--surface-border] bg-white px-3 py-1.5 text-xs font-semibold text-[#54453D] shadow-xs hover:bg-[--surface-muted]"
             >
               <Globe className="h-3.5 w-3.5" />
               <span>{isAr ? 'English' : 'العربية'}</span>
@@ -88,519 +89,721 @@ export default async function HomePage() {
         </PageContainer>
       </header>
 
-      {/* ── Hero / Corporate Positioning Section ────────────────────── */}
-      <SectionContainer spacing="lg" className="border-b border-[--surface-border] bg-gradient-to-b from-[--surface-card] to-[--surface-background]">
+      {/* ── Hero / Corporate Positioning ────────────────────────────── */}
+      <SectionContainer spacing="lg" className="border-b border-[--surface-border] bg-gradient-to-b from-[#FAF9F8] to-[#FFFFFF]">
         <PageContainer size="xl">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="mb-4 inline-flex items-center gap-2">
-              <Badge variant="outline" size="md">
+            <div className="mb-6 inline-flex flex-wrap items-center justify-center gap-2">
+              <Badge variant="outline" size="md" className="border-[#54453D]/30 bg-white text-[#54453D]">
                 {isAr ? 'التأسيس: 2026' : 'Founded: 2026'}
               </Badge>
-              <Badge variant="secondary" size="md">
+              <Badge variant="secondary" size="md" className="bg-[#F0C5AE] text-[#54453D] font-medium">
                 {isAr ? 'المؤسس: م. محمد عبده رشاد البهي' : 'Founder: Eng. Mohamed Abdo Rashad El-Bahy'}
+              </Badge>
+              <Badge variant="outline" size="md" className="border-[#91B8C0] bg-[#E4EEF0] text-[#2C4349]">
+                {isAr ? 'المملكة العربية السعودية' : 'Saudi Arabia · KSA'}
               </Badge>
             </div>
 
-            <Typography variant="display-1" className="mb-4 font-extrabold text-[--surface-foreground]">
-              {isAr ? 'أكثر من مجرد إدارة، تجربة رقمية متكاملة.' : 'More Than Management, A Complete Digital Experience.'}
-            </Typography>
+            <div className="my-8 flex justify-center">
+              <div className="rounded-2xl border border-[#E8DFD8] bg-[#FAF9F8] p-8 shadow-sm">
+                <RashxLockupBilingual height={64} color="ink" />
+              </div>
+            </div>
 
-            <Typography variant="body-lg" color="muted" className="mx-auto mb-8 max-w-2xl">
+            <Typography variant="h1" className="font-extrabold tracking-tight text-[#54453D]">
               {isAr
-                ? 'نظام التشغيل الرقمي الأول المصمم خصيصاً لصالونات التجميل، مراكز العناية، والسبا في المملكة العربية السعودية. نجمع العمليات، الحجوزات، نقاط البيع، وفريق العمل في منصة سحابية واحدة فائقة الموثوقية.'
-                : 'The premier digital operating system purpose-built for salons, beauty centers, and spas in Saudi Arabia. Unifying operations, bookings, POS, and staff into one ultra-reliable cloud platform.'}
+                ? 'نظام التشغيل الرقمي لصالونات التجميل والعناية'
+                : 'The Integrated Digital Operating System for Salons & Spas'}
             </Typography>
 
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Button
-                variant="primary"
-                size="lg"
-                endIcon={<ArrowIcon className="h-4 w-4" />}
-              >
-                {isAr ? 'استكشف النظام' : 'Explore Platform'}
+            <Typography variant="body-lg" color="muted" className="mx-auto mt-4 max-w-2xl text-[#75645B]">
+              {isAr
+                ? 'إدارة متكاملة، حجوزات، نقاط بيع، علاقات عملاء، وتحليلات تشغيلية متطورة مصممة خصيصاً لقطاع التجميل والاستجمام في المملكة العربية السعودية.'
+                : 'Integrated operations, bookings, POS, CRM, staff administration, and operational analytics engineered for the Saudi beauty and wellness market.'}
+            </Typography>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <Button size="lg" className="bg-[#54453D] text-white hover:bg-[#433730]">
+                <span>{isAr ? 'طلب عرض توضيحي' : 'Request Demo'}</span>
+                <ArrowIcon className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="lg">
-                {isAr ? 'ملف الشركة المعتمد' : 'Corporate Profile'}
-              </Button>
-              <Button variant="secondary" size="lg" isLoading>
-                {isAr ? 'قيد المعالجة' : 'Processing'}
+              <Button variant="outline" size="lg" className="border-[#54453D] text-[#54453D] hover:bg-[#F0C5AE]/30">
+                <span>{isAr ? 'تصفح مواصفات الهوية' : 'View Brand Specs'}</span>
               </Button>
             </div>
           </div>
         </PageContainer>
       </SectionContainer>
 
-      {/* ── Section: Brand Mark Explorations for Founder Review ─────── */}
-      <SectionContainer spacing="lg" className="border-b border-[--surface-border]">
-        <PageContainer size="xl">
-          <div className="mb-10 text-center">
-            <Badge variant="brand" className="mb-3">
-              {isAr ? 'استعراض الهوية البصرية لمراجعة المؤسس' : 'Visual Identity Review for Founder'}
-            </Badge>
-            <Typography variant="h2" className="mb-3">
-              {isAr ? 'المفاهيم الهندسية المقترحة لشعار RASHX' : 'Proposed Geometric Mark Concepts'}
-            </Typography>
-            <Typography variant="body" color="muted" className="mx-auto max-w-2xl">
-              {isAr
-                ? 'تجسيد فلسفي لمعاني الثبات (الرسوخ والاعتمادية) والانطلاق (الحرية والتمكين الرقمي) دون الابتذال في رموز التجميل التقليدية.'
-                : 'Philosophical synthesis of Steadfastness (Authority & Reliability) and Freedom (Agility & SaaS Liberation) without generic cosmetic clichés.'}
-            </Typography>
-          </div>
-
-          {/* Detailed 3-Concept Cards */}
-          <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-            {/* Concept A */}
-            <div className="flex flex-col rounded-xl border border-[--surface-border] bg-[--surface-card] p-6 shadow-sm">
-              <div className="mb-6 flex h-40 items-center justify-center rounded-lg bg-[#1B1030] text-[#7C3AED] shadow-inner">
-                <ConceptAnchor size={72} />
-              </div>
-              <div className="mb-2 flex items-center justify-between">
-                <Typography variant="h4">
-                  {isAr ? 'المفهوم أ: الرسوخ والريادة' : 'Concept A: The Anchor'}
-                </Typography>
-                <Badge variant="outline" size="sm">
-                  {isAr ? 'مقترح' : 'Proposal'}
-                </Badge>
-              </div>
-              <Typography variant="body-sm" color="muted" className="mb-4 flex-1">
-                {isAr
-                  ? 'عمود رأسي صلد يمثل الثبات والسيادة التشغيلية، مع ذراع صاعد بزاوية 45 درجة يخترق الفضاء ليعبّر عن الانطلاق والتحليق الرقمي.'
-                  : 'Solid vertical structural stem symbolizing enterprise stability, coupled with an ascending 45-degree cantilever strut breaking free into open digital expansion.'}
-              </Typography>
-              <div className="border-t border-[--surface-border] pt-3 text-xs text-[--surface-muted-foreground]">
-                <span>Component: <code>&lt;ConceptAnchor /&gt;</code></span>
-              </div>
-            </div>
-
-            {/* Concept B */}
-            <div className="flex flex-col rounded-xl border border-[--surface-border] bg-[--surface-card] p-6 shadow-sm">
-              <div className="mb-6 flex h-40 items-center justify-center rounded-lg bg-[#2E1F5E] text-[#A78BFA] shadow-inner">
-                <ConceptMonolith size={72} />
-              </div>
-              <div className="mb-2 flex items-center justify-between">
-                <Typography variant="h4">
-                  {isAr ? 'المفهوم ب: الكتلة المنطلقة' : 'Concept B: The Monolith'}
-                </Typography>
-                <Badge variant="outline" size="sm">
-                  {isAr ? 'مقترح' : 'Proposal'}
-                </Badge>
-              </div>
-              <Typography variant="body-sm" color="muted" className="mb-4 flex-1">
-                {isAr
-                  ? 'كتلتان صلبتان متداخلتان بهندسة متقدمة، تجمع بين مركزية التحكم والسرعة السحابية لتمكين إدارة الأعمال دون أي بطء.'
-                  : 'Two high-precision interlocking geometric masses balancing deep operational governance with an aggressive kinetic shard representing cloud acceleration.'}
-              </Typography>
-              <div className="border-t border-[--surface-border] pt-3 text-xs text-[--surface-muted-foreground]">
-                <span>Component: <code>&lt;ConceptMonolith /&gt;</code></span>
-              </div>
-            </div>
-
-            {/* Concept C */}
-            <div className="flex flex-col rounded-xl border border-[--surface-border] bg-[--surface-card] p-6 shadow-sm">
-              <div className="mb-6 flex h-40 items-center justify-center rounded-lg bg-[#1B1030] text-[#7C3AED] shadow-inner">
-                <ConceptNexus size={72} />
-              </div>
-              <div className="mb-2 flex items-center justify-between">
-                <Typography variant="h4">
-                  {isAr ? 'المفهوم ج: الرابط المتين' : 'Concept C: The Nexus'}
-                </Typography>
-                <Badge variant="outline" size="sm">
-                  {isAr ? 'مقترح' : 'Proposal'}
-                </Badge>
-              </div>
-              <Typography variant="body-sm" color="muted" className="mb-4 flex-1">
-                {isAr
-                  ? 'حلقة مضلعة مشطوفة الزوايا تلتف في مسار غير منقطع، تجسد تكامل العمليات (الحجوزات، المحاسبة، المخزون، ولاء العملاء) في قلب تشغيلي واحد.'
-                  : 'Continuous chamfered polygonal ribbon with a symmetric tri-axial core, embodying the complete unification of salon operations into one unbroken OS.'}
-              </Typography>
-              <div className="border-t border-[--surface-border] pt-3 text-xs text-[--surface-muted-foreground]">
-                <span>Component: <code>&lt;ConceptNexus /&gt;</code></span>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Strict Visual Comparison Matrix across Backgrounds & Scales ── */}
-          <div className="rounded-xl border border-[--surface-border] bg-[--surface-card] p-6">
-            <Typography variant="h4" className="mb-2">
-              {isAr ? 'مصفوفة اختبار الخلفيات والأحجام والأحادية' : 'Background, Scale & Monochrome Testing Matrix'}
-            </Typography>
-            <Typography variant="body-sm" color="muted" className="mb-6">
-              {isAr
-                ? 'فحص شامل لكل مفهوم على خلفيات الأبيض (#FFFFFF)، منتصف الليل الداكن (#1B1030)، البنفسجي الكهربائي (#7C3AED)، وبأحجام 16px و 32px بالإضافة إلى النسخ الأحادية (Monochrome).'
-                : 'Exhaustive verification of each concept across White (#FFFFFF), Deep Midnight (#1B1030), and Electric Purple (#7C3AED) at 16px, 32px, and monochrome.'}
-            </Typography>
-
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-start text-xs">
-                <thead>
-                  <tr className="border-b border-[--surface-border] bg-[--surface-muted]/50 text-[--surface-muted-foreground]">
-                    <th className="p-3 text-start font-semibold">Concept</th>
-                    <th className="p-3 text-center font-semibold">White Bg (#FFFFFF)</th>
-                    <th className="p-3 text-center font-semibold">Deep Midnight (#1B1030)</th>
-                    <th className="p-3 text-center font-semibold">Electric Purple (#7C3AED)</th>
-                    <th className="p-3 text-center font-semibold">16px Favicon Scale</th>
-                    <th className="p-3 text-center font-semibold">32px Scale</th>
-                    <th className="p-3 text-center font-semibold">Monochrome Black/White</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[--surface-border]">
-                  {/* Row: Concept A */}
-                  <tr>
-                    <td className="p-3 font-semibold">Concept A: Anchor</td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-[#7C3AED] shadow-sm">
-                        <ConceptAnchor size={28} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#1B1030] text-[#7C3AED] shadow-sm">
-                        <ConceptAnchor size={28} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#7C3AED] text-white shadow-sm">
-                        <ConceptAnchor size={28} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-8 w-8 items-center justify-center rounded bg-[#1B1030] text-white">
-                        <ConceptAnchor size={16} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-10 w-10 items-center justify-center rounded bg-[#1B1030] text-[#7C3AED]">
-                        <ConceptAnchor size={32} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded border border-black bg-white text-black">
-                          <ConceptAnchor size={20} />
-                        </div>
-                        <div className="flex h-8 w-8 items-center justify-center rounded bg-black text-white">
-                          <ConceptAnchor size={20} />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* Row: Concept B */}
-                  <tr>
-                    <td className="p-3 font-semibold">Concept B: Monolith</td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-[#2E1F5E] shadow-sm">
-                        <ConceptMonolith size={28} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#1B1030] text-[#A78BFA] shadow-sm">
-                        <ConceptMonolith size={28} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#7C3AED] text-white shadow-sm">
-                        <ConceptMonolith size={28} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-8 w-8 items-center justify-center rounded bg-[#1B1030] text-white">
-                        <ConceptMonolith size={16} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-10 w-10 items-center justify-center rounded bg-[#1B1030] text-[#A78BFA]">
-                        <ConceptMonolith size={32} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded border border-black bg-white text-black">
-                          <ConceptMonolith size={20} />
-                        </div>
-                        <div className="flex h-8 w-8 items-center justify-center rounded bg-black text-white">
-                          <ConceptMonolith size={20} />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* Row: Concept C */}
-                  <tr>
-                    <td className="p-3 font-semibold">Concept C: Nexus</td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-[#7C3AED] shadow-sm">
-                        <ConceptNexus size={28} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#1B1030] text-[#7C3AED] shadow-sm">
-                        <ConceptNexus size={28} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#7C3AED] text-white shadow-sm">
-                        <ConceptNexus size={28} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-8 w-8 items-center justify-center rounded bg-[#1B1030] text-white">
-                        <ConceptNexus size={16} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex h-10 w-10 items-center justify-center rounded bg-[#1B1030] text-[#7C3AED]">
-                        <ConceptNexus size={32} />
-                      </div>
-                    </td>
-                    <td className="p-3 text-center">
-                      <div className="inline-flex gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded border border-black bg-white text-black">
-                          <ConceptNexus size={20} />
-                        </div>
-                        <div className="flex h-8 w-8 items-center justify-center rounded bg-black text-white">
-                          <ConceptNexus size={20} />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </PageContainer>
-      </SectionContainer>
-
-      {/* ── Section: Semantic Color Architecture ─────────────────────── */}
-      <SectionContainer spacing="lg" className="border-b border-[--surface-border] bg-[--surface-muted]/30">
-        <PageContainer size="xl">
-          <div className="mb-8">
-            <Typography variant="h3" className="mb-2">
-              {isAr ? 'منظومة الألوان الدلالية ودرجات التباين' : 'Semantic Color Architecture & Contrast'}
-            </Typography>
-            <Typography variant="body" color="muted">
-              {isAr
-                ? 'نتائج إعادة الاحتساب الدقيقة لمعايير WCAG 2.2 AA/AAA للألوان الأساسية والدلالية.'
-                : 'Independently recalculated WCAG 2.2 AA/AAA contrast ratios for core brand and semantic tokens.'}
-            </Typography>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-[--surface-border] bg-[--surface-card] p-4 shadow-sm">
-              <div className="mb-3 h-16 rounded-lg bg-[#1B1030] text-white flex items-center justify-center font-bold">
-                #1B1030
-              </div>
-              <Typography variant="h5" className="font-semibold">Deep Midnight</Typography>
-              <Typography variant="caption" color="muted" className="block mb-2">
-                {isAr ? 'قاعدة الهوية والخلفية الداكنة' : 'Primary Dark Canvas Anchor'}
-              </Typography>
-              <Badge variant="success" size="sm">Contrast 17.5:1 (AAA)</Badge>
-            </div>
-
-            <div className="rounded-xl border border-[--surface-border] bg-[--surface-card] p-4 shadow-sm">
-              <div className="mb-3 h-16 rounded-lg bg-[#2E1F5E] text-white flex items-center justify-center font-bold">
-                #2E1F5E
-              </div>
-              <Typography variant="h5" className="font-semibold">Obsidian Violet</Typography>
-              <Typography variant="caption" color="muted" className="block mb-2">
-                {isAr ? 'الأسطح الثانوية والبطاقات' : 'Secondary Structural Container'}
-              </Typography>
-              <Badge variant="success" size="sm">Contrast 14.25:1 (AAA)</Badge>
-            </div>
-
-            <div className="rounded-xl border border-[--surface-border] bg-[--surface-card] p-4 shadow-sm">
-              <div className="mb-3 h-16 rounded-lg bg-[#7C3AED] text-white flex items-center justify-center font-bold">
-                #7C3AED
-              </div>
-              <Typography variant="h5" className="font-semibold">Electric Purple</Typography>
-              <Typography variant="caption" color="muted" className="block mb-2">
-                {isAr ? 'التفاعل الحيوي والأزرار الرئيسية' : 'Third Primary Interactive Accent'}
-              </Typography>
-              <Badge variant="success" size="sm">Contrast 5.70:1 (AA)</Badge>
-            </div>
-
-            <div className="rounded-xl border border-[--surface-border] bg-[--surface-card] p-4 shadow-sm">
-              <div className="mb-3 h-16 rounded-lg bg-[#15803D] text-white flex items-center justify-center font-bold">
-                #15803D
-              </div>
-              <Typography variant="h5" className="font-semibold">Enterprise Success Text</Typography>
-              <Typography variant="caption" color="muted" className="block mb-2">
-                {isAr ? 'نصوص تأكيد الحجوزات والعمليات' : 'Verified Text Token on Light Surfaces'}
-              </Typography>
-              <Badge variant="success" size="sm">Contrast 5.02:1 (AA)</Badge>
-            </div>
-          </div>
-        </PageContainer>
-      </SectionContainer>
-
-      {/* ── Section: Typography Scale (Arabic & English) ─────────────── */}
+      {/* ── Section 1: Official Logo Marks & Variants ──────────────── */}
       <SectionContainer spacing="lg" className="border-b border-[--surface-border]">
         <PageContainer size="xl">
           <div className="mb-8">
-            <Typography variant="h3" className="mb-2">
-              {isAr ? 'سلم التيبوغرافي ثنائي اللغة وسياق الأرقام' : 'Bilingual Typography & Numeral Convention'}
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#75645B]">
+              <Sparkles className="h-4 w-4 text-[#C78360]" />
+              <span>{isAr ? 'العلامات والشعارات الرسمية' : 'Official Brand Marks'}</span>
+            </div>
+            <Typography variant="h2" className="mt-1 font-bold text-[#54453D]">
+              {isAr ? 'الشعارات المعتمدة بدقة المتجهات الأصلية' : 'Approved Logo Marks & Outlines'}
             </Typography>
-            <Typography variant="body" color="muted">
+            <Typography variant="body" color="muted" className="text-[#75645B]">
               {isAr
-                ? 'Noto Kufi Arabic للنصوص العربية المعمارية الرصينة، و Inter للنصوص اللاتينية، مع التزام الأرقام العربية الغربية (0 1 2 3...) لكافة العمليات المالية والتقنية.'
-                : 'Noto Kufi Arabic for enterprise Arabic, Inter for Latin, with Western Arabic digits (0 1 2 3...) standardized for all commercial & SaaS data.'}
+                ? 'جميع الشعارات مرسومة بمسارات متجهات صافية (Vector Paths) من حزمة الهوية الرسمية دون الاعتماد على خطوط خارجية.'
+                : 'All marks are engineered as pure SVG paths from the official brand kit with zero external font dependencies.'}
             </Typography>
           </div>
 
-          <div className="space-y-6 rounded-xl border border-[--surface-border] bg-[--surface-card] p-6 shadow-sm">
-            <div className="grid grid-cols-1 items-baseline gap-4 border-b border-[--surface-border] pb-4 md:grid-cols-4">
-              <span className="text-xs font-mono text-[--surface-muted-foreground]">display-1 (72px / 800)</span>
-              <div className="md:col-span-3">
-                <Typography variant="display-1">راش إكس لتقنية الصالونات</Typography>
-                <Typography variant="display-1" className="text-[--surface-muted-foreground]">RASHX Operating System</Typography>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {/* Bilingual Lockup Card */}
+            <div className="flex flex-col justify-between rounded-xl border border-[#E8DFD8] bg-[#FAF9F8] p-6 shadow-xs">
+              <div>
+                <Badge variant="outline" size="sm" className="mb-4 text-[#54453D]">
+                  Bilingual Lockup
+                </Badge>
+                <div className="flex h-32 items-center justify-center">
+                  <RashxLockupBilingual height={44} color="ink" />
+                </div>
+              </div>
+              <div className="mt-4 border-t border-[#E8DFD8] pt-3 text-xs text-[#75645B]">
+                <p className="font-semibold">{isAr ? 'الشعار المزدوج الرسمي' : 'Official Bilingual Lockup'}</p>
+                <p>viewBox: 0 0 1233.1 340</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 items-baseline gap-4 border-b border-[--surface-border] pb-4 md:grid-cols-4">
-              <span className="text-xs font-mono text-[--surface-muted-foreground]">h2 (36px / 700)</span>
-              <div className="md:col-span-3">
-                <Typography variant="h2">إدارة شاملة لأكثر من 500 مركز تجميل وسبا</Typography>
-                <Typography variant="h2" className="text-[--surface-muted-foreground]">Unified Beauty Business Administration</Typography>
+            {/* English Wordmark Card */}
+            <div className="flex flex-col justify-between rounded-xl border border-[#E8DFD8] bg-[#FAF9F8] p-6 shadow-xs">
+              <div>
+                <Badge variant="outline" size="sm" className="mb-4 text-[#54453D]">
+                  English Wordmark
+                </Badge>
+                <div className="flex h-32 items-center justify-center">
+                  <RashxWordmark variant="english" height={36} color="ink" />
+                </div>
+              </div>
+              <div className="mt-4 border-t border-[#E8DFD8] pt-3 text-xs text-[#75645B]">
+                <p className="font-semibold">{isAr ? 'شعار الكلمة الإنجليزي' : 'English Wordmark'}</p>
+                <p>viewBox: 0 0 4549.3 1000</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 items-baseline gap-4 border-b border-[--surface-border] pb-4 md:grid-cols-4">
-              <span className="text-xs font-mono text-[--surface-muted-foreground]">body-lg (20px / 400)</span>
-              <div className="md:col-span-3">
-                <Typography variant="body-lg">
-                  تحويل شامل من الفوضى التشغيلية والبرمجيات المتفرقة إلى منظومة سحابية متكاملة تضمن أعلى معايير الكفاءة بمعدل استجابة أقل من 200ms.
-                </Typography>
-                <Typography variant="body-lg" className="text-[--surface-muted-foreground]">
-                  Empowering salon founders to streamline scheduling, POS, and client loyalty in real time with sub-200ms cloud latency.
-                </Typography>
+            {/* Arabic Wordmark Card */}
+            <div className="flex flex-col justify-between rounded-xl border border-[#E8DFD8] bg-[#FAF9F8] p-6 shadow-xs">
+              <div>
+                <Badge variant="outline" size="sm" className="mb-4 text-[#54453D]">
+                  Arabic Wordmark
+                </Badge>
+                <div className="flex h-32 items-center justify-center">
+                  <RashxWordmark variant="arabic" height={34} color="ink" />
+                </div>
+              </div>
+              <div className="mt-4 border-t border-[#E8DFD8] pt-3 text-xs text-[#75645B]">
+                <p className="font-semibold">{isAr ? 'شعار الكلمة العربي' : 'Arabic Wordmark'}</p>
+                <p>viewBox: 0 0 7706.8 1000</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 items-baseline gap-4 md:grid-cols-4">
-              <span className="text-xs font-mono text-[--surface-muted-foreground]">caption / label</span>
-              <div className="flex flex-wrap items-center gap-4 md:col-span-3">
-                <Typography variant="caption">مُصادق ومحمي برقم ضريبي 310294857300003</Typography>
-                <Separator orientation="vertical" className="h-4" />
-                <Typography variant="label">SAUDI COMMERCE STANDARD 2026</Typography>
+            {/* Rx Symbol Card */}
+            <div className="flex flex-col justify-between rounded-xl border border-[#E8DFD8] bg-[#FAF9F8] p-6 shadow-xs">
+              <div>
+                <Badge variant="outline" size="sm" className="mb-4 text-[#54453D]">
+                  Rx Brand Symbol
+                </Badge>
+                <div className="flex h-32 items-center justify-center">
+                  <RashxSymbol size={54} color="ink" />
+                </div>
+              </div>
+              <div className="mt-4 border-t border-[#E8DFD8] pt-3 text-xs text-[#75645B]">
+                <p className="font-semibold">{isAr ? 'رمز Rx الرسمي' : 'Official Rx Symbol'}</p>
+                <p>viewBox: 0 0 1048.8 1000</p>
               </div>
             </div>
           </div>
         </PageContainer>
       </SectionContainer>
 
-      {/* ── Section: Core UI Primitives Live Matrix ──────────────────── */}
+      {/* ── Section 2: Logo on Approved Backgrounds ────────────────── */}
+      <SectionContainer spacing="lg" className="border-b border-[--surface-border] bg-[#FAF9F8]/60">
+        <PageContainer size="xl">
+          <div className="mb-8">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#75645B]">
+              <Layers className="h-4 w-4 text-[#91B8C0]" />
+              <span>{isAr ? 'تطبيقات الشعار على الألوان المعتمدة' : 'Logo on Approved Backgrounds'}</span>
+            </div>
+            <Typography variant="h2" className="mt-1 font-bold text-[#54453D]">
+              {isAr ? 'التوافق اللوني والتباين المعتمد' : 'Contrast Pairing & Surface Verification'}
+            </Typography>
+            <Typography variant="body" color="muted" className="text-[#75645B]">
+              {isAr
+                ? 'وفقاً لإرشادات المؤسس: يظهر الشعار دائماً بلون Ink (#54453D) على الخلفيات الفاتحة، وبلون White (#FFFFFF) حصرياً على خلفية Ink.'
+                : 'Per Founder guidelines: Logo is always Ink (#54453D) on light surfaces, and White (#FFFFFF) exclusively on Ink background.'}
+            </Typography>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            {/* On Warm Peach */}
+            <div className="rounded-xl border border-[#E6D0C3] bg-[#F0C5AE] p-6 text-center shadow-xs">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#54453D]/70">On Warm Peach</span>
+              <div className="my-6 flex h-24 items-center justify-center">
+                <RashxSymbol size={48} color="ink" />
+              </div>
+              <div className="border-t border-[#54453D]/15 pt-3">
+                <p className="text-xs font-semibold text-[#54453D]">Logo: Ink #54453D</p>
+                <p className="text-[11px] text-[#54453D]/80">Contrast: 5.82:1 (Pass AA/AAA)</p>
+              </div>
+            </div>
+
+            {/* On Dusty Blue */}
+            <div className="rounded-xl border border-[#B5CBD0] bg-[#91B8C0] p-6 text-center shadow-xs">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#54453D]/70">On Dusty Blue</span>
+              <div className="my-6 flex h-24 items-center justify-center">
+                <RashxSymbol size={48} color="ink" />
+              </div>
+              <div className="border-t border-[#54453D]/15 pt-3">
+                <p className="text-xs font-semibold text-[#54453D]">Logo: Ink #54453D</p>
+                <p className="text-[11px] text-[#54453D]/80">Contrast: 4.31:1 (Pass 3:1 UI)</p>
+              </div>
+            </div>
+
+            {/* On Soft Cream */}
+            <div className="rounded-xl border border-[#E8DFD8] bg-[#FAF9F8] p-6 text-center shadow-xs">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#75645B]">On Soft Cream</span>
+              <div className="my-6 flex h-24 items-center justify-center">
+                <RashxSymbol size={48} color="ink" />
+              </div>
+              <div className="border-t border-[#E8DFD8] pt-3">
+                <p className="text-xs font-semibold text-[#54453D]">Logo: Ink #54453D</p>
+                <p className="text-[11px] text-[#75645B]">Contrast: 8.65:1 (Pass AAA)</p>
+              </div>
+            </div>
+
+            {/* On Pure White */}
+            <div className="rounded-xl border border-[#E8DFD8] bg-[#FFFFFF] p-6 text-center shadow-xs">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#75645B]">On Pure White</span>
+              <div className="my-6 flex h-24 items-center justify-center">
+                <RashxSymbol size={48} color="ink" />
+              </div>
+              <div className="border-t border-[#E8DFD8] pt-3">
+                <p className="text-xs font-semibold text-[#54453D]">Logo: Ink #54453D</p>
+                <p className="text-[11px] text-[#75645B]">Contrast: 9.04:1 (Pass AAA)</p>
+              </div>
+            </div>
+
+            {/* On Brand Ink */}
+            <div className="rounded-xl border border-[#433730] bg-[#54453D] p-6 text-center shadow-xs text-white">
+              <span className="text-xs font-bold uppercase tracking-wider text-white/70">On Brand Ink</span>
+              <div className="my-6 flex h-24 items-center justify-center">
+                <RashxSymbol size={48} color="white" />
+              </div>
+              <div className="border-t border-white/20 pt-3">
+                <p className="text-xs font-semibold text-white">Logo: White #FFFFFF</p>
+                <p className="text-[11px] text-white/80">Contrast: 9.04:1 (Pass AAA)</p>
+              </div>
+            </div>
+          </div>
+        </PageContainer>
+      </SectionContainer>
+
+      {/* ── Section 3: Multi-Scale Resolution Matrix ───────────────── */}
+      <SectionContainer spacing="lg" className="border-b border-[--surface-border]">
+        <PageContainer size="xl">
+          <div className="mb-8">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#75645B]">
+              <ShieldCheck className="h-4 w-4 text-[#16A34A]" />
+              <span>{isAr ? 'مصفوفة الأحجام والشاشات' : 'Size Scale & Legibility Verification'}</span>
+            </div>
+            <Typography variant="h2" className="mt-1 font-bold text-[#54453D]">
+              {isAr ? 'وضوح الرمز عبر الأحجام من 16px إلى 120px' : 'Optical Legibility from 16px to 120px'}
+            </Typography>
+            <Typography variant="body" color="muted" className="text-[#75645B]">
+              {isAr
+                ? 'الحد الأدنى المعتمد للشاشات: 16px للرمز و 12px لشعار الكلمة، مما يضمن الوضوح التام في شريط المتصفح وتطبيقات الجوال.'
+                : 'Minimum sizes: 16px for Rx symbol, 12px for wordmarks on screen (3mm for print).'}
+            </Typography>
+          </div>
+
+          <div className="rounded-2xl border border-[#E8DFD8] bg-[#FAF9F8] p-8 shadow-xs">
+            <div className="flex flex-wrap items-end justify-around gap-8 text-center">
+              {/* 16px (Minimum Screen Size) */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-[#E8DFD8] bg-white p-2">
+                  <RashxSymbol size={16} color="ink" />
+                </div>
+                <div className="text-xs font-medium text-[#54453D]">
+                  <p className="font-bold">16px</p>
+                  <p className="text-[10px] text-[#75645B]">{isAr ? 'الحد الأدنى' : 'Min Screen'}</p>
+                </div>
+              </div>
+
+              {/* 24px */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-[#E8DFD8] bg-white p-2">
+                  <RashxSymbol size={24} color="ink" />
+                </div>
+                <div className="text-xs font-medium text-[#54453D]">
+                  <p className="font-bold">24px</p>
+                  <p className="text-[10px] text-[#75645B]">Favicon / App</p>
+                </div>
+              </div>
+
+              {/* 32px (Default UI) */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-[#E8DFD8] bg-white p-2">
+                  <RashxSymbol size={32} color="ink" />
+                </div>
+                <div className="text-xs font-medium text-[#54453D]">
+                  <p className="font-bold">32px</p>
+                  <p className="text-[10px] text-[#75645B]">Header Bar</p>
+                </div>
+              </div>
+
+              {/* 48px */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex h-20 w-20 items-center justify-center rounded-xl border border-[#E8DFD8] bg-white p-2">
+                  <RashxSymbol size={48} color="ink" />
+                </div>
+                <div className="text-xs font-medium text-[#54453D]">
+                  <p className="font-bold">48px</p>
+                  <p className="text-[10px] text-[#75645B]">Cards / UI</p>
+                </div>
+              </div>
+
+              {/* 64px */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex h-24 w-24 items-center justify-center rounded-xl border border-[#E8DFD8] bg-white p-2">
+                  <RashxSymbol size={64} color="ink" />
+                </div>
+                <div className="text-xs font-medium text-[#54453D]">
+                  <p className="font-bold">64px</p>
+                  <p className="text-[10px] text-[#75645B]">Hero / Covers</p>
+                </div>
+              </div>
+
+              {/* 120px (Display) */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex h-36 w-36 items-center justify-center rounded-2xl border border-[#E8DFD8] bg-white p-3">
+                  <RashxSymbol size={110} color="ink" />
+                </div>
+                <div className="text-xs font-medium text-[#54453D]">
+                  <p className="font-bold">120px</p>
+                  <p className="text-[10px] text-[#75645B]">Billboard / Display</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </PageContainer>
+      </SectionContainer>
+
+      {/* ── Section 4: Official Typography (Ping AR + LT) ───────────── */}
+      <SectionContainer spacing="lg" className="border-b border-[--surface-border] bg-[#FAF9F8]/60">
+        <PageContainer size="xl">
+          <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#75645B]">
+                <FileText className="h-4 w-4 text-[#54453D]" />
+                <span>{isAr ? 'الطباعة والخطوط الرسمية' : 'Official Typography Architecture'}</span>
+              </div>
+              <Typography variant="h2" className="mt-1 font-bold text-[#54453D]">
+                Ping AR + LT — {isAr ? 'الأوزان الأربعة المعتمدة' : 'Official 4-Weight Matrix'}
+              </Typography>
+              <Typography variant="body" color="muted" className="text-[#75645B]">
+                {isAr
+                  ? 'الخط المعتمد رسمياً: Ping AR + LT بجميع أوزانه، مع حزمة بدائل متوافقة هندسياً للأجهزة التي لا يتوفر بها الخط.'
+                  : 'Official corporate font: Ping AR + LT across all weights, with robust system fallbacks.'}
+              </Typography>
+            </div>
+            <div className="rounded-lg border border-[#E8DFD8] bg-white px-4 py-2 text-xs text-[#75645B]">
+              <span className="font-semibold text-[#54453D]">Fallback Stack:</span>{' '}
+              <code className="text-[11px]">Ping AR + LT, Helvetica Neue, Arial, Noto Sans Arabic, Tahoma</code>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* Regular 400 */}
+            <div className="flex flex-col justify-between gap-4 rounded-xl border border-[#E8DFD8] bg-white p-6 md:flex-row md:items-center">
+              <div>
+                <span className="text-xs font-bold uppercase text-[#75645B]">Regular 400 · Body & Paragraphs</span>
+                <p className="mt-1 font-normal text-2xl text-[#54453D]">RASHX Aa Bb 0123</p>
+              </div>
+              <div className="text-start md:text-end">
+                <p className="font-normal text-2xl text-[#54453D]" dir="rtl">
+                  راش اكس أب جد ٠١٢٣
+                </p>
+                <p className="text-xs text-[#75645B] mt-1">{isAr ? 'نصوص المتن والفقرات' : 'Body Text & Editorial'}</p>
+              </div>
+            </div>
+
+            {/* Medium 500 */}
+            <div className="flex flex-col justify-between gap-4 rounded-xl border border-[#E8DFD8] bg-white p-6 md:flex-row md:items-center">
+              <div>
+                <span className="text-xs font-bold uppercase text-[#75645B]">Medium 500 · Labels & UI</span>
+                <p className="mt-1 font-medium text-2xl text-[#54453D]">RASHX Aa Bb 0123</p>
+              </div>
+              <div className="text-start md:text-end">
+                <p className="font-medium text-2xl text-[#54453D]" dir="rtl">
+                  راش اكس أب جد ٠١٢٣
+                </p>
+                <p className="text-xs text-[#75645B] mt-1">{isAr ? 'عناصر واجهة المستخدم والأزرار' : 'UI & Button Labels'}</p>
+              </div>
+            </div>
+
+            {/* Bold 700 */}
+            <div className="flex flex-col justify-between gap-4 rounded-xl border border-[#E8DFD8] bg-white p-6 md:flex-row md:items-center">
+              <div>
+                <span className="text-xs font-bold uppercase text-[#75645B]">Bold 700 · Headlines & Names</span>
+                <p className="mt-1 font-bold text-2xl text-[#54453D]">RASHX Aa Bb 0123</p>
+              </div>
+              <div className="text-start md:text-end">
+                <p className="font-bold text-2xl text-[#54453D]" dir="rtl">
+                  راش اكس أب جد ٠١٢٣
+                </p>
+                <p className="text-xs text-[#75645B] mt-1">{isAr ? 'العناوين الرئيسية وأسماء الأقسام' : 'Headlines & Section Titles'}</p>
+              </div>
+            </div>
+
+            {/* Extra Bold 800 */}
+            <div className="flex flex-col justify-between gap-4 rounded-xl border border-[#E8DFD8] bg-white p-6 md:flex-row md:items-center">
+              <div>
+                <span className="text-xs font-bold uppercase text-[#75645B]">Extra Bold 800 · Display & Emphasis</span>
+                <p className="mt-1 font-extrabold text-2xl text-[#54453D]">RASHX Aa Bb 0123</p>
+              </div>
+              <div className="text-start md:text-end">
+                <p className="font-extrabold text-2xl text-[#54453D]" dir="rtl">
+                  راش اكس أب جد ٠١٢٣
+                </p>
+                <p className="text-xs text-[#75645B] mt-1">{isAr ? 'عناوين الشاشات الكبرى والتركيز البصري' : 'Display & Hero Titles'}</p>
+              </div>
+            </div>
+          </div>
+        </PageContainer>
+      </SectionContainer>
+
+      {/* ── Section 5: Brand Color Palette & Contrast Specs ────────── */}
+      <SectionContainer spacing="lg" className="border-b border-[--surface-border]">
+        <PageContainer size="xl">
+          <div className="mb-8">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#75645B]">
+              <Sparkles className="h-4 w-4 text-[#C78360]" />
+              <span>{isAr ? 'الألوان الرسمية المعتمدة' : 'Official Color Swatches & Contrast'}</span>
+            </div>
+            <Typography variant="h2" className="mt-1 font-bold text-[#54453D]">
+              {isAr ? 'القيم الدقيقة ونسب التباين WCAG 2.2' : 'Exact Hex Specifications & WCAG Ratios'}
+            </Typography>
+            <Typography variant="body" color="muted" className="text-[#75645B]">
+              {isAr
+                ? '5 ألوان أساسية تشكل الهوية الرسمية الكاملة لراش إكس. تباين لون الحبر Ink يفوق المعايير الدولية على جميع الأسطح.'
+                : 'The 5 canonical brand colors. Ink (#54453D) achieves superior contrast across all approved surfaces.'}
+            </Typography>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            {/* Warm Peach */}
+            <div className="overflow-hidden rounded-xl border border-[#E6D0C3] bg-white shadow-xs">
+              <div className="h-32 bg-[#F0C5AE]" />
+              <div className="p-4">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-[#54453D]">Warm Peach</p>
+                  <Badge variant="outline" size="sm" className="text-[10px] text-[#54453D]">Primary</Badge>
+                </div>
+                <code className="text-xs font-bold text-[#75645B]">#F0C5AE</code>
+                <p className="mt-2 text-xs text-[#75645B]">
+                  {isAr ? 'الخلفيات وبطاقات التمييز' : 'Backgrounds & primary cards'}
+                </p>
+                <div className="mt-3 rounded-md bg-[#FAF9F8] p-2 text-[11px] text-[#54453D]">
+                  <p className="font-semibold">Ink contrast: 5.82:1</p>
+                  <p className="text-[10px] text-[#15803D]">✓ Passes AA Normal / AAA Large</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Dusty Blue */}
+            <div className="overflow-hidden rounded-xl border border-[#B5CBD0] bg-white shadow-xs">
+              <div className="h-32 bg-[#91B8C0]" />
+              <div className="p-4">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-[#54453D]">Dusty Blue</p>
+                  <Badge variant="outline" size="sm" className="text-[10px] text-[#2C4349]">Secondary</Badge>
+                </div>
+                <code className="text-xs font-bold text-[#75645B]">#91B8C0</code>
+                <p className="mt-2 text-xs text-[#75645B]">
+                  {isAr ? 'التفاصيل وأشرطة العناوين' : 'Details & header cards'}
+                </p>
+                <div className="mt-3 rounded-md bg-[#FAF9F8] p-2 text-[11px] text-[#54453D]">
+                  <p className="font-semibold">Ink contrast: 4.31:1</p>
+                  <p className="text-[10px] text-[#15803D]">✓ Passes 3:1 UI & Large Text</p>
+                </div>
+              </div>
+            </div>
+
+            {/* White */}
+            <div className="overflow-hidden rounded-xl border border-[#E8DFD8] bg-white shadow-xs">
+              <div className="h-32 border-b border-[#E8DFD8] bg-[#FFFFFF]" />
+              <div className="p-4">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-[#54453D]">White</p>
+                  <Badge variant="outline" size="sm" className="text-[10px] text-[#54453D]">Base 1</Badge>
+                </div>
+                <code className="text-xs font-bold text-[#75645B]">#FFFFFF</code>
+                <p className="mt-2 text-xs text-[#75645B]">
+                  {isAr ? 'الأسطح الصافية والحاويات' : 'Canvas & clean cards'}
+                </p>
+                <div className="mt-3 rounded-md bg-[#FAF9F8] p-2 text-[11px] text-[#54453D]">
+                  <p className="font-semibold">Ink contrast: 9.04:1</p>
+                  <p className="text-[10px] text-[#15803D]">✓ Passes AAA Highest Standard</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Soft Cream */}
+            <div className="overflow-hidden rounded-xl border border-[#E8DFD8] bg-white shadow-xs">
+              <div className="h-32 bg-[#FAF9F8]" />
+              <div className="p-4">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-[#54453D]">Soft Cream</p>
+                  <Badge variant="outline" size="sm" className="text-[10px] text-[#54453D]">Base 2</Badge>
+                </div>
+                <code className="text-xs font-bold text-[#75645B]">#FAF9F8</code>
+                <p className="mt-2 text-xs text-[#75645B]">
+                  {isAr ? 'الخلفيات الهادئة والبطاقات' : 'Soft surfaces & cards'}
+                </p>
+                <div className="mt-3 rounded-md bg-[#FAF9F8] p-2 text-[11px] text-[#54453D]">
+                  <p className="font-semibold">Ink contrast: 8.65:1</p>
+                  <p className="text-[10px] text-[#15803D]">✓ Passes AAA Highest Standard</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Brand Ink */}
+            <div className="overflow-hidden rounded-xl border border-[#433730] bg-white shadow-xs">
+              <div className="h-32 bg-[#54453D]" />
+              <div className="p-4">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-[#54453D]">Brand Ink</p>
+                  <Badge variant="outline" size="sm" className="text-[10px] text-[#54453D]">Logo / Text</Badge>
+                </div>
+                <code className="text-xs font-bold text-[#75645B]">#54453D</code>
+                <p className="mt-2 text-xs text-[#75645B]">
+                  {isAr ? 'لون الشعار وكل النصوص' : 'Logo & text color on all surfaces'}
+                </p>
+                <div className="mt-3 rounded-md bg-[#FAF9F8] p-2 text-[11px] text-[#54453D]">
+                  <p className="font-semibold">White contrast: 9.04:1</p>
+                  <p className="text-[10px] text-[#15803D]">✓ Passes AAA Inverted Standard</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </PageContainer>
+      </SectionContainer>
+
+      {/* ── Section 6: Brand Rules (Clear Space & Incorrect Usage) ── */}
+      <SectionContainer spacing="lg" className="border-b border-[--surface-border] bg-[#FAF9F8]/60">
+        <PageContainer size="xl">
+          <div className="mb-8">
+            <Typography variant="h2" className="font-bold text-[#54453D]">
+              {isAr ? 'قواعد الاستخدام المعتمدة وحظر التشويه' : 'Usage Rules & Prohibited Alterations'}
+            </Typography>
+            <Typography variant="body" color="muted" className="text-[#75645B]">
+              {isAr
+                ? 'إرشادات ملزمة للحفاظ على نزاهة العلامة التجارية وتوحيد تمثيلها البصري في كافة الوسائط الرقمية والمطبوعة.'
+                : 'Mandatory rules extracted from guidelines.svg to protect brand integrity across digital and print touchpoints.'}
+            </Typography>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Approved Usage Rules */}
+            <div className="rounded-xl border border-[#E8DFD8] bg-white p-6 shadow-xs">
+              <div className="mb-4 flex items-center gap-2 text-sm font-bold text-[#15803D]">
+                <CheckCircle2 className="h-5 w-5" />
+                <span>{isAr ? 'قواعد الاستخدام الصحيحة' : 'Approved Brand Standards'}</span>
+              </div>
+              <ul className="space-y-3 text-sm text-[#54453D]">
+                <li className="flex items-start gap-2">
+                  <span className="font-bold text-[#C78360]">01.</span>
+                  <span>
+                    <strong>{isAr ? 'المساحة المحمية (Clear Space):' : 'Clear Space:'}</strong>{' '}
+                    {isAr
+                      ? 'الحفاظ دائماً على مسافة أمان حول الشعار تعادل ارتفاع ساق حرف R على الأقل.'
+                      : 'Maintain clear space around the logo equal to the height of the R stem (0.5H).'}
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-bold text-[#C78360]">02.</span>
+                  <span>
+                    <strong>{isAr ? 'لون الشعار والنصوص:' : 'Logo & Text Color:'}</strong>{' '}
+                    {isAr
+                      ? 'الشعار والنصوص دائماً بلون Ink (#54453D) فوق خلفيات الخوخي والأزرق والكريم والأبيض.'
+                      : 'Logo and text are always Ink (#54453D) over Peach, Blue, Cream, and White surfaces.'}
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-bold text-[#C78360]">03.</span>
+                  <span>
+                    <strong>{isAr ? 'الحد الأدنى للحجم:' : 'Minimum Sizes:'}</strong>{' '}
+                    {isAr
+                      ? 'شعار الكلمة 12px على الشاشة (3 مم للطباعة)، والرمز 16px كحد أدنى.'
+                      : 'Wordmark minimum 12px on screen (3mm print); Rx symbol minimum 16px.'}
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-bold text-[#C78360]">04.</span>
+                  <span>
+                    <strong>{isAr ? 'شعار المواد العربية:' : 'Arabic Materials:'}</strong>{' '}
+                    {isAr
+                      ? 'استخدام شعار الكلمة العربي أو القفل المزدوج للمواد الموجهة باللغة العربية.'
+                      : 'Use Arabic wordmark or bilingual lockup for Arabic-language communications.'}
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Prohibited Alterations */}
+            <div className="rounded-xl border border-[#FCA5A5] bg-[#FEF2F2] p-6 shadow-xs">
+              <div className="mb-4 flex items-center gap-2 text-sm font-bold text-[#DC2626]">
+                <AlertTriangle className="h-5 w-5" />
+                <span>{isAr ? 'الممارسات المحظورة تماماً' : 'Strictly Prohibited Practices'}</span>
+              </div>
+              <ul className="space-y-3 text-sm text-[#7F1D1D]">
+                <li className="flex items-start gap-2">
+                  <span className="font-bold">✕</span>
+                  <span>
+                    <strong>{isAr ? 'حظر تغيير الألوان:' : 'No Unauthorized Colors:'}</strong>{' '}
+                    {isAr
+                      ? 'يُحظر تلوين الشعار بالخوخي أو الأزرق أو أي لون غير Ink أو White.'
+                      : 'Never color the logo mark in Peach, Blue, or any color other than Ink or White.'}
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-bold">✕</span>
+                  <span>
+                    <strong>{isAr ? 'حظر النص الأبيض على الخوخي أو الأزرق:' : 'No White Text on Peach or Blue:'}</strong>{' '}
+                    {isAr
+                      ? 'لا تستخدم نصاً أبيض فوق الخوخي أو الأزرق لضعف التباين (1.55:1 و 1.84:1).'
+                      : 'Never place White text on Peach or Blue backgrounds due to failing WCAG contrast.'}
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-bold">✕</span>
+                  <span>
+                    <strong>{isAr ? 'حظر التمطيط أو التدوير:' : 'No Stretching or Rotation:'}</strong>{' '}
+                    {isAr
+                      ? 'يُمنع تغيير أبعاد الشعار أو تدويره أو إضافة ظلال وتأثيرات غير معتمدة.'
+                      : 'Never alter aspect ratios, rotate angles, or add unapproved drop shadows.'}
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-bold">✕</span>
+                  <span>
+                    <strong>{isAr ? 'حظر استبدال الخط:' : 'No Font Replacement:'}</strong>{' '}
+                    {isAr
+                      ? 'يُحظر استبدال خط Ping AR + LT بخطوط أخرى في التصاميم المعتمدة.'
+                      : 'Never replace Ping AR + LT with arbitrary non-brand typefaces.'}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </PageContainer>
+      </SectionContainer>
+
+      {/* ── Section 7: Core UI Primitives Harmonized with Official Tokens */}
       <SectionContainer spacing="lg">
         <PageContainer size="xl">
           <div className="mb-8">
-            <Typography variant="h3" className="mb-2">
-              {isAr ? 'حزمة المكونات التأسيسية التسعة (Phase 2.1 Primitives)' : 'The 9 Foundation Primitives'}
+            <Typography variant="h2" className="font-bold text-[#54453D]">
+              {isAr ? 'العناصر التفاعلية المنسجمة مع الهوية' : 'Interactive UI Components'}
             </Typography>
-            <Typography variant="body" color="muted">
+            <Typography variant="body" color="muted" className="text-[#75645B]">
               {isAr
-                ? 'مكونات متوافقة مع إمكانية الوصول، تدعم الاتجاهين RTL/LTR، ومبنية على التوكنات الدلالية الموحدة.'
-                : 'Strictly accessible, RTL/LTR first-class components adhering to unified design tokens.'}
+                ? 'مكونات النظام البرمجي متوافقة تماماً مع معايير إمكانية الوصول WCAG 2.2 AA.'
+                : 'Production-ready UI primitives fully synchronized with the official brand token system.'}
             </Typography>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Component: Button & IconButton */}
-            <div className="rounded-xl border border-[--surface-border] bg-[--surface-card] p-6 shadow-sm">
-              <Typography variant="h5" className="mb-1 font-semibold">1 & 2. Button & IconButton</Typography>
-              <Typography variant="caption" color="muted" className="mb-4 block">
-                {isAr ? 'أنماط متنوعة، دعم لحالة التحميل، أيقونات البداية والنهاية، وإلزامية aria-label.' : 'Multiple variants, loading state, start/end slots, enforced accessibility.'}
-              </Typography>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button variant="primary">Primary</Button>
-                <Button variant="secondary">Secondary</Button>
-                <Button variant="outline">Outline</Button>
-                <Button variant="ghost">Ghost</Button>
-                <Button variant="destructive">Destructive</Button>
-                <Button variant="primary" isLoading>Loading</Button>
+          <div className="space-y-6">
+            {/* Buttons Row */}
+            <div className="rounded-xl border border-[#E8DFD8] bg-white p-6 shadow-xs">
+              <span className="text-xs font-bold uppercase text-[#75645B]">Button Variants</span>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <Button variant="primary" size="md" className="bg-[#54453D] text-white hover:bg-[#433730]">
+                  Primary Button
+                </Button>
+                <Button variant="secondary" size="md" className="bg-[#F0C5AE] text-[#54453D] hover:bg-[#E4A889]">
+                  Secondary Button
+                </Button>
+                <Button variant="outline" size="md" className="border-[#54453D] text-[#54453D] hover:bg-[#F0C5AE]/20">
+                  Outline Button
+                </Button>
+                <Button variant="ghost" size="md" className="text-[#54453D] hover:bg-[#FAF9F8]">
+                  Ghost Button
+                </Button>
+                <Button variant="destructive" size="md">
+                  Destructive
+                </Button>
                 <IconButton
-                  aria-label={isAr ? 'البحث في المنظومة' : 'Search system'}
-                  icon={<Search className="h-4 w-4" />}
-                />
-                <IconButton
-                  aria-label={isAr ? 'تصفية البيانات' : 'Filter options'}
+                  aria-label={isAr ? 'تبديل اللغة' : 'Toggle Language'}
                   variant="outline"
-                  icon={<Filter className="h-4 w-4" />}
+                  size="md"
+                  className="border-[#54453D] text-[#54453D]"
+                  icon={<Globe className="h-4 w-4" />}
                 />
               </div>
             </div>
 
-            {/* Component: Badge */}
-            <div className="rounded-xl border border-[--surface-border] bg-[--surface-card] p-6 shadow-sm">
-              <Typography variant="h5" className="mb-1 font-semibold">3. Badge Primitive</Typography>
-              <Typography variant="caption" color="muted" className="mb-4 block">
-                {isAr ? 'حالات دلالية، نقاط مؤشر الحالة الحية، وتنسيق أنيق للمؤشرات.' : 'Semantic states, live status beacons, and high contrast chips.'}
-              </Typography>
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="default">Default</Badge>
-                <Badge variant="brand">Brand</Badge>
-                <Badge variant="success" dot>Active Salon</Badge>
-                <Badge variant="warning" dot>Pending Sync</Badge>
+            {/* Badges Row */}
+            <div className="rounded-xl border border-[#E8DFD8] bg-white p-6 shadow-xs">
+              <span className="text-xs font-bold uppercase text-[#75645B]">Badge Status Variants</span>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Badge variant="brand" dot className="bg-[#54453D] text-white">Brand Active</Badge>
+                <Badge variant="secondary" className="bg-[#F0C5AE] text-[#54453D]">Warm Peach</Badge>
+                <Badge variant="outline" className="border-[#91B8C0] text-[#2C4349]">Dusty Blue</Badge>
+                <Badge variant="success" dot>Operational</Badge>
+                <Badge variant="warning" dot>Attention</Badge>
                 <Badge variant="error" dot>Alert</Badge>
-                <Badge variant="info" icon={<CheckCircle2 className="h-3 w-3" />}>Cloud Verified</Badge>
-                <Badge variant="outline">v2.1-stable</Badge>
+                <Badge variant="info" dot>System Info</Badge>
               </div>
             </div>
 
-            {/* Component: Link & Localization */}
-            <div className="rounded-xl border border-[--surface-border] bg-[--surface-card] p-6 shadow-sm">
-              <Typography variant="h5" className="mb-1 font-semibold">4. Link & Preservation</Typography>
-              <Typography variant="caption" color="muted" className="mb-4 block">
-                {isAr ? 'روابط داخلية تحافظ تلقائياً على معيار اللغة دون مسارات مفرغة، وتحكم صريح بالنوافذ الخارجية.' : 'Preserves ?lang=en on relative links; safe explicit openInNewTab control.'}
-              </Typography>
-              <div className="flex flex-wrap items-center gap-6">
-                <Link href="/" lang={lang} variant="default">
-                  {isAr ? 'الرئيسية (مسار نظيف)' : 'Home (Clean)'}
-                </Link>
-                <Link href="/about" lang={lang} variant="accent">
-                  {isAr ? 'من نحن (?lang=en)' : 'About Us (?lang=en)'}
-                </Link>
-                <Link href="https://rashx.org" lang={lang} variant="underline">
-                  {isAr ? 'خارجي (في نفس النافذة)' : 'External (Same Tab)'}
-                </Link>
-                <Link href="https://zatca.gov.sa" lang={lang} openInNewTab variant="accent">
-                  {isAr ? 'خارجي (نافذة جديدة)' : 'External (New Tab)'}
-                </Link>
-              </div>
-            </div>
+            <Separator />
 
-            {/* Component: Avatar & Separator */}
-            <div className="rounded-xl border border-[--surface-border] bg-[--surface-card] p-6 shadow-sm">
-              <Typography variant="h5" className="mb-1 font-semibold">5 & 6. Avatar & Separator</Typography>
-              <Typography variant="caption" color="muted" className="mb-4 block">
-                {isAr ? 'معالجة ذكية للأحرف الأولى، فواصل أفقية ورأسية بمعايير ARIA.' : 'Initial fallback extraction and ARIA-compliant structural dividers.'}
-              </Typography>
-              <div className="flex items-center gap-4">
-                <Avatar alt="Mohamed Rashad" fallback="MR" size="lg" />
-                <Avatar alt="RASHX Enterprise" fallback="RX" size="md" />
-                <Avatar alt="Salon Owner" fallback="SO" size="sm" />
-                <Separator orientation="vertical" className="h-10" />
-                <Typography variant="body-sm" color="muted">
-                  {isAr ? 'فصل بصري دقيق مع دعم قارئات الشاشة' : 'Screen-reader decorative separation'}
-                </Typography>
+            {/* Avatars & Monograms Row */}
+            <div className="rounded-xl border border-[#E8DFD8] bg-white p-6 shadow-xs">
+              <span className="text-xs font-bold uppercase text-[#75645B]">Avatars & Official Monograms</span>
+              <div className="mt-4 flex flex-wrap items-center gap-4">
+                <Avatar alt="RASHX Avatar Large" fallback="RX" size="lg" className="border border-[#E8DFD8] bg-[#F0C5AE] text-[#54453D]" />
+                <Avatar alt="RASHX Avatar Medium" fallback="RX" size="md" className="border border-[#E8DFD8] bg-[#91B8C0] text-[#54453D]" />
+                <Avatar alt="RASHX Avatar Small" fallback="RX" size="sm" className="border border-[#E8DFD8] bg-[#FAF9F8] text-[#54453D]" />
+                <div className="flex items-center gap-2">
+                  <RashxMonogram size={40} background="peach" />
+                  <RashxMonogram size={40} background="blue" />
+                  <RashxMonogram size={40} background="ink" />
+                  <RashxMonogram size={40} background="cream" />
+                </div>
               </div>
             </div>
           </div>
         </PageContainer>
       </SectionContainer>
 
-      {/* ── Corporate Footer ────────────────────────────────────────── */}
-      <footer className="border-t border-[--surface-border] bg-[--surface-card] py-8 text-center">
+      {/* ── Official Corporate Footer ───────────────────────────────── */}
+      <footer className="border-t border-[#433730] bg-[#54453D] py-12 text-white">
         <PageContainer size="xl">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-[--color-accent]" />
-              <Typography variant="body-sm" className="font-semibold">
-                {isAr ? 'راش إكس — المملكة العربية السعودية' : 'RASHX Corporate — Kingdom of Saudi Arabia'}
-              </Typography>
+          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+            <div className="flex items-center gap-4">
+              <RashxLockupBilingual height={36} color="white" />
             </div>
-            <Typography variant="caption" color="muted">
-              {isAr
-                ? 'جميع الحقوق محفوظة © 2026 م. محمد عبده رشاد البهي. منصة إدارة صالونات التجميل.'
-                : 'All rights reserved © 2026 Eng. Mohamed Abdo Rashad El-Bahy. Beauty & Wellness SaaS.'}
-            </Typography>
+
+            <div className="text-center text-xs text-white/80 md:text-end">
+              <p className="font-semibold text-white">
+                {isAr
+                  ? 'راش إكس لتقنية المعلومات — المملكة العربية السعودية'
+                  : 'RASHX Information Technology — Kingdom of Saudi Arabia'}
+              </p>
+              <p className="mt-1 text-white/60">
+                {isAr
+                  ? 'المؤسس: م. محمد عبده رشاد البهي · جميع الحقوق محفوظة © 2026'
+                  : 'Founder: Eng. Mohamed Abdo Rashad El-Bahy · All rights reserved © 2026'}
+              </p>
+            </div>
           </div>
         </PageContainer>
       </footer>

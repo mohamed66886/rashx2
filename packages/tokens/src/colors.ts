@@ -1,74 +1,75 @@
 /**
- * RASHX Color Token System
+ * RASHX Official Brand Color Token System
  *
- * Core Brand Pillars:
- * 1. Primary: Deep Midnight (#1B1030) — Authority, infrastructure, steadfastness
- * 2. Secondary: Obsidian Violet (#2E1F5E) — Structural depth, elevated surfaces
- * 3. Third Primary Accent: Electric Purple (#7C3AED) — Innovation, momentum, primary CTAs
+ * Single Source of Truth: rashx-brand
  *
- * Strictly synchronized with packages/tokens/css/tokens.css
+ * Official Palette:
+ * 1. Primary: Warm Peach (#F0C5AE) — Backgrounds, accents, cards
+ * 2. Secondary: Dusty Blue (#91B8C0) — Details, secondary headers, cards
+ * 3. Base 1: White (#FFFFFF) — Base canvas / surface
+ * 4. Base 2: Soft Cream (#FAF9F8) — Elevated cards & soft surfaces
+ * 5. Ink: (#54453D) — Official color for all logos, headings, and readable text
+ *
+ * Contrast Ratios (WCAG 2.2 AA / AAA):
+ * - Ink (#54453D) on White (#FFFFFF): 9.04:1 (Passes AAA)
+ * - Ink (#54453D) on Soft Cream (#FAF9F8): 8.65:1 (Passes AAA)
+ * - Ink (#54453D) on Warm Peach (#F0C5AE): 5.82:1 (Passes AA normal, AAA large)
+ * - Ink (#54453D) on Dusty Blue (#91B8C0): 4.31:1 (Passes UI components 3:1 & large text)
+ * - White (#FFFFFF) on Ink (#54453D): 9.04:1 (Passes AAA)
  */
 
-// ─── 1. Primary Brand Palette (Midnight Authority) ───────────────────────────
+// ─── 1. Official Brand Palette (Single Source of Truth) ──────────────────────
+export const colorBrand = {
+  peach: '#F0C5AE', // Primary Brand Color
+  blue: '#91B8C0',  // Secondary Brand Color
+  white: '#FFFFFF', // Base 1
+  cream: '#FAF9F8', // Base 2
+  ink: '#54453D',   // Logo & All Text
+} as const;
+
+// ─── 2. Primary Brand Scale (Warm Peach #F0C5AE) ─────────────────────────────
 export const colorPrimary = {
-  50: '#f5f3ff',
-  100: '#ede9fe',
-  200: '#ddd6fe',
-  300: '#c4b5fd',
-  400: '#8c7ae6',
-  500: '#5240e0',
-  600: '#3d2eb8',
-  700: '#2a1e8f',
-  800: '#1b1166',
-  900: '#1b1030', // Deep Midnight (Anchor)
-  950: '#0d0833',
+  50: '#FDF8F5',
+  100: '#FBF0E9',
+  200: '#F7E2D6',
+  300: '#F3D3C2',
+  400: '#F0C5AE', // Warm Peach (Anchor)
+  500: '#E4A889',
+  600: '#C78360',
+  700: '#A4613F',
+  800: '#7E4529',
+  900: '#542D19',
 } as const;
 
-// ─── 2. Secondary Brand Palette (Obsidian Violet) ────────────────────────────
+// ─── 3. Secondary Brand Scale (Dusty Blue #91B8C0) ───────────────────────────
 export const colorSecondary = {
-  50: '#faf8ff',
-  100: '#f3effe',
-  200: '#e5dcfc',
-  300: '#cfc0f8',
-  400: '#9b7ee8',
-  500: '#6f4ec7',
-  600: '#4f30a6',
-  700: '#3c2384',
-  800: '#2e1f5e', // Obsidian Violet (Anchor)
-  900: '#201544',
-  950: '#130b2c',
+  50: '#F3F7F8',
+  100: '#E4EEF0',
+  200: '#CADEE2',
+  300: '#AECDD3',
+  400: '#91B8C0', // Dusty Blue (Anchor)
+  500: '#6E9BA4',
+  600: '#527C85',
+  700: '#3D5E65',
+  800: '#2C4349',
+  900: '#1B2A2E',
 } as const;
 
-// ─── 3. Third Primary Accent Palette (Electric Purple) ──────────────────────
-export const colorAccent = {
-  50: '#faf5ff',
-  100: '#f3e8ff',
-  200: '#e9d5ff',
-  300: '#d8b4fe',
-  400: '#c084fc',
-  500: '#a855f7',
-  600: '#9333ea', // Electric Purple Light
-  700: '#7c3aed', // Electric Purple (Anchor)
-  800: '#6d28d9',
-  900: '#581c87',
-  950: '#3b0764',
-} as const;
-
-// ─── 4. Neutral / Monochromatic Scale ───────────────────────────────────────
+// ─── 4. Ink & Monochromatic Neutral Scale ───────────────────────────────────
 export const colorNeutral = {
-  0: '#ffffff',    // Pure White
-  50: '#f8f8fb',   // Soft Canvas Light
-  100: '#f0f0f7',  // Card Muted Light
-  200: '#e2e1ef',  // Subtle Borders Light
-  300: '#cbc9e0',  // Strong Borders Light
-  400: '#aeacc8',  // Placeholder Text Light / Muted Dark
-  500: '#8f8dab',  // Secondary Text Light
-  600: '#706d8d',  // Muted Body Light
-  700: '#545271',  // Primary Text Dark
-  800: '#3b3952',  // Card Borders Dark
-  900: '#252337',  // Elevated Surfaces Dark
-  950: '#14121f',  // Card Backgrounds Dark
-  1000: '#0a0612', // Deep Canvas Dark
+  0: '#FFFFFF',    // Pure White (Base 1)
+  50: '#FAF9F8',   // Soft Cream (Base 2)
+  100: '#F2EFEB',  // Card Muted
+  200: '#E6E1DC',  // Subtle Borders
+  300: '#D1C8C0',  // Strong Borders
+  400: '#A39890',  // Muted Text Light
+  500: '#75645B',  // Secondary Text Light
+  600: '#54453D',  // Brand Ink (Anchor)
+  700: '#433730',  // Deep Ink
+  800: '#332924',  // Card Backgrounds Dark
+  900: '#241D19',  // Elevated Surfaces Dark
+  950: '#171310',  // Deep Canvas Dark
+  1000: '#0C0A08', // True Dark
 } as const;
 
 // ─── 5. Semantic Feedback Palette ───────────────────────────────────────────
@@ -114,27 +115,27 @@ export const colorSemantic = {
 // ─── 6. Semantic Surface Tokens ─────────────────────────────────────────────
 export const surfaceTokens = {
   light: {
-    background: colorNeutral[0],
-    card: colorNeutral[0],
-    elevated: colorNeutral[0],
-    muted: colorNeutral[100],
-    border: colorNeutral[200],
-    borderStrong: colorNeutral[300],
-    foreground: '#0d0a1a',
-    foregroundMuted: colorNeutral[600],
-    ring: colorAccent[700],
-    overlay: 'rgb(13 10 26 / 0.6)',
+    background: colorBrand.white,
+    card: colorBrand.cream,
+    elevated: colorBrand.white,
+    muted: '#F5ECE5',
+    border: '#E8DFD8',
+    borderStrong: colorBrand.ink,
+    foreground: colorBrand.ink,
+    foregroundMuted: colorNeutral[500],
+    ring: colorBrand.ink,
+    overlay: 'rgb(84 69 61 / 0.5)',
   },
   dark: {
-    background: '#0a0612',
-    card: '#14101f',
-    elevated: '#1e1830',
-    muted: '#1e1830',
-    border: '#2a2440',
-    borderStrong: '#3b3952',
-    foreground: '#f0eeff',
-    foregroundMuted: colorNeutral[400],
-    ring: colorAccent[500],
+    background: '#1F1815',
+    card: '#2A221E',
+    elevated: '#362C27',
+    muted: '#2A221E',
+    border: colorBrand.ink,
+    borderStrong: '#75645B',
+    foreground: colorBrand.cream,
+    foregroundMuted: '#D1C8C0',
+    ring: colorBrand.peach,
     overlay: 'rgb(0 0 0 / 0.75)',
   },
 } as const;
@@ -142,6 +143,12 @@ export const surfaceTokens = {
 // ─── 7. CSS Variable Names Registry ─────────────────────────────────────────
 export const colorTokenNames = {
   // Brand Anchors
+  brandPeach: '--color-brand-peach',
+  brandBlue: '--color-brand-blue',
+  brandWhite: '--color-brand-white',
+  brandCream: '--color-brand-cream',
+  brandInk: '--color-brand-ink',
+
   primary: '--color-primary',
   primaryForeground: '--color-primary-foreground',
   secondary: '--color-secondary',

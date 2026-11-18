@@ -1,19 +1,24 @@
 /**
- * RASHX Typography Token System
+ * RASHX Official Typography Token System
  *
- * Arabic Font: Noto Kufi Arabic (variable weight)
- * Latin Font: Inter (variable weight)
+ * Single Source of Truth: rashx-brand/fonts/
+ * Official Brand Typeface: Ping AR + LT
  *
- * Strict Arabic shaping & line-height considerations:
- * - Arabic script has taller ascenders and deeper descenders than Latin.
- * - Arabic headings MUST NOT use leading < 1.3 to avoid diacritic and letter clipping.
- * - Numerals default to standard Latin/Arabic decimal figures.
+ * Weight Mapping:
+ * - Regular: 400 (Body text)
+ * - Medium: 500 (Labels, UI, micro-copy)
+ * - Bold: 700 (Headlines, section titles)
+ * - Extra Bold: 800 (Display, brand emphasis)
+ *
+ * Fallback Stack:
+ * "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif
  */
 
 export const fontFamilies = {
-  arabic: 'var(--font-arabic), "Noto Kufi Arabic", system-ui, sans-serif',
-  latin: 'var(--font-latin), "Inter", system-ui, sans-serif',
-  sans: 'var(--font-arabic), var(--font-latin), system-ui, sans-serif',
+  brand: 'var(--font-brand), "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif',
+  arabic: 'var(--font-brand), "Ping AR + LT", "Noto Sans Arabic", Tahoma, system-ui, sans-serif',
+  latin: 'var(--font-brand), "Ping AR + LT", "Helvetica Neue", Arial, system-ui, sans-serif',
+  sans: 'var(--font-brand), "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif',
   mono: '"JetBrains Mono", "Courier New", monospace',
 } as const;
 
@@ -44,17 +49,15 @@ export const fontSizes = {
 } as const;
 
 export const fontWeights = {
-  light: '300',
   regular: '400',
   medium: '500',
-  semibold: '600',
   bold: '700',
   extrabold: '800',
 } as const;
 
 export const lineHeights = {
   tight: '1.2',    // Display titles only
-  snug: '1.35',   // Section headings
+  snug: '1.35',    // Section headings
   normal: '1.5',   // Standard Latin text
   relaxed: '1.65', // Standard Arabic text (prevents glyph clipping)
   loose: '1.85',   // Arabic long-form editorial & quotes

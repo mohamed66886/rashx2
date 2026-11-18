@@ -1,6 +1,6 @@
 /**
- * RASHX Brand Icons
- * All brand-specific SVG components
+ * RASHX Official Brand Icons & Logos
+ * All brand-specific vector components derived from rashx-brand/
  */
 
 export { RashxSymbol } from './RashxSymbol';
@@ -12,5 +12,10 @@ export type { RashxMonogramProps } from './RashxMonogram';
 export { RashxWordmark } from './RashxWordmark';
 export type { RashxWordmarkProps } from './RashxWordmark';
 
-// Visual explorations for Founder evaluation
+export { RashxLockupBilingual } from './RashxLockupBilingual';
+export type { RashxLockupBilingualProps } from './RashxLockupBilingual';
+
+export { RASHX_PATHS } from './paths';
+
+// Visual explorations for historical reference
 export * from './explorations';

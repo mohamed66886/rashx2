@@ -1,11 +1,11 @@
 {
   "name": "RASHX | راش إكس",
   "short_name": "RASHX",
-  "description": "نظام التشغيل الرقمي المتكامل لصالونات التجميل",
+  "description": "نظام التشغيل الرقمي المتكامل لصالونات التجميل والعناية",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#7c3aed",
+  "background_color": "#FAF9F8",
+  "theme_color": "#F0C5AE",
   "lang": "ar",
   "dir": "rtl",
   "icons": [
@@ -20,6 +20,11 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/favicon-ink-on-peach.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     }
   ]
 }

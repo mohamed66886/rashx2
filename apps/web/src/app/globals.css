@@ -1,49 +1,93 @@
 /**
  * RASHX Global Stylesheet
  *
+ * Official Brand Integration: rashx-brand
  * Layer order:
  * 1. Tailwind base, components, utilities
- * 2. RASHX design tokens (@theme for Tailwind integration)
+ * 2. RASHX official design tokens (@theme for Tailwind integration)
  * 3. Base HTML element styles
  * 4. Utility overrides
  */
 
 @import "tailwindcss";
 
+/* ── Official Brand Typography (@font-face) ────────────────── */
+@font-face {
+  font-family: "Ping AR + LT";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/PingAR+LT-Regular.woff2") format("woff2"),
+       url("/fonts/PingAR+LT-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Ping AR + LT";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/PingAR+LT-Medium.woff2") format("woff2"),
+       url("/fonts/PingAR+LT-Medium.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Ping AR + LT";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/PingAR+LT-Bold.woff2") format("woff2"),
+       url("/fonts/PingAR+LT-Bold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Ping AR + LT";
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/PingAR+LT-ExtraBold.woff2") format("woff2"),
+       url("/fonts/PingAR+LT-ExtraBold.otf") format("opentype");
+}
+
 @theme {
-  /* ── Fonts ───────────────────────────────────────────────── */
-  --font-sans: var(--font-arabic), var(--font-latin), system-ui, sans-serif;
+  /* ── Official Fonts ──────────────────────────────────────── */
+  --font-brand: "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif;
+  --font-sans: var(--font-brand);
   --font-mono: "JetBrains Mono", "Courier New", monospace;
 
-  /* ── Brand Colors ────────────────────────────────────────── */
-  /* ⚠️ PLACEHOLDER — pending founder approval of final brand colors */
-  --color-primary: #1b1030;
-  --color-primary-foreground: #ffffff;
+  /* ── Official Brand Palette ──────────────────────────────── */
+  --color-brand-peach: #f0c5ae;
+  --color-brand-blue: #91b8c0;
+  --color-brand-white: #ffffff;
+  --color-brand-cream: #faf9f8;
+  --color-brand-ink: #54453d;
 
-  --color-secondary: #2e1f5e;
-  --color-secondary-foreground: #ffffff;
+  /* Functional Bindings */
+  --color-primary: #f0c5ae;
+  --color-primary-foreground: #54453d;
 
-  /* Purple — clearly visible third primary brand color */
-  --color-accent: #7c3aed;
-  --color-accent-light: #9333ea;
+  --color-secondary: #91b8c0;
+  --color-secondary-foreground: #54453d;
+
+  --color-accent: #54453d;
+  --color-accent-light: #75645b;
   --color-accent-foreground: #ffffff;
 
   /* ── Neutrals ────────────────────────────────────────────── */
   --color-neutral-0: #ffffff;
-  --color-neutral-50: #f8f8fb;
-  --color-neutral-100: #f0f0f7;
-  --color-neutral-200: #e2e1ef;
-  --color-neutral-300: #cbc9e0;
-  --color-neutral-400: #aeacc8;
-  --color-neutral-500: #8f8dab;
-  --color-neutral-600: #706d8d;
-  --color-neutral-700: #545271;
-  --color-neutral-800: #3b3952;
-  --color-neutral-900: #252337;
-  --color-neutral-950: #14121f;
-  --color-neutral-1000: #080712;
+  --color-neutral-50: #faf9f8;
+  --color-neutral-100: #f2efeb;
+  --color-neutral-200: #e6e1dc;
+  --color-neutral-300: #d1c8c0;
+  --color-neutral-400: #a39890;
+  --color-neutral-500: #75645b;
+  --color-neutral-600: #54453d;
+  --color-neutral-700: #433730;
+  --color-neutral-800: #332924;
+  --color-neutral-900: #241d19;
+  --color-neutral-950: #171310;
+  --color-neutral-1000: #0c0a08;
 
-  /* ── Semantic ────────────────────────────────────────────── */
+  /* ── Semantic Feedback ───────────────────────────────────── */
   --color-success: #16a34a;
   --color-success-text: #15803d;
   --color-success-light: #dcfce7;
@@ -71,26 +115,27 @@
   --radius-2xl: 1.5rem;
 
   /* ── Shadows ─────────────────────────────────────────────── */
-  --shadow-glow: 0 0 20px 0 rgb(124 58 237 / 0.3);
-  --shadow-glow-lg: 0 0 40px 0 rgb(124 58 237 / 0.2);
+  --shadow-glow: 0 0 20px 0 rgb(240 197 174 / 0.5);
+  --shadow-glow-lg: 0 0 40px 0 rgb(240 197 174 / 0.3);
 
   /* ── Breakpoints ─────────────────────────────────────────── */
   --breakpoint-3xl: 1600px;
 }
 
-/* ── Surface Tokens (theme-aware, not Tailwind utilities) ──── */
+/* ── Surface Tokens (theme-aware) ──────────────────────────── */
 :root {
   --surface-background: #ffffff;
-  --surface-foreground: #0d0a1a;
-  --surface-card: #ffffff;
-  --surface-card-foreground: #0d0a1a;
+  --surface-foreground: #54453d;
+  --surface-card: #faf9f8;
+  --surface-card-foreground: #54453d;
   --surface-elevated: #ffffff;
-  --surface-elevated-foreground: #0d0a1a;
-  --surface-muted: #f0f0f7;
-  --surface-muted-foreground: #545271;
-  --surface-border: #e2e1ef;
-  --surface-ring: #7c3aed;
-  --surface-overlay: rgb(0 0 0 / 0.5);
+  --surface-elevated-foreground: #54453d;
+  --surface-muted: #f5ece5;
+  --surface-muted-foreground: #75645b;
+  --surface-border: #e8dfd8;
+  --surface-border-strong: #54453d;
+  --surface-ring: #54453d;
+  --surface-overlay: rgb(84 69 61 / 0.5);
 
   /* Z-index scale */
   --z-dropdown: 100;
@@ -109,17 +154,18 @@
 }
 
 .dark {
-  --surface-background: #0a0612;
-  --surface-foreground: #f0eeff;
-  --surface-card: #14101f;
-  --surface-card-foreground: #f0eeff;
-  --surface-elevated: #1e1830;
-  --surface-elevated-foreground: #f0eeff;
-  --surface-muted: #1e1830;
-  --surface-muted-foreground: #aeacc8;
-  --surface-border: #2a2440;
-  --surface-ring: #9333ea;
-  --surface-overlay: rgb(0 0 0 / 0.7);
+  --surface-background: #1f1815;
+  --surface-foreground: #faf9f8;
+  --surface-card: #2a221e;
+  --surface-card-foreground: #faf9f8;
+  --surface-elevated: #362c27;
+  --surface-elevated-foreground: #faf9f8;
+  --surface-muted: #2a221e;
+  --surface-muted-foreground: #d1c8c0;
+  --surface-border: #54453d;
+  --surface-border-strong: #75645b;
+  --surface-ring: #f0c5ae;
+  --surface-overlay: rgb(0 0 0 / 0.75);
 
   /* Dark mode semantic overrides */
   --color-success-light: #052e16;
@@ -184,8 +230,8 @@
     top: -100%;
     inset-inline-start: 0;
     padding: 0.5rem 1rem;
-    background: var(--color-accent);
-    color: white;
+    background: var(--color-brand-ink);
+    color: var(--color-brand-white);
     font-weight: 600;
     z-index: 9999;
     border-radius: 0 0 0.5rem 0.5rem;
@@ -204,7 +250,7 @@
 
   /* Selection color */
   ::selection {
-    background-color: rgb(124 58 237 / 0.2);
+    background-color: rgb(240 197 174 / 0.5);
     color: var(--surface-foreground);
   }
 }

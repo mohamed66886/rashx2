@@ -1,52 +1,54 @@
 /**
- * RASHX Brand Symbol
+ * RASHX Official Brand Symbol (Rx)
  *
- * ⚠️  PLACEHOLDER — This is a geometric placeholder awaiting
- * the approved final logo artwork from the founder/designer.
- * Replace the SVG paths when final artwork is approved.
- *
- * Do not use this in production without approval.
+ * Single Source of Truth: rashx-brand/logo/symbol-rx/symbol-rx-ink.svg
+ * Geometry, proportions, and paths are strictly preserved.
  */
 
 import type { SVGProps } from 'react';
+import { RASHX_PATHS } from './paths';
 
 export interface RashxSymbolProps extends SVGProps<SVGSVGElement> {
   /** Size in pixels (width = height) */
   size?: number;
-  /** Accessible label — always provide for standalone usage */
+  /** Fill color variant */
+  color?: 'ink' | 'white' | 'currentColor';
+  /** Accessible label */
   'aria-label'?: string;
 }
 
-/** RASHX primary brand symbol (placeholder) */
+const COLOR_MAP = {
+  ink: '#54453D',
+  white: '#FFFFFF',
+  currentColor: 'currentColor',
+} as const;
+
+/** Official RASHX primary brand symbol (Rx) */
 export function RashxSymbol({
   size = 32,
+  color = 'ink',
   'aria-label': ariaLabel = 'RASHX Symbol',
   ...props
 }: RashxSymbolProps) {
+  const fill = COLOR_MAP[color];
+
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 32 32"
+      viewBox="0 0 1048.8 1000"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label={ariaLabel}
       {...props}
     >
-      {/* PLACEHOLDER — awaiting approved artwork */}
-      <rect width="32" height="32" rx="8" fill="currentColor" fillOpacity="0.1" />
-      <text
-        x="16"
-        y="21"
-        textAnchor="middle"
-        fontSize="16"
-        fontWeight="700"
-        fill="currentColor"
-        fontFamily="system-ui"
-      >
-        R
-      </text>
+      <title>{ariaLabel}</title>
+      <path
+        d={RASHX_PATHS.symbolRx}
+        fill={fill}
+        fillRule="evenodd"
+      />
     </svg>
   );
 }

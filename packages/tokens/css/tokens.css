@@ -1,42 +1,51 @@
 /**
- * RASHX Design Token CSS Custom Properties
+ * RASHX Official Design Token CSS Custom Properties
  *
- * Primary Brand Anchors:
- * --color-primary: #1B1030 (Deep Midnight)
- * --color-secondary: #2E1F5E (Obsidian Violet)
- * --color-accent: #7C3AED (Electric Purple — Third Primary)
+ * Single Source of Truth: rashx-brand
+ * Official Brand Anchors:
+ * --color-brand-peach: #F0C5AE (Warm Peach)
+ * --color-brand-blue:  #91B8C0 (Dusty Blue)
+ * --color-brand-white: #FFFFFF (Base 1)
+ * --color-brand-cream: #FAF9F8 (Base 2)
+ * --color-brand-ink:   #54453D (Ink — logos and text)
  */
 
 @layer base {
   :root {
-    /* ── 1. Brand Colors (Light Canvas) ─────────────────────── */
-    --color-primary: #1b1030;
-    --color-primary-foreground: #ffffff;
+    /* ── 1. Official Brand Colors ──────────────────────────── */
+    --color-brand-peach: #f0c5ae;
+    --color-brand-blue: #91b8c0;
+    --color-brand-white: #ffffff;
+    --color-brand-cream: #faf9f8;
+    --color-brand-ink: #54453d;
 
-    --color-secondary: #2e1f5e;
-    --color-secondary-foreground: #ffffff;
+    /* Functional Semantic Bindings */
+    --color-primary: #f0c5ae;
+    --color-primary-foreground: #54453d;
 
-    /* Electric Purple — Third Primary Color */
-    --color-accent: #7c3aed;
-    --color-accent-light: #9333ea;
+    --color-secondary: #91b8c0;
+    --color-secondary-foreground: #54453d;
+
+    --color-accent: #54453d;
+    --color-accent-light: #75645b;
     --color-accent-foreground: #ffffff;
 
-    /* ── 2. Neutral Palette (12 Steps) ─────────────────────── */
+    /* ── 2. Neutral Scale ──────────────────────────────────── */
     --color-neutral-0: #ffffff;
-    --color-neutral-50: #f8f8fb;
-    --color-neutral-100: #f0f0f7;
-    --color-neutral-200: #e2e1ef;
-    --color-neutral-300: #cbc9e0;
-    --color-neutral-400: #aeacc8;
-    --color-neutral-500: #8f8dab;
-    --color-neutral-600: #706d8d;
-    --color-neutral-700: #545271;
-    --color-neutral-800: #3b3952;
-    --color-neutral-900: #252337;
-    --color-neutral-950: #14121f;
-    --color-neutral-1000: #0a0612;
+    --color-neutral-50: #faf9f8;
+    --color-neutral-100: #f2efeb;
+    --color-neutral-200: #e6e1dc;
+    --color-neutral-300: #d1c8c0;
+    --color-neutral-400: #a39890;
+    --color-neutral-500: #75645b;
+    --color-neutral-600: #54453d;
+    --color-neutral-700: #433730;
+    --color-neutral-800: #332924;
+    --color-neutral-900: #241d19;
+    --color-neutral-950: #171310;
+    --color-neutral-1000: #0c0a08;
 
-    /* ── 3. Semantic Colors ─────────────────────────────────── */
+    /* ── 3. Semantic Feedback Colors ───────────────────────── */
     --color-success: #16a34a;
     --color-success-text: #15803d;
     --color-success-light: #dcfce7;
@@ -59,22 +68,23 @@
 
     /* ── 4. Surfaces (Light Theme) ─────────────────────────── */
     --surface-background: #ffffff;
-    --surface-foreground: #0d0a1a;
-    --surface-card: #ffffff;
-    --surface-card-foreground: #0d0a1a;
+    --surface-foreground: #54453d;
+    --surface-card: #faf9f8;
+    --surface-card-foreground: #54453d;
     --surface-elevated: #ffffff;
-    --surface-elevated-foreground: #0d0a1a;
-    --surface-muted: #f0f0f7;
-    --surface-muted-foreground: #545271;
-    --surface-border: #e2e1ef;
-    --surface-border-strong: #cbc9e0;
-    --surface-ring: #7c3aed;
-    --surface-overlay: rgb(13 10 26 / 0.6);
+    --surface-elevated-foreground: #54453d;
+    --surface-muted: #f5ece5;
+    --surface-muted-foreground: #75645b;
+    --surface-border: #e8dfd8;
+    --surface-border-strong: #54453d;
+    --surface-ring: #54453d;
+    --surface-overlay: rgb(84 69 61 / 0.5);
 
-    /* ── 5. Typography CSS Variables ───────────────────────── */
-    --font-arabic: "Noto Kufi Arabic", system-ui, sans-serif;
-    --font-latin: "Inter", system-ui, sans-serif;
-    --font-sans: var(--font-arabic), var(--font-latin), system-ui, sans-serif;
+    /* ── 5. Official Typography CSS Variables ──────────────── */
+    --font-brand: "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif;
+    --font-arabic: var(--font-brand);
+    --font-latin: var(--font-brand);
+    --font-sans: var(--font-brand);
     --font-mono: "JetBrains Mono", "Courier New", monospace;
 
     /* Line Heights */
@@ -112,12 +122,12 @@
     --radius-full: 9999px;
 
     /* ── 8. Shadows Scale ──────────────────────────────────── */
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 24px 0 rgb(124 58 237 / 0.35);
+    --shadow-xs: 0 1px 2px 0 rgb(84 69 61 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(84 69 61 / 0.08), 0 1px 2px -1px rgb(84 69 61 / 0.08);
+    --shadow-md: 0 4px 6px -1px rgb(84 69 61 / 0.08), 0 2px 4px -2px rgb(84 69 61 / 0.08);
+    --shadow-lg: 0 10px 15px -3px rgb(84 69 61 / 0.08), 0 4px 6px -4px rgb(84 69 61 / 0.08);
+    --shadow-xl: 0 20px 25px -5px rgb(84 69 61 / 0.08), 0 8px 10px -6px rgb(84 69 61 / 0.08);
+    --shadow-glow: 0 0 24px 0 rgb(240 197 174 / 0.5);
 
     /* ── 9. Motion Durations & Easings ──────────────────────── */
     --duration-instant: 0ms;
@@ -139,18 +149,18 @@
   /* ── Dark Mode Token Overrides ───────────────────────────── */
   .dark {
     /* Surfaces */
-    --surface-background: #0a0612;
-    --surface-foreground: #f0eeff;
-    --surface-card: #14101f;
-    --surface-card-foreground: #f0eeff;
-    --surface-elevated: #1e1830;
-    --surface-elevated-foreground: #f0eeff;
-    --surface-muted: #1e1830;
-    --surface-muted-foreground: #aeacc8;
-    --surface-border: #2a2440;
-    --surface-border-strong: #3b3952;
-    --surface-ring: #a855f7;
-    --surface-overlay: rgb(0 0 0 / 0.8);
+    --surface-background: #1f1815;
+    --surface-foreground: #faf9f8;
+    --surface-card: #2a221e;
+    --surface-card-foreground: #faf9f8;
+    --surface-elevated: #362c27;
+    --surface-elevated-foreground: #faf9f8;
+    --surface-muted: #2a221e;
+    --surface-muted-foreground: #d1c8c0;
+    --surface-border: #54453d;
+    --surface-border-strong: #75645b;
+    --surface-ring: #f0c5ae;
+    --surface-overlay: rgb(0 0 0 / 0.75);
 
     /* Semantics in Dark Mode */
     --color-success-light: #052e16;

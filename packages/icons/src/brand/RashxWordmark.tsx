@@ -1,50 +1,124 @@
 /**
- * RASHX Wordmark (text-based logo component)
+ * RASHX Official Vector Wordmark Component
  *
- * ⚠️  PLACEHOLDER — awaiting approved final wordmark artwork.
- * This component renders the RASHX name as text until the SVG wordmark is approved.
+ * Single Source of Truth: rashx-brand/logo/
+ * Supports English, Arabic, and Bilingual Combined lockup.
+ * Geometry, proportions, and paths are strictly preserved.
  */
 
-import type { HTMLAttributes } from 'react';
+import type { SVGProps } from 'react';
+import { RASHX_PATHS } from './paths';
 
-export interface RashxWordmarkProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: 'arabic' | 'english' | 'combined';
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export interface RashxWordmarkProps extends SVGProps<SVGSVGElement> {
+  /** Logo variant: English, Arabic, or Combined bilingual */
+  variant?: 'english' | 'arabic' | 'combined';
+  /** Fill color variant */
+  color?: 'ink' | 'white' | 'currentColor';
+  /** Height in pixels (width is auto-calculated according to exact aspect ratio) */
+  height?: number;
+  /** Width in pixels (overrides aspect ratio) */
+  width?: number;
+  /** Accessible label */
+  'aria-label'?: string;
 }
 
-const sizeStyles = {
-  xs: { fontSize: '0.875rem' },
-  sm: { fontSize: '1rem' },
-  md: { fontSize: '1.25rem' },
-  lg: { fontSize: '1.5rem' },
-  xl: { fontSize: '2rem' },
+const COLOR_MAP = {
+  ink: '#54453D',
+  white: '#FFFFFF',
+  currentColor: 'currentColor',
 } as const;
 
-/** RASHX wordmark text component (placeholder) */
 export function RashxWordmark({
   variant = 'combined',
-  size = 'md',
-  style,
+  color = 'ink',
+  height,
+  width,
+  'aria-label': ariaLabel,
   ...props
 }: RashxWordmarkProps) {
-  const fontSize = sizeStyles[size].fontSize;
+  const fill = COLOR_MAP[color];
+
+  if (variant === 'english') {
+    const defaultHeight = height ?? 28;
+    const computedWidth = width ?? Math.round(defaultHeight * (4549.3 / 1000));
+    const label = ariaLabel ?? 'RASHX';
+
+    return (
+      <svg
+        width={computedWidth}
+        height={defaultHeight}
+        viewBox="0 0 4549.3 1000"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-label={label}
+        {...props}
+      >
+        <title>{label}</title>
+        <path
+          d={RASHX_PATHS.wordmarkEnglish}
+          fill={fill}
+          fillRule="evenodd"
+        />
+      </svg>
+    );
+  }
+
+  if (variant === 'arabic') {
+    const defaultHeight = height ?? 28;
+    const computedWidth = width ?? Math.round(defaultHeight * (7706.8 / 1000));
+    const label = ariaLabel ?? 'راش إكس';
+
+    return (
+      <svg
+        width={computedWidth}
+        height={defaultHeight}
+        viewBox="0 0 7706.8 1000"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-label={label}
+        {...props}
+      >
+        <title>{label}</title>
+        <path
+          d={RASHX_PATHS.wordmarkArabic}
+          fill={fill}
+          fillRule="evenodd"
+        />
+      </svg>
+    );
+  }
+
+  // Combined bilingual lockup
+  const defaultHeight = height ?? 36;
+  const computedWidth = width ?? Math.round(defaultHeight * (1233.1 / 340));
+  const label = ariaLabel ?? 'RASHX | راش إكس';
 
   return (
-    <span
-      style={{ fontWeight: 800, letterSpacing: '-0.02em', fontSize, ...style }}
-      aria-label="RASHX"
+    <svg
+      width={computedWidth}
+      height={defaultHeight}
+      viewBox="0 0 1233.1 340"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label={label}
       {...props}
     >
-      {variant === 'arabic' && 'راش إكس'}
-      {variant === 'english' && 'RASHX'}
-      {variant === 'combined' && (
-        <>
-          <span>RASHX</span>
-          <span aria-hidden="true" style={{ marginInlineStart: '0.25em', opacity: 0.7 }}>
-            | راش إكس
-          </span>
-        </>
-      )}
-    </span>
+      <title>{label}</title>
+      <path
+        transform="translate(0.000 0.000) scale(0.160000)"
+        d={RASHX_PATHS.wordmarkArabic}
+        fill={fill}
+        fillRule="evenodd"
+      />
+      <path
+        transform="translate(343.586 250.000) scale(0.090000)"
+        d={RASHX_PATHS.wordmarkEnglish}
+        fill={fill}
+        fillRule="evenodd"
+      />
+    </svg>
   );
 }

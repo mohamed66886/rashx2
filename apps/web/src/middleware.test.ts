@@ -57,3 +57,4 @@ describe('Middleware i18n & Routing Verification', () => {
     expect(response.cookies.get(LANG_COOKIE)?.value).toBe('en');
   });
 });
+
