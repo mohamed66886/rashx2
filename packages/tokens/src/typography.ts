@@ -10,15 +10,17 @@
  * - Bold: 700 (Headlines, section titles)
  * - Extra Bold: 800 (Display, brand emphasis)
  *
- * Fallback Stack:
- * "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif
+ * Robust Hierarchy:
+ * 1. Ping AR + LT (Local system installation or self-hosted)
+ * 2. Next.js loaded Google Fonts: var(--font-arabic) [Noto Kufi Arabic] & var(--font-latin) [Inter]
+ * 3. System UI fallbacks
  */
 
 export const fontFamilies = {
-  brand: 'var(--font-brand), "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif',
-  arabic: 'var(--font-brand), "Ping AR + LT", "Noto Sans Arabic", Tahoma, system-ui, sans-serif',
-  latin: 'var(--font-brand), "Ping AR + LT", "Helvetica Neue", Arial, system-ui, sans-serif',
-  sans: 'var(--font-brand), "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif',
+  brand: '"Ping AR + LT", var(--font-arabic), var(--font-latin), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  arabic: 'var(--font-arabic), "Ping AR + LT", "Noto Kufi Arabic", system-ui, sans-serif',
+  latin: 'var(--font-latin), "Ping AR + LT", "Inter", "Helvetica Neue", Arial, sans-serif',
+  sans: '"Ping AR + LT", var(--font-arabic), var(--font-latin), system-ui, sans-serif',
   mono: '"JetBrains Mono", "Courier New", monospace',
 } as const;
 

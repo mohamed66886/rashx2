@@ -81,9 +81,9 @@
     --surface-overlay: rgb(84 69 61 / 0.5);
 
     /* ── 5. Official Typography CSS Variables ──────────────── */
-    --font-brand: "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif;
-    --font-arabic: var(--font-brand);
-    --font-latin: var(--font-brand);
+    --font-brand: "Ping AR + LT", var(--font-arabic), var(--font-latin), system-ui, sans-serif;
+    --font-arabic: var(--font-arabic), "Ping AR + LT", "Noto Kufi Arabic", system-ui, sans-serif;
+    --font-latin: var(--font-latin), "Ping AR + LT", "Inter", "Helvetica Neue", Arial, sans-serif;
     --font-sans: var(--font-brand);
     --font-mono: "JetBrains Mono", "Courier New", monospace;
 

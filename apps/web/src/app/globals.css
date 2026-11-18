@@ -12,12 +12,17 @@
 @import "tailwindcss";
 
 /* ── Official Brand Typography (@font-face) ────────────────── */
+/* Supports local OS installation + self-hosted webfonts */
 @font-face {
   font-family: "Ping AR + LT";
   font-weight: 400;
   font-style: normal;
   font-display: swap;
-  src: url("/fonts/PingAR+LT-Regular.woff2") format("woff2"),
+  src: local("Ping AR + LT Regular"),
+       local("Ping AR + LT"),
+       local("PingAR+LT-Regular"),
+       local("PingAR-LT-Regular"),
+       url("/fonts/PingAR+LT-Regular.woff2") format("woff2"),
        url("/fonts/PingAR+LT-Regular.otf") format("opentype");
 }
 
@@ -26,7 +31,10 @@
   font-weight: 500;
   font-style: normal;
   font-display: swap;
-  src: url("/fonts/PingAR+LT-Medium.woff2") format("woff2"),
+  src: local("Ping AR + LT Medium"),
+       local("PingAR+LT-Medium"),
+       local("PingAR-LT-Medium"),
+       url("/fonts/PingAR+LT-Medium.woff2") format("woff2"),
        url("/fonts/PingAR+LT-Medium.otf") format("opentype");
 }
 
@@ -35,7 +43,10 @@
   font-weight: 700;
   font-style: normal;
   font-display: swap;
-  src: url("/fonts/PingAR+LT-Bold.woff2") format("woff2"),
+  src: local("Ping AR + LT Bold"),
+       local("PingAR+LT-Bold"),
+       local("PingAR-LT-Bold"),
+       url("/fonts/PingAR+LT-Bold.woff2") format("woff2"),
        url("/fonts/PingAR+LT-Bold.otf") format("opentype");
 }
 
@@ -44,13 +55,20 @@
   font-weight: 800;
   font-style: normal;
   font-display: swap;
-  src: url("/fonts/PingAR+LT-ExtraBold.woff2") format("woff2"),
+  src: local("Ping AR + LT Extra Bold"),
+       local("Ping AR + LT ExtraBold"),
+       local("PingAR+LT-ExtraBold"),
+       local("PingAR-LT-ExtraBold"),
+       url("/fonts/PingAR+LT-ExtraBold.woff2") format("woff2"),
        url("/fonts/PingAR+LT-ExtraBold.otf") format("opentype");
 }
 
 @theme {
   /* ── Official Fonts ──────────────────────────────────────── */
-  --font-brand: "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif;
+  /* Prioritizes Ping AR + LT, seamlessly falls back to Next.js Noto Kufi Arabic & Inter */
+  --font-brand: "Ping AR + LT", var(--font-arabic), var(--font-latin), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-arabic: var(--font-arabic), "Ping AR + LT", "Noto Kufi Arabic", system-ui, sans-serif;
+  --font-latin: var(--font-latin), "Ping AR + LT", "Inter", "Helvetica Neue", Arial, sans-serif;
   --font-sans: var(--font-brand);
   --font-mono: "JetBrains Mono", "Courier New", monospace;
 
