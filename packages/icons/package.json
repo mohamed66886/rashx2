@@ -1,0 +1,24 @@
+{
+  "name": "@rashx/icons",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./brand": "./src/brand/index.ts",
+    "./interface": "./src/interface/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@rashx/config": "workspace:*",
+    "@types/react": "^19.0.0",
+    "lucide-react": "^0.400.0",
+    "react": "^19.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

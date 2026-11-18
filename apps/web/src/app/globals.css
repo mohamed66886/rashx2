@@ -1,0 +1,188 @@
+/**
+ * RASHX Global Stylesheet
+ *
+ * Layer order:
+ * 1. Tailwind base, components, utilities
+ * 2. RASHX design tokens (@theme for Tailwind integration)
+ * 3. Base HTML element styles
+ * 4. Utility overrides
+ */
+
+@import "tailwindcss";
+
+@theme {
+  /* ── Fonts ───────────────────────────────────────────────── */
+  --font-sans: var(--font-arabic), var(--font-latin), system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+
+  /* ── Brand Colors ────────────────────────────────────────── */
+  /* ⚠️ PLACEHOLDER — pending founder approval of final brand colors */
+  --color-primary: #1b1030;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #2e1f5e;
+  --color-secondary-foreground: #ffffff;
+
+  /* Purple — clearly visible third primary brand color */
+  --color-accent: #7c3aed;
+  --color-accent-light: #9333ea;
+  --color-accent-foreground: #ffffff;
+
+  /* ── Neutrals ────────────────────────────────────────────── */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f8f8fb;
+  --color-neutral-100: #f0f0f7;
+  --color-neutral-200: #e2e1ef;
+  --color-neutral-300: #cbc9e0;
+  --color-neutral-400: #aeacc8;
+  --color-neutral-500: #8f8dab;
+  --color-neutral-600: #706d8d;
+  --color-neutral-700: #545271;
+  --color-neutral-800: #3b3952;
+  --color-neutral-900: #252337;
+  --color-neutral-950: #14121f;
+  --color-neutral-1000: #080712;
+
+  /* ── Semantic ────────────────────────────────────────────── */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-info: #2563eb;
+
+  /* ── Spacing ─────────────────────────────────────────────── */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-26: 6.5rem;
+
+  /* ── Border Radius ───────────────────────────────────────── */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-glow: 0 0 20px 0 rgb(124 58 237 / 0.3);
+  --shadow-glow-lg: 0 0 40px 0 rgb(124 58 237 / 0.2);
+
+  /* ── Breakpoints ─────────────────────────────────────────── */
+  --breakpoint-3xl: 1600px;
+}
+
+/* ── Surface Tokens (theme-aware, not Tailwind utilities) ──── */
+:root {
+  --surface-background: #ffffff;
+  --surface-foreground: #0d0a1a;
+  --surface-card: #ffffff;
+  --surface-card-foreground: #0d0a1a;
+  --surface-muted: #f0f0f7;
+  --surface-muted-foreground: #545271;
+  --surface-border: #e2e1ef;
+  --surface-ring: #7c3aed;
+  --surface-overlay: rgb(0 0 0 / 0.5);
+
+  /* Z-index scale */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+
+  /* Motion */
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 350ms;
+  --easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.dark {
+  --surface-background: #0a0612;
+  --surface-foreground: #f0eeff;
+  --surface-card: #14101f;
+  --surface-card-foreground: #f0eeff;
+  --surface-muted: #1e1830;
+  --surface-muted-foreground: #aeacc8;
+  --surface-border: #2a2440;
+  --surface-ring: #9333ea;
+  --surface-overlay: rgb(0 0 0 / 0.7);
+}
+
+/* ── Reduced Motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Base HTML Element Styles ────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-color: var(--surface-border);
+  }
+
+  html {
+    background-color: var(--surface-background);
+    color: var(--surface-foreground);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* RTL-aware focus ring */
+  :focus-visible {
+    outline: 2px solid var(--surface-ring);
+    outline-offset: 2px;
+  }
+
+  /* Skip-to-content link (accessibility) */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    padding: 0.5rem 1rem;
+    background: var(--color-accent);
+    color: white;
+    font-weight: 600;
+    z-index: 9999;
+    border-radius: 0 0 0.5rem 0.5rem;
+    transition: top 0.2s;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
+
+  /* Smooth scroll except for reduced motion */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Selection color */
+  ::selection {
+    background-color: rgb(124 58 237 / 0.2);
+    color: var(--surface-foreground);
+  }
+}

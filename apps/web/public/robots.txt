@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and internal paths
+Disallow: /api/
+Disallow: /_next/
+
+# Sitemap
+Sitemap: https://rashx.org/sitemap.xml
