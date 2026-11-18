@@ -26,3 +26,4 @@ describe('Route Registry', () => {
     expect(routes.salons.profile('salon-1')).toBe('/salons/salon-1');
   });
 });
+

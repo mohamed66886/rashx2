@@ -31,3 +31,4 @@ describe('Metadata Generator', () => {
     expect(meta.openGraph?.alternateLocale).toBe('ar_SA');
   });
 });
+

@@ -9,6 +9,7 @@ export const en = {
       'The complete digital operating system for beauty salons, wellness centers, and spas in Saudi Arabia.',
     siteTagline: 'More Than Management, A Complete Digital Experience',
     siteTaglineAr: 'أكثر من مجرد إدارة، تجربة رقمية متكاملة',
+    siteTaglineEn: 'More Than Management, A Complete Digital Experience',
     founder: 'Eng. Mohamed Abdo Rashad El-Bahy',
     founded: '2026',
   },

@@ -24,3 +24,4 @@ We chose a **Turborepo monorepo** using **pnpm workspaces** with a single Next.j
 - Zero code duplication between features.
 - Isolated package testing and type checking.
 - Foundation ready to support future apps (`app.rashx.org`) in the same monorepo.
+

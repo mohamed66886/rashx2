@@ -11,3 +11,6 @@ export type { RashxMonogramProps } from './RashxMonogram';
 
 export { RashxWordmark } from './RashxWordmark';
 export type { RashxWordmarkProps } from './RashxWordmark';
+
+// Visual explorations for Founder evaluation
+export * from './explorations';

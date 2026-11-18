@@ -31,3 +31,4 @@ RASHX serves the Saudi Arabia market initially with Arabic as the primary langua
 - Clean URLs without route segment bloating.
 - High performance: zero runtime client-side translation framework overhead.
 - Strict type-safety: all keys across `ar.ts` and `en.ts` match 1:1.
+

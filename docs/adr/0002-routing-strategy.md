@@ -18,3 +18,4 @@ All application routes are centrally registered in `apps/web/src/lib/routes.ts` 
 - Single source of truth for all routes.
 - Compile-time route validation with Next.js `typedRoutes: true`.
 - Zero broken internal links during refactoring.
+

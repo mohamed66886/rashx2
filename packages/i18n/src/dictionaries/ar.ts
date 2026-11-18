@@ -9,6 +9,7 @@ export const ar = {
     siteDescription:
       'نظام التشغيل الرقمي المتكامل لصالونات التجميل ومراكز العناية والسبا في المملكة العربية السعودية',
     siteTagline: 'أكثر من مجرد إدارة، تجربة رقمية متكاملة',
+    siteTaglineAr: 'أكثر من مجرد إدارة، تجربة رقمية متكاملة',
     siteTaglineEn: 'More Than Management, A Complete Digital Experience',
     founder: 'م. محمد عبده رشاد البهي',
     founded: '2026',

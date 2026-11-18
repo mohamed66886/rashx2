@@ -25,3 +25,4 @@ describe('Language Utilities', () => {
     expect(getLangAttr('en')).toBe('en');
   });
 });
+

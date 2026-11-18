@@ -1,29 +1,45 @@
 /**
  * RASHX Color Token System
  *
- * Brand direction: dark authority palette with vivid purple accent.
- * ⚠️ PLACEHOLDER VALUES — pending founder approval of exact brand colors.
- * Update hex values after color approval before Phase 2 completion.
+ * Core Brand Pillars:
+ * 1. Primary: Deep Midnight (#1B1030) — Authority, infrastructure, steadfastness
+ * 2. Secondary: Obsidian Violet (#2E1F5E) — Structural depth, elevated surfaces
+ * 3. Third Primary Accent: Electric Purple (#7C3AED) — Innovation, momentum, primary CTAs
+ *
+ * Strictly synchronized with packages/tokens/css/tokens.css
  */
 
-// ─── Primary Palette ───────────────────────────────────────────────────────
-
-/** Primary brand color — deep authority tone */
+// ─── 1. Primary Brand Palette (Midnight Authority) ───────────────────────────
 export const colorPrimary = {
-  50: '#f0eeff',
-  100: '#e3deff',
-  200: '#c8bdff',
-  300: '#a99cff',
-  400: '#8a7aff',
-  500: '#6b58ff',
-  600: '#5240e0',
-  700: '#3d2eb8',
-  800: '#2a1e8f',
-  900: '#1b1166',
+  50: '#f5f3ff',
+  100: '#ede9fe',
+  200: '#ddd6fe',
+  300: '#c4b5fd',
+  400: '#8c7ae6',
+  500: '#5240e0',
+  600: '#3d2eb8',
+  700: '#2a1e8f',
+  800: '#1b1166',
+  900: '#1b1030', // Deep Midnight (Anchor)
   950: '#0d0833',
 } as const;
 
-/** Accent / Purple — clearly visible third primary brand color */
+// ─── 2. Secondary Brand Palette (Obsidian Violet) ────────────────────────────
+export const colorSecondary = {
+  50: '#faf8ff',
+  100: '#f3effe',
+  200: '#e5dcfc',
+  300: '#cfc0f8',
+  400: '#9b7ee8',
+  500: '#6f4ec7',
+  600: '#4f30a6',
+  700: '#3c2384',
+  800: '#2e1f5e', // Obsidian Violet (Anchor)
+  900: '#201544',
+  950: '#130b2c',
+} as const;
+
+// ─── 3. Third Primary Accent Palette (Electric Purple) ──────────────────────
 export const colorAccent = {
   50: '#faf5ff',
   100: '#f3e8ff',
@@ -31,57 +47,122 @@ export const colorAccent = {
   300: '#d8b4fe',
   400: '#c084fc',
   500: '#a855f7',
-  600: '#9333ea',
-  700: '#7c3aed',
+  600: '#9333ea', // Electric Purple Light
+  700: '#7c3aed', // Electric Purple (Anchor)
   800: '#6d28d9',
   900: '#581c87',
   950: '#3b0764',
 } as const;
 
-/** Neutral / Gray scale */
+// ─── 4. Neutral / Monochromatic Scale ───────────────────────────────────────
 export const colorNeutral = {
-  0: '#ffffff',
-  50: '#f8f8fb',
-  100: '#f0f0f7',
-  200: '#e2e1ef',
-  300: '#cbc9e0',
-  400: '#aeacc8',
-  500: '#8f8dab',
-  600: '#706d8d',
-  700: '#545271',
-  800: '#3b3952',
-  900: '#252337',
-  950: '#14121f',
-  1000: '#080712',
+  0: '#ffffff',    // Pure White
+  50: '#f8f8fb',   // Soft Canvas Light
+  100: '#f0f0f7',  // Card Muted Light
+  200: '#e2e1ef',  // Subtle Borders Light
+  300: '#cbc9e0',  // Strong Borders Light
+  400: '#aeacc8',  // Placeholder Text Light / Muted Dark
+  500: '#8f8dab',  // Secondary Text Light
+  600: '#706d8d',  // Muted Body Light
+  700: '#545271',  // Primary Text Dark
+  800: '#3b3952',  // Card Borders Dark
+  900: '#252337',  // Elevated Surfaces Dark
+  950: '#14121f',  // Card Backgrounds Dark
+  1000: '#0a0612', // Deep Canvas Dark
 } as const;
 
-/** Semantic colors */
+// ─── 5. Semantic Feedback Palette ───────────────────────────────────────────
 export const colorSemantic = {
-  success: '#16a34a',
-  successLight: '#dcfce7',
-  warning: '#d97706',
-  warningLight: '#fef3c7',
-  error: '#dc2626',
-  errorLight: '#fee2e2',
-  info: '#2563eb',
-  infoLight: '#dbeafe',
+  success: {
+    DEFAULT: '#16a34a',
+    light: '#dcfce7',
+    dark: '#052e16',
+    border: '#86efac',
+    foreground: '#ffffff',
+  },
+  warning: {
+    DEFAULT: '#d97706',
+    light: '#fef3c7',
+    dark: '#451a03',
+    border: '#fde68a',
+    foreground: '#ffffff',
+  },
+  error: {
+    DEFAULT: '#dc2626',
+    light: '#fee2e2',
+    dark: '#450a0a',
+    border: '#fca5a5',
+    foreground: '#ffffff',
+  },
+  info: {
+    DEFAULT: '#2563eb',
+    light: '#dbeafe',
+    dark: '#172554',
+    border: '#93c5fd',
+    foreground: '#ffffff',
+  },
 } as const;
 
-/** CSS custom property names for all brand colors */
+// ─── 6. Semantic Surface Tokens ─────────────────────────────────────────────
+export const surfaceTokens = {
+  light: {
+    background: colorNeutral[0],
+    card: colorNeutral[0],
+    elevated: colorNeutral[0],
+    muted: colorNeutral[100],
+    border: colorNeutral[200],
+    borderStrong: colorNeutral[300],
+    foreground: '#0d0a1a',
+    foregroundMuted: colorNeutral[600],
+    ring: colorAccent[700],
+    overlay: 'rgb(13 10 26 / 0.6)',
+  },
+  dark: {
+    background: '#0a0612',
+    card: '#14101f',
+    elevated: '#1e1830',
+    muted: '#1e1830',
+    border: '#2a2440',
+    borderStrong: '#3b3952',
+    foreground: '#f0eeff',
+    foregroundMuted: colorNeutral[400],
+    ring: colorAccent[500],
+    overlay: 'rgb(0 0 0 / 0.75)',
+  },
+} as const;
+
+// ─── 7. CSS Variable Names Registry ─────────────────────────────────────────
 export const colorTokenNames = {
+  // Brand Anchors
   primary: '--color-primary',
+  primaryForeground: '--color-primary-foreground',
+  secondary: '--color-secondary',
+  secondaryForeground: '--color-secondary-foreground',
   accent: '--color-accent',
+  accentLight: '--color-accent-light',
   accentForeground: '--color-accent-foreground',
-  background: '--color-background',
-  foreground: '--color-foreground',
-  card: '--color-card',
-  cardForeground: '--color-card-foreground',
-  muted: '--color-muted',
-  mutedForeground: '--color-muted-foreground',
-  border: '--color-border',
-  ring: '--color-ring',
+
+  // Surfaces
+  background: '--surface-background',
+  foreground: '--surface-foreground',
+  card: '--surface-card',
+  cardForeground: '--surface-card-foreground',
+  elevated: '--surface-elevated',
+  elevatedForeground: '--surface-elevated-foreground',
+  muted: '--surface-muted',
+  mutedForeground: '--surface-muted-foreground',
+  border: '--surface-border',
+  borderStrong: '--surface-border-strong',
+  ring: '--surface-ring',
+  overlay: '--surface-overlay',
+
+  // Semantics
   success: '--color-success',
+  successLight: '--color-success-light',
   warning: '--color-warning',
+  warningLight: '--color-warning-light',
   error: '--color-error',
+  errorLight: '--color-error-light',
   info: '--color-info',
+  infoLight: '--color-info-light',
 } as const;
