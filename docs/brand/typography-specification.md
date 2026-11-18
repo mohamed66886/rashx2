@@ -69,8 +69,16 @@ The scale uses an optical modular progression calibrated specifically to prevent
    - **Latin:** Positive tracking (e.g. `tracking-wider`, `letter-spacing: 0.05em`) is permitted on small caps, labels, and badges.
    - **Arabic:** ❌ **NEVER apply letter-spacing or tracking to Arabic script.** Arabic characters are cursively connected; adding tracking breaks character ligatures and creates fragmented, illegible glyphs. The `Typography` component and CSS tokens disable tracking when rendering in RTL context.
 
-3. **Numerals (الأرقام):**
-   - In accordance with Saudi commercial and enterprise software standards, standard Arabic-Indic numerals (`1, 2, 3...`) are standard for financial, operational, and time metrics to ensure instant cross-platform readability.
+3. **Numeral Convention & Localization Policy (سياسة الأرقام والتعريب):**
+   - **Western Arabic Digits (`0 1 2 3 4 5 6 7 8 9` / الأرقام العربية الغربية):**
+     Standardized as the primary, universal numeral set across all RASHX systems (both Arabic and English interfaces).
+     - *Scope:* Financial figures, prices (`150 SAR`), invoices, POS receipts, calendar booking times (`14:30`), operational metrics, CR numbers, VAT numbers, phone numbers (`+966...`), URLs, and technical IDs.
+     - *Saudi Market Alignment:* Aligns with current Saudi governmental, banking, and commercial technology standards (including ZATCA Phase 2 e-invoicing and Saudi Central Bank / Mada payment integrations).
+   - **Eastern Arabic Digits (`٠ ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩` / الأرقام العربية المشرقية):**
+     Reserved strictly for optional cultural/editorial headings or commemorative certificates where aesthetic calligraphic parity is explicitly desired.
+   - **Critical Architectural Safeguard:**
+     ❌ **NEVER apply global automated numeral string replacement (e.g. converting `0-9` to `٠-٩`).** Global regex replacement corrupts telephone numbers, machine-readable barcodes, ISO timestamps, query parameters, HTML data attributes, and form inputs. Numeric conversions must be explicitly scoped via isolated display formatters only.
 
 4. **Mixed Arabic/English Content:**
    - Mixed text (e.g. "نظام RASHX لإدارة الصالونات") must be wrapped with proper directionality tags or CSS `unicode-bidi: isolate;` to prevent punctuation inversion.
+

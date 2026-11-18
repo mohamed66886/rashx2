@@ -18,7 +18,23 @@ describe('Button Primitive', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  it('handles disabled state properly', async () => {
+  it('triggers onClick when focused and activated via keyboard (Enter / Space)', async () => {
+    const handleClick = vi.fn();
+    const user = userEvent.setup();
+    render(<Button onClick={handleClick}>Keyboard Action</Button>);
+
+    const btn = screen.getByRole('button', { name: /keyboard action/i });
+    btn.focus();
+    expect(btn).toHaveFocus();
+
+    await user.keyboard('{Enter}');
+    expect(handleClick).toHaveBeenCalledTimes(1);
+
+    await user.keyboard(' ');
+    expect(handleClick).toHaveBeenCalledTimes(2);
+  });
+
+  it('handles disabled state properly and prevents keyboard activation', async () => {
     const handleClick = vi.fn();
     const user = userEvent.setup();
     render(
@@ -33,24 +49,31 @@ describe('Button Primitive', () => {
     expect(handleClick).not.toHaveBeenCalled();
   });
 
-  it('displays loading spinner and sets aria-busy when isLoading is true', () => {
+  it('displays loading spinner and sets aria-busy and aria-disabled when isLoading is true', () => {
     render(<Button isLoading>Processing</Button>);
     const btn = screen.getByRole('button', { name: /processing/i });
     expect(btn).toHaveAttribute('aria-busy', 'true');
+    expect(btn).toHaveAttribute('aria-disabled', 'true');
     expect(btn).toBeDisabled();
     expect(btn.querySelector('svg')).toBeInTheDocument();
   });
 
-  it('renders left and right icons when provided', () => {
+  it('renders start and end icons when provided with bidirectional slot alignment', () => {
     render(
       <Button
-        leftIcon={<span data-testid="left-icon">←</span>}
-        rightIcon={<span data-testid="right-icon">→</span>}
+        startIcon={<span data-testid="start-icon">★</span>}
+        endIcon={<span data-testid="end-icon">→</span>}
       >
         With Icons
       </Button>
     );
-    expect(screen.getByTestId('left-icon')).toBeInTheDocument();
-    expect(screen.getByTestId('right-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('start-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('end-icon')).toBeInTheDocument();
+  });
+
+  it('enforces visible focus outline styles', () => {
+    render(<Button>Focus Target</Button>);
+    const btn = screen.getByRole('button', { name: /focus target/i });
+    expect(btn.className).toContain('focus-visible:ring-2');
   });
 });

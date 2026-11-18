@@ -75,6 +75,8 @@ export const colorNeutral = {
 export const colorSemantic = {
   success: {
     DEFAULT: '#16a34a',
+    text: '#15803d',
+    darkText: '#4ade80',
     light: '#dcfce7',
     dark: '#052e16',
     border: '#86efac',
@@ -82,6 +84,8 @@ export const colorSemantic = {
   },
   warning: {
     DEFAULT: '#d97706',
+    text: '#b45309',
+    darkText: '#fbbf24',
     light: '#fef3c7',
     dark: '#451a03',
     border: '#fde68a',
@@ -89,6 +93,8 @@ export const colorSemantic = {
   },
   error: {
     DEFAULT: '#dc2626',
+    text: '#dc2626',
+    darkText: '#f87171',
     light: '#fee2e2',
     dark: '#450a0a',
     border: '#fca5a5',
@@ -96,6 +102,8 @@ export const colorSemantic = {
   },
   info: {
     DEFAULT: '#2563eb',
+    text: '#1d4ed8',
+    darkText: '#60a5fa',
     light: '#dbeafe',
     dark: '#172554',
     border: '#93c5fd',
@@ -158,11 +166,15 @@ export const colorTokenNames = {
 
   // Semantics
   success: '--color-success',
+  successText: '--color-success-text',
   successLight: '--color-success-light',
   warning: '--color-warning',
+  warningText: '--color-warning-text',
   warningLight: '--color-warning-light',
   error: '--color-error',
+  errorText: '--color-error-text',
   errorLight: '--color-error-light',
   info: '--color-info',
+  infoText: '--color-info-text',
   infoLight: '--color-info-light',
 } as const;

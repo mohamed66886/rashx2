@@ -8,7 +8,7 @@ describe('Badge Primitive', () => {
     expect(screen.getByText('Enterprise')).toBeInTheDocument();
   });
 
-  it('renders status dot when dot prop is true', () => {
+  it('renders status dot with aria-hidden="true" to preserve clean screen reader text', () => {
     const { container } = render(<Badge dot variant="success">Active</Badge>);
     const dotSpan = container.querySelector('span[aria-hidden="true"]');
     expect(dotSpan).toBeInTheDocument();

@@ -4,7 +4,8 @@
  * - Accessible semantic link supporting standard anchors and Next.js Link via `asChild`
  * - Language preservation utility: preserves active language across internal routes
  *   without introducing URL segment bloating (respects ADR 0003 & ADR 0004)
- * - Accessible external link handling (target="_blank", rel="noopener noreferrer", screen-reader label)
+ * - Safe external link handling with explicit `openInNewTab` control (WCAG 2.2 AA compliant)
+ *   Avoids unexpectedly forcing new tabs unless explicitly requested
  */
 
 import { Slot } from '@radix-ui/react-slot';
@@ -67,6 +68,12 @@ export interface LinkProps
   href: string;
   /** Whether the link points to an external destination */
   external?: boolean;
+  /**
+   * Explicitly controls whether the link opens in a new tab.
+   * Default: false.
+   * When true, enforces target="_blank", rel="noopener noreferrer", and accessible screen reader text.
+   */
+  openInNewTab?: boolean;
   /** Active language code for automatic query-param preservation */
   lang?: string;
   /** When true, renders child component via Radix Slot (e.g. Next.js Link) */
@@ -77,6 +84,7 @@ export interface LinkProps
 export function Link({
   href,
   external = false,
+  openInNewTab = false,
   lang,
   variant,
   size,
@@ -89,20 +97,28 @@ export function Link({
 }: LinkProps) {
   const Comp = asChild ? Slot : 'a';
   const computedHref = external ? href : buildLocalizedHref(href, lang);
-  const isExternal = external || computedHref.startsWith('http');
+  const isExternal =
+    external ||
+    computedHref.startsWith('http://') ||
+    computedHref.startsWith('https://') ||
+    computedHref.startsWith('//');
 
-  const externalProps = isExternal
-    ? {
-        target: target ?? '_blank',
-        rel: rel ?? 'noopener noreferrer',
-      }
-    : { target, rel };
+  // Only open in a new tab if explicitly requested or if target was explicitly set to '_blank'
+  const shouldOpenNewTab = openInNewTab || target === '_blank';
+
+  const resolvedTarget = shouldOpenNewTab ? '_blank' : target;
+  const resolvedRel = shouldOpenNewTab
+    ? (rel ?? 'noopener noreferrer')
+    : isExternal
+      ? (rel ?? 'noopener')
+      : rel;
 
   return (
     <Comp
       href={computedHref}
       className={cn(linkVariants({ variant, size, className }))}
-      {...externalProps}
+      target={resolvedTarget}
+      rel={resolvedRel}
       {...props}
     >
       {asChild ? (
@@ -110,7 +126,7 @@ export function Link({
       ) : (
         <>
           {children}
-          {isExternal && (
+          {shouldOpenNewTab && (
             <span className="sr-only">
               {lang === 'ar' ? ' (يفتح في نافذة جديدة)' : ' (opens in a new tab)'}
             </span>

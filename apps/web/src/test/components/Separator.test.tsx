@@ -20,3 +20,4 @@ describe('Separator Primitive', () => {
     expect(div).toHaveAttribute('aria-orientation', 'vertical');
   });
 });
+

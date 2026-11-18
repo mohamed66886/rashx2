@@ -44,9 +44,21 @@ describe('Link Primitive & Localization Utility', () => {
       expect(link).toHaveAttribute('href', '/contact?lang=en');
     });
 
-    it('adds security attributes and screen-reader notice to external links', () => {
+    it('does NOT force new tab on external links by default', () => {
       render(
-        <Link href="https://twitter.com/rashx" lang="en" external>
+        <Link href="https://example.com" lang="en">
+          External Site
+        </Link>
+      );
+      const link = screen.getByRole('link', { name: /external site/i });
+      expect(link).not.toHaveAttribute('target');
+      expect(link).toHaveAttribute('rel', 'noopener');
+      expect(screen.queryByText('(opens in a new tab)')).not.toBeInTheDocument();
+    });
+
+    it('adds target="_blank", rel="noopener noreferrer", and sr-only notice when openInNewTab is true', () => {
+      render(
+        <Link href="https://twitter.com/rashx" lang="en" openInNewTab>
           Twitter
         </Link>
       );
@@ -54,6 +66,15 @@ describe('Link Primitive & Localization Utility', () => {
       expect(link).toHaveAttribute('target', '_blank');
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       expect(screen.getByText('(opens in a new tab)')).toBeInTheDocument();
+    });
+
+    it('renders Arabic screen-reader notice when openInNewTab is true in Arabic context', () => {
+      render(
+        <Link href="https://zatca.gov.sa" lang="ar" openInNewTab>
+          هيئة الزكاة والضريبة والجمارك
+        </Link>
+      );
+      expect(screen.getByText('(يفتح في نافذة جديدة)')).toBeInTheDocument();
     });
   });
 });

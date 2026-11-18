@@ -36,3 +36,4 @@ describe('Typography Primitive', () => {
     expect(el.className).toContain('text-[--color-accent]');
   });
 });
+

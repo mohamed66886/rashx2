@@ -96,3 +96,4 @@
   - `as`: `'section' | 'div' | 'article' | 'aside'` (default: `'section'`)
   - `spacing`: `'none' | 'sm' | 'md' | 'lg' | 'xl'` (default: `'lg'`)
   - `children`: `ReactNode`
+

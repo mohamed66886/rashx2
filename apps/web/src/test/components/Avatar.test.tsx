@@ -24,3 +24,4 @@ describe('Avatar Primitive', () => {
     expect(screen.getByText('BU')).toBeInTheDocument();
   });
 });
+

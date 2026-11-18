@@ -52,3 +52,4 @@ export function ConceptMonolith({
     </svg>
   );
 }
+
