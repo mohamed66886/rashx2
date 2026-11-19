@@ -75,15 +75,13 @@
     --surface-elevated-foreground: #54453d;
     --surface-muted: #f5ece5;
     --surface-muted-foreground: #75645b;
-    --surface-border: #e8dfd8;
-    --surface-border-strong: #54453d;
+    --surface-border: transparent;
+    --surface-border-strong: transparent;
     --surface-ring: #54453d;
     --surface-overlay: rgb(84 69 61 / 0.5);
 
     /* ── 5. Official Typography CSS Variables ──────────────── */
     --font-brand: "Ping AR + LT", var(--font-arabic), var(--font-latin), system-ui, sans-serif;
-    --font-arabic: var(--font-arabic), "Ping AR + LT", "Noto Kufi Arabic", system-ui, sans-serif;
-    --font-latin: var(--font-latin), "Ping AR + LT", "Inter", "Helvetica Neue", Arial, sans-serif;
     --font-sans: var(--font-brand);
     --font-mono: "JetBrains Mono", "Courier New", monospace;
 
@@ -121,13 +119,13 @@
     --radius-2xl: 1.5rem;
     --radius-full: 9999px;
 
-    /* ── 8. Shadows Scale ──────────────────────────────────── */
-    --shadow-xs: 0 1px 2px 0 rgb(84 69 61 / 0.05);
-    --shadow-sm: 0 1px 3px 0 rgb(84 69 61 / 0.08), 0 1px 2px -1px rgb(84 69 61 / 0.08);
-    --shadow-md: 0 4px 6px -1px rgb(84 69 61 / 0.08), 0 2px 4px -2px rgb(84 69 61 / 0.08);
-    --shadow-lg: 0 10px 15px -3px rgb(84 69 61 / 0.08), 0 4px 6px -4px rgb(84 69 61 / 0.08);
-    --shadow-xl: 0 20px 25px -5px rgb(84 69 61 / 0.08), 0 8px 10px -6px rgb(84 69 61 / 0.08);
-    --shadow-glow: 0 0 24px 0 rgb(240 197 174 / 0.5);
+    /* ── 8. Shadows Scale (Zero Shadows Architecture) ───────── */
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    --shadow-glow: none;
 
     /* ── 9. Motion Durations & Easings ──────────────────────── */
     --duration-instant: 0ms;
@@ -157,8 +155,8 @@
     --surface-elevated-foreground: #faf9f8;
     --surface-muted: #2a221e;
     --surface-muted-foreground: #d1c8c0;
-    --surface-border: #54453d;
-    --surface-border-strong: #75645b;
+    --surface-border: transparent;
+    --surface-border-strong: transparent;
     --surface-ring: #f0c5ae;
     --surface-overlay: rgb(0 0 0 / 0.75);
 

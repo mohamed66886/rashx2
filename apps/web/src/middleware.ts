@@ -63,24 +63,11 @@ export function middleware(request: NextRequest): NextResponse {
 
   const langParam = searchParams.get(LANG_PARAM);
 
-  const response = NextResponse.next({
-    request: {
-      headers: new Headers(request.headers),
-    },
-  });
-
   // Determine active language (priority: query param > cookie > default)
   let lang = DEFAULT_LANG;
 
   if (langParam !== null && isValidLang(langParam)) {
     lang = langParam;
-    // Persist language preference
-    response.cookies.set(LANG_COOKIE, lang, {
-      maxAge: 60 * 60 * 24 * 365, // 1 year
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: false, // Client-readable for language switcher
-    });
   } else {
     const cookieLang = request.cookies.get(LANG_COOKIE)?.value;
     if (cookieLang !== undefined && isValidLang(cookieLang)) {
@@ -88,7 +75,27 @@ export function middleware(request: NextRequest): NextResponse {
     }
   }
 
-  // Pass language to RSC via header
+  // Pass language to RSC via request headers
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(LANG_HEADER, lang);
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+
+  // Persist language preference whenever explicit query param is supplied
+  if (langParam !== null && isValidLang(langParam)) {
+    response.cookies.set(LANG_COOKIE, lang, {
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: false, // Client-readable for language switcher
+    });
+  }
+
+  // Pass language to response header as well (for client / tests inspection)
   response.headers.set(LANG_HEADER, lang);
 
   return response;
@@ -103,6 +110,6 @@ export const config = {
      * - _next/image (image optimization)
      * - Public files with extensions
      */
-    '/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|sw\\.js|icons|images|fonts|brand).*)',
+    '/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|sw\\.js|icons|images|fonts|arfonts-ping-ar-lt-light).*)',
   ],
 };

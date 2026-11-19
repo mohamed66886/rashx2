@@ -56,5 +56,31 @@ describe('Middleware i18n & Routing Verification', () => {
     expect(response.headers.get(LANG_HEADER)).toBe('en');
     expect(response.cookies.get(LANG_COOKIE)?.value).toBe('en');
   });
+
+  it('switches back to Arabic when ?lang=ar is provided with an existing English cookie', () => {
+    const request = new NextRequest('http://localhost:3000/?lang=ar', {
+      headers: {
+        cookie: `${LANG_COOKIE}=en`,
+      },
+    });
+    const response = middleware(request);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get(LANG_HEADER)).toBe('ar');
+    expect(response.cookies.get(LANG_COOKIE)?.value).toBe('ar');
+  });
+
+  it('handles /brand path and switches language back to Arabic via ?lang=ar', () => {
+    const request = new NextRequest('http://localhost:3000/brand?lang=ar', {
+      headers: {
+        cookie: `${LANG_COOKIE}=en`,
+      },
+    });
+    const response = middleware(request);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get(LANG_HEADER)).toBe('ar');
+    expect(response.cookies.get(LANG_COOKIE)?.value).toBe('ar');
+  });
 });
 

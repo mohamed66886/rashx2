@@ -50,3 +50,4 @@ To guarantee immediate typographic stability, optimal performance, and zero layo
 - [x] Fallback stack verified across Arabic (RTL) and Latin (LTR) viewports.
 - [x] Zero text clipping on diacritics and ascenders with `line-height >= 1.35` on headings and `1.65` on Arabic body copy.
 - [x] Tested alongside official vector logos in the Brand Identity Showcase.
+

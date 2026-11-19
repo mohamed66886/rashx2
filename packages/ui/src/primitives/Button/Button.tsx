@@ -26,20 +26,24 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary: [
-          'bg-[--color-accent] text-white',
-          'hover:bg-[--color-accent-light] hover:shadow-[--shadow-glow]',
+          'bg-[#F0C5AE] text-[#54453D]',
+          'hover:bg-[#E4A889]',
           'active:scale-[0.98]',
         ],
         secondary: [
-          'bg-[--color-primary] text-white',
-          'hover:bg-[--color-secondary]',
+          'bg-[#91B8C0] text-[#54453D]',
+          'hover:bg-[#6E9BA4]',
+          'active:scale-[0.98]',
+        ],
+        ink: [
+          'bg-[#54453D] text-white',
+          'hover:bg-[#433730]',
           'active:scale-[0.98]',
         ],
         outline: [
-          'border border-[--surface-border] text-[--surface-foreground]',
-          'hover:border-[--color-accent] hover:text-[--color-accent] hover:bg-[--surface-muted]',
+          'bg-[--surface-muted] text-[--surface-foreground]',
+          'hover:bg-[#E8DFD8] hover:text-[--color-accent]',
           'active:scale-[0.98]',
-          'bg-transparent',
         ],
         ghost: [
           'text-[--surface-foreground]',

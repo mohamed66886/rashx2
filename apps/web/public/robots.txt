@@ -1,9 +1,10 @@
 User-agent: *
 Allow: /
 
-# Disallow admin and internal paths
+# Disallow admin, internal, and showcase paths
 Disallow: /api/
 Disallow: /_next/
+Disallow: /brand
 
 # Sitemap
 Sitemap: https://rashx.org/sitemap.xml

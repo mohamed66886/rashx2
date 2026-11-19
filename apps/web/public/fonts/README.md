@@ -10,3 +10,4 @@ Place licensed `Ping AR + LT` font files in this folder with the following exact
 ### Automatic Activation:
 The moment these files are placed in this folder, `@font-face` in `globals.css` will immediately serve them.
 When not present, the system automatically uses the local system installation (if installed on Mac/Windows) or falls back to Next.js's optimized `Noto Kufi Arabic` and `Inter`.
+

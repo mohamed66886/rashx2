@@ -12,7 +12,7 @@ import { cn } from '../../lib/cn';
 import type { HTMLAttributes } from 'react';
 
 export const avatarVariants = cva(
-  'inline-flex items-center justify-center overflow-hidden font-semibold select-none bg-[--surface-muted] text-[--color-primary] border border-[--surface-border] shrink-0',
+  'inline-flex items-center justify-center overflow-hidden font-semibold select-none bg-[--surface-muted] text-[--color-primary] shrink-0',
   {
     variants: {
       size: {

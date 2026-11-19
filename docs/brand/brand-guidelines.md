@@ -62,8 +62,8 @@ The RASHX brand mark architecture consists of 4 approved variants:
 ## 4. Clear Space & Sizing Rules
 
 ### 4.1 Clear Space
-- Clear space around any logo variant must be equal to or greater than the height of the "R" stem ($0.5H$, where $H$ is the total height of the mark).
-- No text, graphics, or borders may intrude into this exclusion zone.
+- Keep clear space around the logo equal to the height of the R stem.
+- No text, graphics, or UI elements may intrude into this exclusion zone.
 
 ### 4.2 Minimum Sizes
 - **Screen:**
@@ -101,3 +101,4 @@ font-family: "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma
 4. **Do NOT rotate or angle:** Logos must always sit squarely on their baseline.
 5. **Do NOT place white text on peach or blue:** Always use Ink text on Peach and Blue surfaces to guarantee WCAG compliance.
 6. **Do NOT substitute typography:** Never replace Ping AR + LT with arbitrary non-brand fonts.
+

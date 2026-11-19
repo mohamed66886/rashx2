@@ -18,7 +18,7 @@
 
 export const fontFamilies = {
   brand: '"Ping AR + LT", var(--font-arabic), var(--font-latin), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  arabic: 'var(--font-arabic), "Ping AR + LT", "Noto Kufi Arabic", system-ui, sans-serif',
+  arabic: '"Ping AR + LT", var(--font-arabic), "Noto Kufi Arabic", system-ui, sans-serif',
   latin: 'var(--font-latin), "Ping AR + LT", "Inter", "Helvetica Neue", Arial, sans-serif',
   sans: '"Ping AR + LT", var(--font-arabic), var(--font-latin), system-ui, sans-serif',
   mono: '"JetBrains Mono", "Courier New", monospace',

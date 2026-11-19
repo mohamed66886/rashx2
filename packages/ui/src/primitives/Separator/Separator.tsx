@@ -31,10 +31,7 @@ export function Separator({
         role={decorative ? 'none' : 'separator'}
         aria-orientation="horizontal"
         aria-hidden={decorative ? 'true' : undefined}
-        className={cn(
-          'w-full border-t border-[--surface-border] my-4 shrink-0',
-          className,
-        )}
+        className={cn('w-full my-6 shrink-0 h-0 border-0', className)}
         {...props}
       />
     );
@@ -45,10 +42,7 @@ export function Separator({
       role={decorative ? 'none' : 'separator'}
       aria-orientation="vertical"
       aria-hidden={decorative ? 'true' : undefined}
-      className={cn(
-        'self-stretch w-px bg-[--surface-border] mx-4 shrink-0',
-        className,
-      )}
+      className={cn('self-stretch w-0 mx-4 shrink-0', className)}
       {...props}
     />
   );

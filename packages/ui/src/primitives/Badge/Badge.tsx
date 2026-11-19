@@ -16,12 +16,12 @@ export const badgeVariants = cva(
       variant: {
         default: 'bg-[--color-accent] text-white',
         secondary: 'bg-[--surface-muted] text-[--surface-muted-foreground]',
-        outline: 'border border-[--surface-border] text-[--surface-foreground] bg-transparent',
-        success: 'bg-[--color-success-light] text-[--color-success-text] border border-[--color-success]/20',
-        warning: 'bg-[--color-warning-light] text-[--color-warning-text] border border-[--color-warning]/20',
-        error: 'bg-[--color-error-light] text-[--color-error-text] border border-[--color-error]/20',
-        info: 'bg-[--color-info-light] text-[--color-info-text] border border-[--color-info]/20',
-        brand: 'bg-[--color-primary] text-white',
+        outline: 'bg-[--surface-muted] text-[--surface-foreground]',
+        success: 'bg-[--color-success-light] text-[--color-success-text]',
+        warning: 'bg-[--color-warning-light] text-[--color-warning-text]',
+        error: 'bg-[--color-error-light] text-[--color-error-text]',
+        info: 'bg-[--color-info-light] text-[--color-info-text]',
+        brand: 'bg-[#F0C5AE] text-[#54453D]',
       },
       size: {
         sm: 'px-2 py-0.5 text-[11px] gap-1',
@@ -56,13 +56,13 @@ export function Badge({
 }: BadgeProps) {
   const dotColorMap = {
     default: 'bg-white',
-    secondary: 'bg-[--color-neutral-400]',
+    secondary: 'bg-[--color-neutral-500]',
     outline: 'bg-[--color-accent]',
     success: 'bg-[--color-success]',
     warning: 'bg-[--color-warning]',
     error: 'bg-[--color-error]',
     info: 'bg-[--color-info]',
-    brand: 'bg-[--color-accent]',
+    brand: 'bg-[#54453D]',
   };
 
   const activeVariant = variant ?? 'default';

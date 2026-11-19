@@ -123,3 +123,4 @@ rashx-brand/
 | `social/*` | `apps/web/public/brand/social/` |
 | `email/images/*` | `apps/web/public/brand/email/` |
 | `fonts/fonts.css` | Integrated into `apps/web/src/app/globals.css` and `@rashx/tokens` |
+
