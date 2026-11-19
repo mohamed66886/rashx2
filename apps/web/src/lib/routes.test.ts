@@ -11,6 +11,7 @@ describe('Route Registry', () => {
 
   it('should define platform routes', () => {
     expect(routes.platform).toBe('/platform');
+    expect(routes.features).toBe('/features');
     expect(routes.solutions.management).toBe('/solutions/management');
     expect(routes.solutions.hr).toBe('/solutions/hr');
     expect(routes.solutions.crm).toBe('/solutions/crm');

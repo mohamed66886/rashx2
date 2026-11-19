@@ -24,4 +24,5 @@ export {
   Globe,
   MapPin,
   Navigation,
+  Send,
 } from 'lucide-react';

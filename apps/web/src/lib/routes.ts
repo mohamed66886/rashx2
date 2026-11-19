@@ -30,6 +30,7 @@ export const routes = {
 
   // ── Platform & Solutions ───────────────────────────────────
   platform: '/platform',
+  features: '/features',
   solutions: {
     index: '/solutions',
     management: '/solutions/management',
@@ -184,10 +185,19 @@ export const routes = {
 
   // ── External ───────────────────────────────────────────────
   external: {
+    website: 'https://rashx.org',
     app: 'https://app.rashx.org',
+    phone: '+966 54 808 2945',
+    phoneTel: 'tel:+966548082945',
+    telegram: 'https://t.me/rashxsa',
     twitter: 'https://twitter.com/rashx',
+    x: 'https://x.com/rashxsa',
     linkedin: 'https://linkedin.com/company/rashx',
     instagram: 'https://instagram.com/rashx',
+    officialInstagram: 'https://www.instagram.com/rashx.sa',
+    tiktok: 'https://www.tiktok.com/@rashx.sa',
+    snapchat: 'https://snapchat.com/t/MuwsbAAK',
+    facebook: 'https://www.facebook.com/rashx.sa',
   },
 } as const;
 
