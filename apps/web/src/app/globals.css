@@ -14,24 +14,9 @@
 @source "../../../../packages/icons/src";
 
 /* ── Official Brand Typography (@font-face) ────────────────── */
-/* Universal rule covering all weights 100-900 so headings and buttons never drop out to fallback */
-@font-face {
-  font-family: "Ping AR + LT";
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-  src: local("Ping AR + LT Bold"),
-       local("Ping AR + LT ExtraBold"),
-       local("Ping AR + LT Medium"),
-       local("Ping AR + LT Regular"),
-       local("Ping AR + LT Light"),
-       local("Ping AR + LT"),
-       local("Ping"),
-       url("/fonts/PingAR+LT-Light.otf") format("opentype"),
-       url("/fonts/PingAR+LT-Regular.otf") format("opentype");
-}
+/* RASHX Dual-Weight Type System: Ping AR + LT Light & Ping AR + LT Bold */
+/* Weights 100–500 map to Light | Weights 600–900 map to Bold */
 
-/* Supports local OS installation + self-hosted webfonts per weight */
 @font-face {
   font-family: "Ping AR + LT";
   font-weight: 300;
@@ -41,8 +26,7 @@
        local("PingAR+LT-Light"),
        local("Ping AR Light"),
        local("Ping Light"),
-       url("/fonts/PingAR+LT-Light.otf") format("opentype"),
-       url("/fonts/PingAR+LT-Light.woff2") format("woff2");
+       url("/fonts/PingAR+LT-Light.otf") format("opentype");
 }
 
 @font-face {
@@ -56,8 +40,9 @@
        local("PingAR-LT-Regular"),
        local("Ping AR"),
        local("Ping"),
-       url("/fonts/PingAR+LT-Regular.otf") format("opentype"),
-       url("/fonts/PingAR+LT-Regular.woff2") format("woff2");
+       local("Ping AR + LT Light"),
+       local("PingAR+LT-Light"),
+       url("/fonts/PingAR+LT-Light.otf") format("opentype");
 }
 
 @font-face {
@@ -70,9 +55,9 @@
        local("PingAR-LT-Medium"),
        local("Ping AR Medium"),
        local("Ping Medium"),
-       url("/fonts/PingAR+LT-Medium.otf") format("opentype"),
-       url("/fonts/PingAR+LT-Medium.woff2") format("woff2"),
-       url("/fonts/PingAR+LT-Regular.otf") format("opentype");
+       local("Ping AR + LT Regular"),
+       local("Ping AR + LT Light"),
+       url("/fonts/PingAR+LT-Light.otf") format("opentype");
 }
 
 @font-face {
@@ -85,8 +70,9 @@
        local("PingAR-LT-SemiBold"),
        local("Ping AR SemiBold"),
        local("Ping SemiBold"),
-       url("/fonts/PingAR+LT-Bold.otf") format("opentype"),
-       url("/fonts/PingAR+LT-Regular.otf") format("opentype");
+       local("Ping AR + LT Bold"),
+       local("PingAR+LT-Bold"),
+       url("/fonts/PingAR+LT-Bold.otf") format("opentype");
 }
 
 @font-face {
@@ -99,9 +85,7 @@
        local("PingAR-LT-Bold"),
        local("Ping AR Bold"),
        local("Ping Bold"),
-       url("/fonts/PingAR+LT-Bold.otf") format("opentype"),
-       url("/fonts/PingAR+LT-Bold.woff2") format("woff2"),
-       url("/fonts/PingAR+LT-Regular.otf") format("opentype");
+       url("/fonts/PingAR+LT-Bold.otf") format("opentype");
 }
 
 @font-face {
@@ -115,9 +99,20 @@
        local("PingAR-LT-ExtraBold"),
        local("Ping AR ExtraBold"),
        local("Ping ExtraBold"),
-       url("/fonts/PingAR+LT-ExtraBold.otf") format("opentype"),
-       url("/fonts/PingAR+LT-ExtraBold.woff2") format("woff2"),
-       url("/fonts/PingAR+LT-Regular.otf") format("opentype");
+       local("Ping AR + LT Bold"),
+       local("PingAR+LT-Bold"),
+       url("/fonts/PingAR+LT-Bold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Ping AR + LT";
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+  src: local("Ping AR + LT Extra Bold"),
+       local("Ping AR + LT Bold"),
+       local("PingAR+LT-Bold"),
+       url("/fonts/PingAR+LT-Bold.otf") format("opentype");
 }
 
 @theme {

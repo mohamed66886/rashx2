@@ -23,6 +23,8 @@ export interface SectionTitleProps extends HTMLAttributes<HTMLDivElement> {
   align?: SectionTitleAlign;
   /** Optional semantic HTML heading tag (default: 'h2') */
   as?: SectionHeadingLevel;
+  /** Whether to render the official RASHX wordmark as a subtle background watermark (default: true) */
+  withWordmark?: boolean;
   /** Optional additional class names applied to the container */
   className?: string;
 }
@@ -32,6 +34,7 @@ export function SectionTitle({
   eyebrow,
   align = 'start',
   as = 'h2',
+  withWordmark = true,
   className,
   ...props
 }: SectionTitleProps) {
@@ -41,12 +44,33 @@ export function SectionTitle({
   return (
     <div
       className={cn(
-        'flex flex-col',
+        'relative isolate flex flex-col',
         isCenter ? 'items-center text-center' : 'items-start text-start',
         className
       )}
       {...props}
     >
+      {/* Background Official RASHX Wordmark Watermark */}
+      {withWordmark && (
+        <div
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none absolute -z-10 select-none overflow-hidden',
+            isCenter
+              ? 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'
+              : 'start-0 top-1/2 -translate-y-1/2'
+          )}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/logo/wordmark/wordmark-ink.svg"
+            alt=""
+            className="h-14 sm:h-20 md:h-24 lg:h-28 w-auto max-w-none opacity-[0.05] object-contain select-none"
+            draggable={false}
+          />
+        </div>
+      )}
+
       {eyebrow && (
         <span className="mb-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#C78360] select-none">
           {eyebrow}
@@ -58,3 +82,4 @@ export function SectionTitle({
     </div>
   );
 }
+

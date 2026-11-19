@@ -1,13 +1,11 @@
-# RASHX Self-Hosted Fonts Directory
+# RASHX Self-Hosted Fonts Directory (Dual-Weight Architecture)
 
-Place licensed `Ping AR + LT` font files in this folder with the following exact filenames:
+Active `Ping AR + LT` font files:
 
-- `PingAR+LT-Regular.woff2` (and/or `PingAR+LT-Regular.otf`)
-- `PingAR+LT-Medium.woff2` (and/or `PingAR+LT-Medium.otf`)
-- `PingAR+LT-Bold.woff2` (and/or `PingAR+LT-Bold.otf`)
-- `PingAR+LT-ExtraBold.woff2` (and/or `PingAR+LT-ExtraBold.otf`)
+- `PingAR+LT-Light.otf` (Light / Regular / Normal — Weights 100–500)
+- `PingAR+LT-Bold.otf` (Bold / ExtraBold / SemiBold — Weights 600–900)
 
 ### Automatic Activation:
-The moment these files are placed in this folder, `@font-face` in `globals.css` will immediately serve them.
-When not present, the system automatically uses the local system installation (if installed on Mac/Windows) or falls back to Next.js's optimized `Noto Kufi Arabic` and `Inter`.
+These files are loaded directly via `@font-face` in `globals.css`.
+When not present on client networks, the system falls back to the local system installation (if installed on Mac/Windows) or Next.js's optimized `Noto Kufi Arabic` and `Inter`.
 

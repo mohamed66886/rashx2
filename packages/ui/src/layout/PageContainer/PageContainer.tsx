@@ -8,7 +8,7 @@ import type { HTMLAttributes } from 'react';
 
 export interface PageContainerProps extends HTMLAttributes<HTMLDivElement> {
   /** Max width variant */
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
   /** Whether to include horizontal padding */
   padded?: boolean;
 }
@@ -18,13 +18,14 @@ const sizeClasses = {
   md: 'max-w-screen-md',
   lg: 'max-w-screen-lg',
   xl: 'max-w-screen-xl',
-  '2xl': 'max-w-[1400px]',
-  full: 'max-w-full',
+  '2xl': 'max-w-[1440px]',
+  '3xl': 'max-w-[1600px]',
+  full: 'max-w-full 2xl:max-w-[1600px]',
 } as const;
 
 export function PageContainer({
   className,
-  size = 'xl',
+  size = 'full',
   padded = true,
   children,
   ...props

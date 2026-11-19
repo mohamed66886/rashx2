@@ -4,22 +4,22 @@ import { PageContainer, SectionContainer } from '@rashx/ui';
 
 describe('Layout Containers', () => {
   describe('PageContainer', () => {
-    it('renders children with default max-width xl and padding', () => {
+    it('renders children with default max-width full and padding', () => {
       render(<PageContainer data-testid="page-container">Page content</PageContainer>);
       const container = screen.getByTestId('page-container');
       expect(container).toBeInTheDocument();
-      expect(container.className).toContain('max-w-screen-xl');
+      expect(container.className).toContain('max-w-full');
       expect(container.className).toContain('px-4');
     });
 
     it('renders with custom size without padding when padded is false', () => {
       render(
-        <PageContainer data-testid="page-container" size="full" padded={false}>
+        <PageContainer data-testid="page-container" size="xl" padded={false}>
           Full bleed content
         </PageContainer>
       );
       const container = screen.getByTestId('page-container');
-      expect(container.className).toContain('max-w-full');
+      expect(container.className).toContain('max-w-screen-xl');
       expect(container.className).not.toContain('px-4');
     });
   });

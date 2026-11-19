@@ -108,8 +108,8 @@ export const config = {
      * - api routes
      * - _next/static (static files)
      * - _next/image (image optimization)
-     * - Public files with extensions
+     * - Any file with an extension (e.g. .svg, .png, .ico, .otf, etc.)
      */
-    '/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|sw\\.js|icons|images|fonts|arfonts-ping-ar-lt-light).*)',
+    '/((?!api|_next/static|_next/image|.*\\..*).*)',
   ],
 };

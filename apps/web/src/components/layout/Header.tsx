@@ -43,7 +43,7 @@ export function Header({ lang, className }: HeaderProps) {
       className={`sticky top-0 z-40 bg-[#FFFFFF]/95 backdrop-blur-md transition-colors duration-200 ${className ?? ''}`}
       dir={isAr ? 'rtl' : 'ltr'}
     >
-      <PageContainer size="xl" className="flex items-center justify-between py-4">
+      <PageContainer size="full" className="flex items-center justify-between py-4">
         {/* ── Brand Logo ────────────────────────────────────────────── */}
         <div className="flex items-center gap-8">
           <Link

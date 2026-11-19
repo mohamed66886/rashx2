@@ -22,7 +22,16 @@ import {
   Layers,
 } from '@rashx/icons';
 import { Header, Footer } from '@/components/layout';
-import { Hero } from '@/components/home';
+import {
+  Hero,
+  ProblemSolution,
+  PlatformFeatures,
+  HowItWorks,
+  WhyChooseUs,
+  Testimonials,
+  FAQ,
+  FinalCTA,
+} from '@/components/home';
 
 export async function generateMetadata(): Promise<Metadata> {
   return generatePageMetadata({
@@ -45,9 +54,30 @@ export default async function HomePage() {
       {/* ── Official Homepage Hero Section ────────────────────────── */}
       <Hero lang={lang} />
 
+      {/* ── Problem & Solution Section ────────────────────────────── */}
+      <ProblemSolution lang={lang} />
+
+      {/* ── Platform Features Section ──────────────────────────────── */}
+      <PlatformFeatures lang={lang} />
+
+      {/* ── How It Works Section ───────────────────────────────────── */}
+      <HowItWorks lang={lang} />
+
+      {/* ── Why Choose RASHX Section ───────────────────────────────── */}
+      <WhyChooseUs lang={lang} />
+
+      {/* ── Testimonials & Experience Section ──────────────────────── */}
+      <Testimonials lang={lang} />
+
+      {/* ── Frequently Asked Questions (FAQ) Section ───────────────── */}
+      <FAQ lang={lang} />
+
+      {/* ── Final Call To Action (Final CTA) Section ───────────────── */}
+      <FinalCTA lang={lang} />
+
       {/* ── Key Architectural Pillars (Flat & Borderless) ──────────── */}
       <SectionContainer id="pillars" spacing="lg">
-        <PageContainer size="xl">
+        <PageContainer size="full">
           <div className="mx-auto max-w-2xl text-center mb-12">
             <Typography variant="h2" className="font-bold text-[#54453D]">
               {isAr ? 'الركائز الهندسية والتقنية للمنظومة' : 'Architectural & Technical Pillars'}

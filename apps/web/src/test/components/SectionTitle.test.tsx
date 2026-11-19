@@ -173,4 +173,38 @@ describe('RASHX — SectionTitle Primitive Component Suite', () => {
       expect(root).toHaveAttribute('id', 'custom-section-id');
     });
   });
+
+  describe('Official RASHX Wordmark Backdrop Watermark', () => {
+    it('renders the official wordmark SVG as a subtle background watermark by default', () => {
+      const { container } = render(
+        <SectionTitle title="العنوان مع الشعار الخلفي" align="center" />
+      );
+
+      const img = container.querySelector('img');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', '/brand/logo/wordmark/wordmark-ink.svg');
+      expect(img?.parentElement).toHaveAttribute('aria-hidden', 'true');
+      expect(img?.parentElement?.className).toContain('pointer-events-none');
+      expect(img?.parentElement?.className).toContain('-z-10');
+      expect(img?.parentElement?.className).toContain('left-1/2');
+    });
+
+    it('positions watermark at start when align="start"', () => {
+      const { container } = render(
+        <SectionTitle title="محاذاة البداية" align="start" />
+      );
+
+      const img = container.querySelector('img');
+      expect(img?.parentElement?.className).toContain('start-0');
+    });
+
+    it('can be disabled when withWordmark is false', () => {
+      const { container } = render(
+        <SectionTitle title="بدون علامة مائية" withWordmark={false} />
+      );
+
+      const img = container.querySelector('img');
+      expect(img).not.toBeInTheDocument();
+    });
+  });
 });

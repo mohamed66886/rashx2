@@ -46,7 +46,7 @@ export function Footer({ lang, className }: FooterProps) {
       className={`bg-[#54453D] text-white transition-colors duration-200 ${className ?? ''}`}
       dir={isAr ? 'rtl' : 'ltr'}
     >
-      <PageContainer size="xl" className="py-16 md:py-20">
+      <PageContainer size="full" className="py-16 md:py-20">
         {/* ── Main Footer Grid ──────────────────────────────────────── */}
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           {/* Brand & Description (Span 6 on desktop) */}

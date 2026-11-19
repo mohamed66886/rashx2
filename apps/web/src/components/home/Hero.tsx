@@ -80,10 +80,10 @@ export function Hero({ lang, className }: HeroProps) {
   return (
     <section
       id="hero"
-      className={`relative overflow-hidden bg-gradient-to-b from-[#FAF9F8] to-[#FFFFFF] py-16 sm:py-20 lg:py-28 transition-colors duration-200 ${className ?? ''}`}
+      className={`relative overflow-hidden bg-gradient-to-b from-[#FAF9F8] to-[#FFFFFF] pt-6 sm:pt-8 lg:pt-10 pb-12 sm:pb-16 lg:pb-20 transition-colors duration-200 ${className ?? ''}`}
       dir={isAr ? 'rtl' : 'ltr'}
     >
-      <PageContainer size="xl">
+      <PageContainer size="full">
         <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
           {/* Main Animated Heading - Strictly single line (side by side) */}
           <h1 className="flex flex-nowrap items-center justify-center gap-2 sm:gap-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-extrabold tracking-tight text-[#54453D] leading-none whitespace-nowrap">
@@ -178,14 +178,14 @@ export function Hero({ lang, className }: HeroProps) {
           </h1>
 
           {/* Value Proposition Description */}
-          <p className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-[#75645B]">
+          <p className="mt-4 sm:mt-5 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-[#75645B]">
             {isAr
               ? 'RASHX منظومة رقمية متكاملة تجمع إدارة المواعيد والعملاء والموظفين والخدمات والمبيعات في مكان واحد، لتمنحك تحكمًا أكبر وتجربة أفضل لعملائك.'
               : 'RASHX brings appointments, customers, staff, services, and sales together in one integrated platform, giving you greater control and a better customer experience.'}
           </p>
 
           {/* Call to Action Buttons */}
-          <div className="mt-8 sm:mt-10 flex w-full flex-col sm:w-auto sm:flex-row items-center justify-center gap-3 sm:gap-4">
+          <div className="mt-6 sm:mt-8 flex w-full flex-col sm:w-auto sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <Link
               href={exploreHref}
               className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center gap-2.5 rounded-xl bg-[#F0C5AE] px-7 py-3.5 text-sm sm:text-base font-bold text-[#54453D] transition-colors duration-200 hover:bg-[#E4A889] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#54453D] focus-visible:ring-offset-2"
@@ -200,6 +200,53 @@ export function Hero({ lang, className }: HeroProps) {
             >
               <span>{isAr ? 'تواصل معنا' : 'Contact Us'}</span>
             </a>
+          </div>
+
+          {/* ── Multi-Device Ecosystem Showcase (MacBook, Tablet, iPhone) ── */}
+          <div className="relative mt-6 sm:mt-8 lg:mt-10 w-full max-w-5xl mx-auto select-none">
+            {/* Ambient warm ground glow */}
+            <div
+              className="pointer-events-none absolute -bottom-4 left-1/2 h-20 sm:h-28 w-3/4 -translate-x-1/2 rounded-full bg-[#F0C5AE]/30 blur-3xl"
+              aria-hidden="true"
+            />
+
+            <div className="relative mx-auto aspect-[1024/430] w-full">
+              {/* MacBook (Center) */}
+              <div className="absolute left-1/2 top-0 w-[58%] -translate-x-1/2 z-10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/Devices/MacBook.svg"
+                  alt={isAr ? 'لوحة تحكم راش إكس على جهاز ماك بوك' : 'RASHX salon dashboard on MacBook'}
+                  className="h-auto w-full select-none"
+                  draggable={false}
+                  loading="eager"
+                />
+              </div>
+
+              {/* Duo Tablet (Front Left) */}
+              <div className="absolute bottom-[2%] left-[1.8%] w-[30.5%] z-20 -rotate-[2.5deg] origin-bottom-left">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/Devices/Duo.svg"
+                  alt={isAr ? 'تحليلات عمولات الأخصائيات على التابلت' : 'Specialist commission analytics on Tablet'}
+                  className="h-auto w-full select-none"
+                  draggable={false}
+                  loading="eager"
+                />
+              </div>
+
+              {/* iPhone (Front Right) */}
+              <div className="absolute bottom-[2%] right-[5.5%] w-[17.2%] z-20 rotate-[2.2deg] origin-bottom-right">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/Devices/iphone.svg"
+                  alt={isAr ? 'تطبيق حجز وتفاصيل الموعد على آيفون' : 'Client appointment booking app on iPhone'}
+                  className="h-auto w-full select-none"
+                  draggable={false}
+                  loading="eager"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </PageContainer>

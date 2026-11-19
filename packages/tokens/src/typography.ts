@@ -2,13 +2,11 @@
  * RASHX Official Typography Token System
  *
  * Single Source of Truth: rashx-brand/fonts/
- * Official Brand Typeface: Ping AR + LT
+ * Official Brand Typeface: Ping AR + LT (Dual-Weight Architecture)
  *
  * Weight Mapping:
- * - Regular: 400 (Body text)
- * - Medium: 500 (Labels, UI, micro-copy)
- * - Bold: 700 (Headlines, section titles)
- * - Extra Bold: 800 (Display, brand emphasis)
+ * - Light / Regular (Ping AR + LT Light): 300, 400, 500 (Body text, UI, descriptions)
+ * - Bold / Extra Bold (Ping AR + LT Bold): 600, 700, 800, 900 (Headlines, section titles, buttons)
  *
  * Robust Hierarchy:
  * 1. Ping AR + LT (Local system installation or self-hosted)

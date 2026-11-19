@@ -1,11 +1,31 @@
 /* RASHX brand font: Ping AR + LT
-   Put your licensed font files in this folder using these names (or edit the urls). */
-@font-face { font-family: "Ping AR + LT"; font-weight: 400; font-style: normal; font-display: swap;
-  src: url("PingAR+LT-Regular.woff2") format("woff2"), url("PingAR+LT-Regular.otf") format("opentype"); }
-@font-face { font-family: "Ping AR + LT"; font-weight: 500; font-style: normal; font-display: swap;
-  src: url("PingAR+LT-Medium.woff2") format("woff2"), url("PingAR+LT-Medium.otf") format("opentype"); }
-@font-face { font-family: "Ping AR + LT"; font-weight: 700; font-style: normal; font-display: swap;
-  src: url("PingAR+LT-Bold.woff2") format("woff2"), url("PingAR+LT-Bold.otf") format("opentype"); }
-@font-face { font-family: "Ping AR + LT"; font-weight: 800; font-style: normal; font-display: swap;
-  src: url("PingAR+LT-ExtraBold.woff2") format("woff2"), url("PingAR+LT-ExtraBold.otf") format("opentype"); }
+   Dual-weight system: Light (300-500) and Bold (600-900) */
+@font-face {
+  font-family: "Ping AR + LT";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: local("Ping AR + LT Regular"), local("Ping AR + LT Light"), url("PingAR+LT-Light.otf") format("opentype");
+}
+@font-face {
+  font-family: "Ping AR + LT";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: local("Ping AR + LT Medium"), local("Ping AR + LT Light"), url("PingAR+LT-Light.otf") format("opentype");
+}
+@font-face {
+  font-family: "Ping AR + LT";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: local("Ping AR + LT Bold"), local("PingAR+LT-Bold"), url("PingAR+LT-Bold.otf") format("opentype");
+}
+@font-face {
+  font-family: "Ping AR + LT";
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+  src: local("Ping AR + LT Extra Bold"), local("Ping AR + LT Bold"), url("PingAR+LT-Bold.otf") format("opentype");
+}
 :root { --font-brand: "Ping AR + LT", "Helvetica Neue", Arial, "Noto Sans Arabic", Tahoma, sans-serif; }
