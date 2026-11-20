@@ -1,5 +1,6 @@
 import { SITE_URL, buildHreflangUrl } from '@rashx/seo/metadata';
 import {
+  RASHX_FOUNDER_ID,
   RASHX_ORGANIZATION_ID,
   RASHX_WEBSITE_ID,
   buildBreadcrumbSchema,
@@ -11,6 +12,7 @@ import { JsonLd } from './JsonLd';
 const PAGE_TYPES: Record<string, string> = {
   '/about': 'AboutPage',
   '/contact': 'ContactPage',
+  '/founder': 'ProfilePage',
 };
 
 /**
@@ -30,6 +32,8 @@ export function PageJsonLd({ path, lang }: { path: string; lang: Lang }) {
     if (n) crumbs.push({ name: n[lang], url: buildHreflangUrl(p, lang) });
   });
 
+  const isFounderProfile = path === '/founder';
+
   const webPage = {
     '@context': 'https://schema.org',
     '@type': PAGE_TYPES[path] ?? 'WebPage',
@@ -38,7 +42,9 @@ export function PageJsonLd({ path, lang }: { path: string; lang: Lang }) {
     name: name[lang],
     inLanguage: lang,
     isPartOf: { '@id': RASHX_WEBSITE_ID },
-    about: { '@id': RASHX_ORGANIZATION_ID },
+    about: { '@id': isFounderProfile ? RASHX_FOUNDER_ID : RASHX_ORGANIZATION_ID },
+    // ProfilePage must point at the person it describes.
+    ...(isFounderProfile ? { mainEntity: { '@id': RASHX_FOUNDER_ID } } : {}),
     breadcrumb: { '@id': `${url}#breadcrumb` },
   };
   const breadcrumb = { ...buildBreadcrumbSchema(crumbs), '@id': `${url}#breadcrumb` };
