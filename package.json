@@ -4,6 +4,10 @@
   "scripts": {
     "build": "HOME=/tmp turbo run build",
     "dev": "HOME=/tmp turbo run dev --parallel",
+    "dev:web": "turbo run dev --filter=@rashx/web",
+    "dev:app": "turbo run dev --filter=@rashx/app",
+    "dev:tenant": "turbo run dev --filter=@rashx/tenant",
+    "dev:admin": "turbo run dev --filter=@rashx/admin",
     "lint": "HOME=/tmp turbo run lint",
     "typecheck": "HOME=/tmp turbo run typecheck",
     "test": "HOME=/tmp turbo run test",

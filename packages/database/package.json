@@ -1,0 +1,27 @@
+{
+  "name": "@rashx/database",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client/index.ts",
+    "./server": "./src/server/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@rashx/auth": "workspace:*",
+    "firebase": "^11.4.0",
+    "firebase-admin": "^13.2.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@rashx/config": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.1.9"
+  }
+}
