@@ -21,6 +21,8 @@ export interface BrandLoaderProps {
   lang?: 'ar' | 'en';
   /** Force show regardless of session or previous loads */
   forceShow?: boolean;
+  /** Only show once per browser session. Defaults to false (shows on full page load). */
+  oncePerSession?: boolean;
   /** Callback fired when the loader animation finishes and dismisses */
   onComplete?: () => void;
   /** Additional CSS class names */
@@ -48,14 +50,13 @@ const RX_PATH =
 export function BrandLoader({
   lang = 'ar',
   forceShow = false,
+  oncePerSession = false,
   onComplete,
   className,
 }: BrandLoaderProps) {
   const [mounted, setMounted] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [isDone, setIsDone] = useState(false);
   const [isGone, setIsGone] = useState(false);
-  const [message, setMessage] = useState(lang === 'ar' ? 'جاري التحضير' : 'Preparing...');
 
   const clipRef = useRef<SVGRectElement>(null);
   const barRef = useRef<HTMLElement>(null);
@@ -63,17 +64,20 @@ export function BrandLoader({
   const msgRef = useRef<HTMLElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
 
+  const progressRef = useRef<number>(0);
   const rafRef = useRef<number | null>(null);
   const startRef = useRef<number>(0);
   const loadedRef = useRef<boolean>(false);
   const finishedRef = useRef<boolean>(false);
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dismissTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const msgs = lang === 'ar' ? MESSAGES_AR : MESSAGES_EN;
 
   const renderProgress = useCallback(
     (p: number) => {
-      const v = Math.round(p);
-      setProgress(v);
+      const v = Math.min(100, Math.max(0, Math.round(p)));
 
       if (clipRef.current) {
         clipRef.current.setAttribute('y', String(1000 - p * 10));
@@ -91,8 +95,7 @@ export function BrandLoader({
       for (let i = msgs.length - 1; i >= 0; i--) {
         const [threshold, text] = msgs[i]!;
         if (v >= threshold) {
-          setMessage(text);
-          if (msgRef.current) {
+          if (msgRef.current && msgRef.current.textContent !== text) {
             msgRef.current.textContent = text;
           }
           break;
@@ -106,37 +109,59 @@ export function BrandLoader({
     if (finishedRef.current) return;
     finishedRef.current = true;
 
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    if (watchdogRef.current) {
+      clearTimeout(watchdogRef.current);
+      watchdogRef.current = null;
+    }
+
     // Small hold at 100%
-    setTimeout(() => {
+    holdTimeoutRef.current = setTimeout(() => {
       setIsDone(true);
 
       // Dismiss panels after curtain transition finishes
-      setTimeout(() => {
+      dismissTimeoutRef.current = setTimeout(() => {
         setIsGone(true);
         if (typeof document !== 'undefined') {
           document.body.style.overflow = '';
           document.dispatchEvent(new Event('rashx:loaded'));
         }
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('rashx:loaded'));
+          if (oncePerSession) {
+            sessionStorage.setItem('rashx_loader_shown', 'true');
+          }
+        }
         onComplete?.();
       }, 1300);
     }, 250);
-  }, [onComplete]);
+  }, [oncePerSession, onComplete]);
 
   const tick = useCallback(
     (t: number) => {
-      if (!startRef.current) startRef.current = t;
-      const el = t - startRef.current;
+      const now =
+        typeof t === 'number' && t > 0
+          ? t
+          : typeof performance !== 'undefined'
+            ? performance.now()
+            : Date.now();
+      if (!startRef.current) startRef.current = now;
+      const el = now - startRef.current;
       const MIN = 1800;
 
       // Ease toward 85% while waiting; release to 100% once ready and MIN threshold reached
       const target = loadedRef.current && el >= MIN ? 100 : Math.min(85, (el / MIN) * 85);
-      const current = progress;
+      const current = progressRef.current;
       let next = current + (target - current) * 0.08;
 
       if (target === 100 && next > 99.4) {
         next = 100;
       }
 
+      progressRef.current = next;
       renderProgress(next);
 
       if (next >= 100) {
@@ -146,14 +171,20 @@ export function BrandLoader({
 
       rafRef.current = requestAnimationFrame(tick);
     },
-    [progress, renderProgress, finish],
+    [renderProgress, finish],
   );
 
   const startLoader = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
+    if (holdTimeoutRef.current) clearTimeout(holdTimeoutRef.current);
+    if (dismissTimeoutRef.current) clearTimeout(dismissTimeoutRef.current);
+
     finishedRef.current = false;
     loadedRef.current = false;
     startRef.current = 0;
+    progressRef.current = 0;
+
     setIsDone(false);
     setIsGone(false);
 
@@ -163,6 +194,14 @@ export function BrandLoader({
 
     renderProgress(0);
     rafRef.current = requestAnimationFrame(tick);
+
+    // Watchdog fallback: ensure loader never hangs if tab is throttled or event missed
+    watchdogRef.current = setTimeout(() => {
+      loadedRef.current = true;
+      progressRef.current = 100;
+      renderProgress(100);
+      finish();
+    }, 4500);
 
     // Track document ready state
     if (typeof document !== 'undefined') {
@@ -175,29 +214,29 @@ export function BrandLoader({
           loadedRef.current = true;
         };
         window.addEventListener('load', onLoad, { once: true });
+        // Secondary safety fallback if load event was already fired
+        setTimeout(() => {
+          loadedRef.current = true;
+        }, 1200);
       }
     }
-  }, [renderProgress, tick]);
+  }, [renderProgress, tick, finish]);
 
   useEffect(() => {
     setMounted(true);
 
-    // Session-based or forced run
     const hasSeenLoader =
-      !forceShow && typeof window !== 'undefined'
+      oncePerSession && !forceShow && typeof window !== 'undefined'
         ? sessionStorage.getItem('rashx_loader_shown')
         : null;
 
     if (!hasSeenLoader || forceShow) {
       startLoader();
-      if (typeof window !== 'undefined' && !forceShow) {
-        sessionStorage.setItem('rashx_loader_shown', 'true');
-      }
     } else {
       setIsGone(true);
     }
 
-    // Expose global API
+    // Expose global window.RashxLoader API
     if (typeof window !== 'undefined') {
       (window as unknown as { RashxLoader: { ready: () => void; replay: () => void } }).RashxLoader = {
         ready: () => {
@@ -211,13 +250,16 @@ export function BrandLoader({
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (watchdogRef.current) clearTimeout(watchdogRef.current);
+      if (holdTimeoutRef.current) clearTimeout(holdTimeoutRef.current);
+      if (dismissTimeoutRef.current) clearTimeout(dismissTimeoutRef.current);
       if (typeof document !== 'undefined') {
         document.body.style.overflow = '';
       }
     };
-  }, [forceShow, startLoader]);
+  }, [forceShow, oncePerSession, startLoader]);
 
-  if (!mounted || isGone) {
+  if (!mounted) {
     return null;
   }
 
@@ -229,10 +271,12 @@ export function BrandLoader({
       aria-label={lang === 'ar' ? 'جاري التحميل' : 'Loading RASHX'}
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-valuenow={progress}
+      aria-valuenow={0}
+      aria-hidden={isGone}
       className={cn(
         'fixed inset-0 z-[99999] pointer-events-auto select-none overflow-hidden font-sans',
         isDone && 'done',
+        isGone && 'gone',
         className,
       )}
     >
@@ -290,9 +334,9 @@ export function BrandLoader({
 
           {/* Localized Status Meta & Counter */}
           <div className="rashx-loader-meta text-[#54453D]">
-            <span ref={msgRef}>{message}</span>
+            <span ref={msgRef}>{lang === 'ar' ? 'جاري التحضير' : 'Preparing...'}</span>
             <b ref={pctRef} className="rashx-loader-pct">
-              {progress}%
+              0%
             </b>
           </div>
         </div>
@@ -300,4 +344,3 @@ export function BrandLoader({
     </div>
   );
 }
-

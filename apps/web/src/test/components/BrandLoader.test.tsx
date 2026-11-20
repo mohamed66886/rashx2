@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { BrandLoader } from '@rashx/ui';
 
 describe('BrandLoader Component', () => {
@@ -54,6 +54,53 @@ describe('BrandLoader Component', () => {
     expect(container.querySelector('.rashx-loader-p3')).toBeInTheDocument();
     expect(container.querySelector('.rashx-loader-mark')).toBeInTheDocument();
     expect(container.querySelector('.rashx-loader-bar')).toBeInTheDocument();
+  });
+
+  it('completes animation, applies done and gone classes, and calls onComplete', () => {
+    const onComplete = vi.fn();
+    const { container } = render(<BrandLoader forceShow onComplete={onComplete} />);
+
+    act(() => {
+      vi.runAllTimers();
+    });
+
+    const loader = container.querySelector('#rashx-loader');
+    expect(loader).toBeInTheDocument();
+    expect(loader?.classList.contains('done')).toBe(true);
+    expect(loader?.classList.contains('gone')).toBe(true);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('allows replay through window.RashxLoader.replay()', () => {
+    const onComplete = vi.fn();
+    const { container } = render(<BrandLoader forceShow onComplete={onComplete} />);
+
+    act(() => {
+      vi.runAllTimers();
+    });
+    expect(onComplete).toHaveBeenCalledTimes(1);
+
+    const api = (window as unknown as { RashxLoader?: { replay: () => void } }).RashxLoader;
+    expect(api?.replay).toBeDefined();
+
+    // Replay
+    act(() => {
+      api?.replay();
+      vi.runAllTimers();
+    });
+
+    const loader = container.querySelector('#rashx-loader');
+    expect(loader?.classList.contains('done')).toBe(true);
+    expect(loader?.classList.contains('gone')).toBe(true);
+    expect(onComplete).toHaveBeenCalledTimes(2);
+  });
+
+  it('respects oncePerSession when sessionStorage has seen value', () => {
+    sessionStorage.setItem('rashx_loader_shown', 'true');
+    const { container } = render(<BrandLoader oncePerSession />);
+
+    const loader = container.querySelector('#rashx-loader');
+    expect(loader?.classList.contains('gone')).toBe(true);
   });
 });
 

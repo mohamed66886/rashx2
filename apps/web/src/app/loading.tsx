@@ -10,7 +10,7 @@ export default function GlobalLoading() {
       aria-label="جاري التحميل"
       role="status"
     >
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-[--surface-border] border-t-[--color-accent]" />
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-[--surface-muted] border-t-[--color-accent]" />
     </div>
   );
 }
