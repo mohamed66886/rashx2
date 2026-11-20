@@ -45,4 +45,5 @@ Each facility gets its own branded digital ecosystem on a RASHX subdomain: a pub
 ## Optional
 - [Arabic home page](https://rashx.org/)
 - [English home page](https://rashx.org/?lang=en)
+- [Full reference](https://rashx.org/llms-full.txt)
 - [Sitemap](https://rashx.org/sitemap.xml)

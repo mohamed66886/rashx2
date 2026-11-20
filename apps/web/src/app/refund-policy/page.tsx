@@ -6,6 +6,7 @@
  * Purpose: Authoritative subscription billing and cancellation guidelines.
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import { getLang } from '@/lib/lang';
 import { generatePageMetadata } from '@/lib/metadata';
@@ -73,9 +74,10 @@ export default async function RefundPolicyPage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
+      <PageJsonLd path="/refund-policy" lang={lang} />
       <Header lang={lang} />
 
-      <main id="main-content">
+      <div id="page-content">
         <section
           className="relative bg-[#FAF9F8] pt-14 pb-12 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20"
           dir={isAr ? 'rtl' : 'ltr'}
@@ -115,7 +117,7 @@ export default async function RefundPolicyPage() {
             </div>
           </PageContainer>
         </section>
-      </main>
+      </div>
 
       <Footer lang={lang} />
     </div>

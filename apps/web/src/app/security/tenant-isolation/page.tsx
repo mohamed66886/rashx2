@@ -3,6 +3,7 @@
  * Dedicated Route: /security/tenant-isolation
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import { getLang } from '@/lib/lang';
 import { generatePageMetadata } from '@/lib/metadata';
@@ -33,14 +34,15 @@ export default async function TenantIsolationPage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
+      <PageJsonLd path="/security/tenant-isolation" lang={lang} />
       <Header lang={lang} />
-      <main id="main-content">
+      <div id="page-content">
         <TrustHero product={product} lang={lang} />
         <TrustPillars product={product} lang={lang} />
         <TrustImpact product={product} lang={lang} />
         <TrustRegulatory product={product} lang={lang} />
         <TrustCTA product={product} lang={lang} />
-      </main>
+      </div>
       <Footer lang={lang} />
     </div>
   );

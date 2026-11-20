@@ -6,6 +6,7 @@
  * Purpose: Core operating values of RASHX.
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { Route } from 'next';
@@ -94,9 +95,10 @@ export default async function ValuesPage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
+      <PageJsonLd path="/values" lang={lang} />
       <Header lang={lang} />
 
-      <main id="main-content">
+      <div id="page-content">
         <section
           className="relative bg-[#FAF9F8] pt-14 pb-12 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20"
           dir={isAr ? 'rtl' : 'ltr'}
@@ -181,7 +183,7 @@ export default async function ValuesPage() {
             </div>
           </PageContainer>
         </section>
-      </main>
+      </div>
 
       <Footer lang={lang} />
     </div>

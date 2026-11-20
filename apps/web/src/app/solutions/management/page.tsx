@@ -3,6 +3,7 @@
  * Dedicated Route: /solutions/management
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import { getLang } from '@/lib/lang';
 import { generatePageMetadata } from '@/lib/metadata';
@@ -33,14 +34,15 @@ export default async function ManagementSolutionPage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
+      <PageJsonLd path="/solutions/management" lang={lang} />
       <Header lang={lang} />
-      <main id="main-content">
+      <div id="page-content">
         <SolutionHero solution={solution} lang={lang} />
         <SolutionCapabilities solution={solution} lang={lang} />
         <SolutionImpact solution={solution} lang={lang} />
         <SolutionEcosystem solution={solution} lang={lang} />
         <SolutionCTA solution={solution} lang={lang} />
-      </main>
+      </div>
       <Footer lang={lang} />
     </div>
   );

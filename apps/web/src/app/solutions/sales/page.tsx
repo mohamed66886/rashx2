@@ -5,6 +5,7 @@
  * Visual Direction: Absolute Flat, Clean, Borderless & Shadowless Architecture
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getLang } from '@/lib/lang';
@@ -46,6 +47,7 @@ export default async function SalesSolutionPage() {
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
       {/* ── Official Public Website Header ───────────────────────── */}
+      <PageJsonLd path="/solutions/sales" lang={lang} />
       <Header lang={lang} />
 
       {/* ── Section A: Solution Hero ──────────────────────────────── */}
