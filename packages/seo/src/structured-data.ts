@@ -66,6 +66,67 @@ export function buildFounderSchema() {
   } as const;
 }
 
+export interface FounderProfileSchemaInput {
+  lang: 'ar' | 'en';
+  /** Primary display name in English (matches the visible H1 spelling). */
+  name: string;
+  /** Every other spelling: Arabic name, short forms, handles. */
+  alternateNames: readonly string[];
+  /** ISO 8601 date, e.g. "2004-12-01". */
+  birthDate: string;
+  birthPlace: { name: string; addressRegion: string; addressCountry: string };
+  description: string;
+  /** Absolute URLs. Only pass photos that really exist on the site. */
+  images: readonly string[];
+  /** Personal profiles, no tracking parameters. */
+  sameAs: readonly string[];
+  knowsAbout: readonly string[];
+  education: { name: string; faculty: string };
+}
+
+/**
+ * Rich Person for /founder. Same @id as buildFounderSchema(), so crawlers merge
+ * both into one entity. Every value must also appear visibly on the page.
+ */
+export function buildFounderProfileSchema(input: FounderProfileSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': RASHX_FOUNDER_ID,
+    name: input.name,
+    alternateName: [...input.alternateNames],
+    url: `${SITE_URL}/founder`,
+    mainEntityOfPage: `${SITE_URL}/founder`,
+    description: input.description,
+    jobTitle: ['Founder', 'Software Developer'],
+    worksFor: { '@id': RASHX_ORGANIZATION_ID },
+    birthDate: input.birthDate,
+    birthPlace: {
+      '@type': 'Place',
+      name: input.birthPlace.name,
+      address: {
+        '@type': 'PostalAddress',
+        addressRegion: input.birthPlace.addressRegion,
+        addressCountry: input.birthPlace.addressCountry,
+      },
+    },
+    nationality: { '@type': 'Country', name: 'Egypt' },
+    alumniOf: {
+      '@type': 'CollegeOrUniversity',
+      name: input.education.name,
+      department: { '@type': 'Organization', name: input.education.faculty },
+    },
+    memberOf: {
+      '@type': 'Organization',
+      name: 'IEEE',
+      url: 'https://www.ieee.org',
+    },
+    knowsAbout: [...input.knowsAbout],
+    ...(input.images.length > 0 ? { image: [...input.images] } : {}),
+    sameAs: [...input.sameAs],
+  };
+}
+
 /** WebSite structured data (no SearchAction: the site has no sitewide search). */
 export function buildWebsiteSchema() {
   return {
