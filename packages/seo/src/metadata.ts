@@ -9,7 +9,18 @@ export const SITE_URL = 'https://rashx.org' as const;
 export const APP_URL = 'https://app.rashx.org' as const;
 export const SITE_NAME = 'RASHX | راش إكس' as const;
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og/default.png` as const;
-export const TWITTER_HANDLE = '@rashx' as const;
+export const TWITTER_HANDLE = '@rashxsa' as const;
+
+/** Official profiles — keep identical everywhere (schema sameAs, footer, llms.txt). */
+export const SOCIAL_PROFILES = [
+  'https://x.com/rashxsa',
+  'https://www.linkedin.com/company/rashx',
+  'https://www.instagram.com/rashx.sa',
+  'https://www.facebook.com/rashx.sa',
+  'https://www.tiktok.com/@rashx.sa',
+  'https://t.me/rashxsa',
+  'https://snapchat.com/t/MuwsbAAK',
+] as const;
 
 export interface PageMetaInput {
   title: string;

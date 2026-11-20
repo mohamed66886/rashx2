@@ -8,7 +8,7 @@ describe('Middleware i18n & Routing Verification', () => {
     const request = new NextRequest('http://localhost:3000/ar');
     const response = middleware(request);
 
-    expect(response.status).toBe(307);
+    expect(response.status).toBe(308);
     expect(response.headers.get('location')).toBe('http://localhost:3000/');
     expect(response.cookies.get(LANG_COOKIE)?.value).toBe('ar');
   });
@@ -17,7 +17,7 @@ describe('Middleware i18n & Routing Verification', () => {
     const request = new NextRequest('http://localhost:3000/ar/about');
     const response = middleware(request);
 
-    expect(response.status).toBe(307);
+    expect(response.status).toBe(308);
     expect(response.headers.get('location')).toBe('http://localhost:3000/about');
     expect(response.cookies.get(LANG_COOKIE)?.value).toBe('ar');
   });
@@ -26,7 +26,7 @@ describe('Middleware i18n & Routing Verification', () => {
     const request = new NextRequest('http://localhost:3000/en');
     const response = middleware(request);
 
-    expect(response.status).toBe(307);
+    expect(response.status).toBe(308);
     expect(response.headers.get('location')).toBe('http://localhost:3000/?lang=en');
     expect(response.cookies.get(LANG_COOKIE)?.value).toBe('en');
   });
@@ -35,7 +35,7 @@ describe('Middleware i18n & Routing Verification', () => {
     const request = new NextRequest('http://localhost:3000/en/pricing');
     const response = middleware(request);
 
-    expect(response.status).toBe(307);
+    expect(response.status).toBe(308);
     expect(response.headers.get('location')).toBe('http://localhost:3000/pricing?lang=en');
     expect(response.cookies.get(LANG_COOKIE)?.value).toBe('en');
   });

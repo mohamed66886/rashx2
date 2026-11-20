@@ -22,6 +22,8 @@ import {
   Layers,
 } from '@rashx/icons';
 import { Header, Footer } from '@/components/layout';
+import { JsonLd } from '@/components/seo';
+import { buildSoftwareApplicationSchema } from '@rashx/seo/structured-data';
 import {
   Hero,
   ProblemSolution,
@@ -34,11 +36,17 @@ import {
 } from '@/components/home';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const lang = await getLang();
+  const isAr = lang === 'ar';
   return generatePageMetadata({
-    title: 'RASHX | راش إكس — نظام التشغيل الرقمي لقطاع التجميل والعناية',
-    description:
-      'راش إكس (RASHX) — نظام التشغيل والمنصة السحابية المتكاملة لإدارة صالونات التجميل، مراكز العناية، والسبا في المملكة العربية السعودية والشرق الأوسط.',
+    title: isAr
+      ? 'RASHX | راش إكس — نظام التشغيل الرقمي لقطاع التجميل والعناية'
+      : 'RASHX | راش إكس — Salon, Beauty Center & Spa Management Platform',
+    description: isAr
+      ? 'راش إكس (RASHX) — نظام التشغيل والمنصة السحابية المتكاملة لإدارة صالونات التجميل، مراكز العناية، والسبا في المملكة العربية السعودية والشرق الأوسط.'
+      : 'RASHX is a cloud platform for beauty salons, beauty centers and spas in Saudi Arabia: bookings, CRM, HR, sales, inventory, loyalty and ZATCA e-invoicing in one system.',
     path: '/',
+    lang,
   });
 }
 
@@ -49,6 +57,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
       {/* ── Official Public Website Header ───────────────────────── */}
+      <JsonLd data={buildSoftwareApplicationSchema()} />
       <Header lang={lang} />
 
       {/* ── Official Homepage Hero Section ────────────────────────── */}

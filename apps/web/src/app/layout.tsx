@@ -14,6 +14,12 @@ import { Noto_Kufi_Arabic, Inter } from 'next/font/google';
 import { getLang, getDir, getLangAttr } from '@/lib/lang';
 import { generateRootMetadata } from '@/lib/metadata';
 import { BrandLoader } from '@rashx/ui';
+import {
+  buildOrganizationSchema,
+  buildWebsiteSchema,
+  buildFounderSchema,
+} from '@rashx/seo/structured-data';
+import { JsonLd } from '@/components/seo';
 import './globals.css';
 
 // ── Arabic Font (Noto Kufi Arabic) ─────────────────────────
@@ -52,6 +58,13 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="antialiased bg-[--surface-background] text-[--surface-foreground]">
+        <JsonLd
+          data={[
+            buildOrganizationSchema(),
+            buildWebsiteSchema(),
+            buildFounderSchema(),
+          ]}
+        />
         {/* Official Brand Splash Curtain Loader */}
         <BrandLoader lang={lang} />
 

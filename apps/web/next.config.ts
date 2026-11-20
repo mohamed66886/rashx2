@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Internal brand review pages: keep out of the index (header is seen even without HTML)
+        source: '/brand/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+      {
         source: '/(.*)',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },

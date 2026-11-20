@@ -33,7 +33,7 @@ export function middleware(request: NextRequest): NextResponse {
       if (key !== 'lang') redirectUrl.searchParams.set(key, val);
     });
 
-    const response = NextResponse.redirect(redirectUrl, 307);
+    const response = NextResponse.redirect(redirectUrl, 308);
     response.cookies.set(LANG_COOKIE, 'ar', {
       maxAge: 60 * 60 * 24 * 365,
       sameSite: 'lax',
@@ -51,7 +51,7 @@ export function middleware(request: NextRequest): NextResponse {
     });
     redirectUrl.searchParams.set('lang', 'en');
 
-    const response = NextResponse.redirect(redirectUrl, 307);
+    const response = NextResponse.redirect(redirectUrl, 308);
     response.cookies.set(LANG_COOKIE, 'en', {
       maxAge: 60 * 60 * 24 * 365,
       sameSite: 'lax',
