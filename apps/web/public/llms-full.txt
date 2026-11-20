@@ -1,0 +1,42 @@
+# RASHX | راش إكس — Full reference for AI assistants
+
+RASHX (راش إكس) is a cloud management platform for beauty salons, beauty centers and spas in Saudi Arabia. It brings management, operations, sales and the customer experience into one connected digital system. Founded in 2026 by Eng. Mohamed Abdo Rashad El-Bahy (م/ محمد عبده رشاد البهي). Official site: https://rashx.org — Phone: +966 54 808 2945.
+
+RASHX is not only a dashboard. Each facility receives its own branded ecosystem on a RASHX subdomain, made of four connected parts:
+1. Website — a public site showing the facility, its services, prices and offers.
+2. Admin Dashboard — daily operations, staff, customers, services, sales, inventory, reports and settings.
+3. Customer Application — browse services, manage bookings and appointments, loyalty and offers.
+4. Service Provider Application — a workspace for staff: schedule, bookings, services and tasks.
+
+## Modules
+- HR Management: staff and provider profiles, roles and permissions, work schedules and shifts, performance, commissions and dues, attendance (depending on enabled capabilities).
+- CRM: customer database, visit and service history, booking and transaction history, segmentation, notes and preferences.
+- Booking Management: appointments, provider schedules, booking statuses, availability, fewer scheduling conflicts.
+- Services Management: service catalog and categories, prices and durations, linking services to providers, packages and offers.
+- Sales Management: daily sales, invoices for services and products, revenue tracking, discounts and offers, payment methods, financial and operational reports.
+- Purchasing Management: purchase records, suppliers, purchase invoices, material cost control.
+- Inventory Management: products and consumables, stock levels and low-stock alerts, issue/receive movements, stock counts.
+- Loyalty Program: custom loyalty programs, points under each facility's policy, rewards and special offers.
+- Notifications: booking and appointment notices, management and staff alerts, offers and updates.
+- Reports & Analytics: sales, staff performance, bookings, customers, purchasing and inventory, KPIs.
+
+## White label
+Each facility can set its name and logo, colors and visual identity, customize the website / customer / provider interfaces, contact details, services and prices, operating settings, and gets an independent subdomain under RASHX.
+
+## ZATCA e-invoicing (Saudi Arabia)
+RASHX supports Saudi e-invoicing requirements, including Phase 2 (integration phase), according to each facility's status and the linking and activation requirements set by ZATCA (هيئة الزكاة والضريبة والجمارك).
+
+## Data security
+Access is organized by permissions; roles and users are managed; accounts and data are protected; data of different facilities is logically separated; confidentiality and business continuity are supported.
+
+## Vision, mission, goals
+Vision: to become one of the leading specialist technology platforms for the beauty and personal-care sector in the region. Mission: help beauty facilities run their business more intelligently by unifying administrative, operational and financial processes in one digital system. Goals: digitize salon and spa operations, reduce complexity, raise workforce efficiency, improve customer experience and loyalty, provide accurate data for decisions, support growth.
+
+## Key pages
+- https://rashx.org/platform — https://rashx.org/features — https://rashx.org/solutions — https://rashx.org/industries
+- https://rashx.org/compliance/e-invoicing — https://rashx.org/security — https://rashx.org/white-label
+- https://rashx.org/pricing (custom pricing) — https://rashx.org/faq — https://rashx.org/demo — https://rashx.org/contact
+- English versions: add ?lang=en to any URL.
+
+## Official channels
+X https://x.com/rashxsa · LinkedIn https://www.linkedin.com/company/rashx · Instagram https://www.instagram.com/rashx.sa · Facebook https://www.facebook.com/rashx.sa · TikTok https://www.tiktok.com/@rashx.sa · Telegram https://t.me/rashxsa · Snapchat https://snapchat.com/t/MuwsbAAK

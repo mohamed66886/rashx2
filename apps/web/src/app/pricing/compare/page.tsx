@@ -6,6 +6,7 @@
  * Purpose: Full feature and module breakdown across subscription tiers.
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { Route } from 'next';
@@ -92,9 +93,10 @@ export default async function PricingComparePage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
+      <PageJsonLd path="/pricing/compare" lang={lang} />
       <Header lang={lang} />
 
-      <main id="main-content">
+      <div id="page-content">
         {/* Hero */}
         <section
           className="relative bg-[#FAF9F8] pt-14 pb-12 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20"
@@ -233,7 +235,7 @@ export default async function PricingComparePage() {
             </div>
           </PageContainer>
         </section>
-      </main>
+      </div>
 
       <Footer lang={lang} />
     </div>

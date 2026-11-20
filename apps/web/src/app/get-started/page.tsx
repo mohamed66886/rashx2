@@ -6,6 +6,7 @@
  * Purpose: Facility onboarding, subdomain reservation, and digital setup initiation.
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import { getLang } from '@/lib/lang';
 import { generatePageMetadata } from '@/lib/metadata';
@@ -39,15 +40,16 @@ export default async function GetStartedPage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
+      <PageJsonLd path="/get-started" lang={lang} />
       <Header lang={lang} />
 
-      <main id="main-content">
+      <div id="page-content">
         <GetStartedHero lang={lang} />
         <GetStartedSteps lang={lang} />
         <GetStartedGuarantees lang={lang} />
         <GetStartedForm lang={lang} />
         <GetStartedCTA lang={lang} />
-      </main>
+      </div>
 
       <Footer lang={lang} />
     </div>

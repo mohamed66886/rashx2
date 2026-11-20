@@ -12,6 +12,8 @@ import type { Route } from 'next';
 import { getLang } from '@/lib/lang';
 import { generatePageMetadata } from '@/lib/metadata';
 import { Header, Footer } from '@/components/layout';
+import { JsonLd, PageJsonLd } from '@/components/seo';
+import { buildFaqSchema } from '@rashx/seo/structured-data';
 import { PageContainer } from '@rashx/ui';
 import { SectionTitle } from '@/components/sections';
 import { ArrowLeft, ArrowRight, HelpCircle, Phone, Sparkles } from '@rashx/icons';
@@ -118,9 +120,19 @@ export default async function FAQPage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
+      <PageJsonLd path="/faq" lang={lang} />
+      <JsonLd
+        data={buildFaqSchema(
+          faqs.map((f) => ({
+            question: f.question[lang],
+            answer: f.answer[lang],
+          })),
+          lang,
+        )}
+      />
       <Header lang={lang} />
 
-      <main id="main-content">
+      <div id="page-content">
         {/* Hero */}
         <section
           className="relative bg-[#FAF9F8] pt-14 pb-12 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20"
@@ -206,7 +218,7 @@ export default async function FAQPage() {
             </div>
           </PageContainer>
         </section>
-      </main>
+      </div>
 
       <Footer lang={lang} />
     </div>

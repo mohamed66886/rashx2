@@ -3,6 +3,7 @@
  * Dedicated Route: /industries/multi-branch
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import { getLang } from '@/lib/lang';
 import { generatePageMetadata } from '@/lib/metadata';
@@ -33,14 +34,15 @@ export default async function MultiBranchPage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
+      <PageJsonLd path="/industries/multi-branch" lang={lang} />
       <Header lang={lang} />
-      <main id="main-content">
+      <div id="page-content">
         <IndustryHero industry={industry} lang={lang} />
         <IndustryChallenges industry={industry} lang={lang} />
         <IndustrySolutions industry={industry} lang={lang} />
         <IndustryFeatures industry={industry} lang={lang} />
         <IndustryCTA industry={industry} lang={lang} />
-      </main>
+      </div>
       <Footer lang={lang} />
     </div>
   );

@@ -206,15 +206,15 @@ describe('RASHX Header & Footer Layout Suite', () => {
       const linkedin = screen.getByRole('link', { name: /لينكدإن/i });
       const instagram = screen.getByRole('link', { name: /إنستغرام/i });
 
-      expect(twitter).toHaveAttribute('href', 'https://twitter.com/rashx');
+      expect(twitter).toHaveAttribute('href', 'https://x.com/rashxsa');
       expect(twitter).toHaveAttribute('target', '_blank');
       expect(twitter).toHaveAttribute('rel', 'noopener noreferrer');
 
-      expect(linkedin).toHaveAttribute('href', 'https://linkedin.com/company/rashx');
+      expect(linkedin).toHaveAttribute('href', 'https://www.linkedin.com/company/rashx');
       expect(linkedin).toHaveAttribute('target', '_blank');
       expect(linkedin).toHaveAttribute('rel', 'noopener noreferrer');
 
-      expect(instagram).toHaveAttribute('href', 'https://instagram.com/rashx');
+      expect(instagram).toHaveAttribute('href', 'https://www.instagram.com/rashx.sa');
       expect(instagram).toHaveAttribute('target', '_blank');
       expect(instagram).toHaveAttribute('rel', 'noopener noreferrer');
     });

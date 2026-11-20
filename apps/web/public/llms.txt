@@ -1,0 +1,49 @@
+# RASHX | راش إكس
+
+> RASHX (راش إكس) is a cloud management platform for beauty salons, beauty centers and spas in Saudi Arabia. It unifies bookings, CRM, HR and commissions, sales and POS, purchasing, inventory, loyalty, notifications and reports in one system, and supports ZATCA e-invoicing (Phase 2, subject to each facility's integration status). Founded in 2026 by Eng. Mohamed Abdo Rashad El-Bahy (محمد عبده رشاد البهي).
+
+Each facility gets its own branded digital ecosystem on a RASHX subdomain: a public website, an admin dashboard, a customer app/portal and a service-provider (staff) app. Arabic is the default language; English pages use `?lang=en`.
+
+## Facts
+- Company: RASHX – راش إكس (technology and digital solutions for the beauty sector)
+- Founded: 2026
+- Founder: Mohamed Abdo Rashad El-Bahy
+- Website: https://rashx.org
+- Phone: +966 54 808 2945
+- Market: Saudi Arabia
+- Pricing: custom, quote-based (see /pricing)
+
+## Platform and solutions
+- [Platform overview](https://rashx.org/platform): the connected ecosystem, white label and tenant security
+- [Features](https://rashx.org/features): all modules
+- [Solutions](https://rashx.org/solutions): booking, CRM, HR, services, sales, POS, purchasing, inventory, loyalty, notifications, analytics, branches, subscriptions
+- [Industries](https://rashx.org/industries): beauty salons, barbershops, beauty centers, spas, personal care, multi-branch
+- [White label and custom domains](https://rashx.org/white-label)
+- [ZATCA e-invoicing](https://rashx.org/compliance/e-invoicing)
+- [Security and tenant isolation](https://rashx.org/security)
+
+## Company
+- [About](https://rashx.org/about)
+- [Founder](https://rashx.org/founder)
+- [Vision](https://rashx.org/vision)
+- [Contact](https://rashx.org/contact)
+
+## Help
+- [FAQ](https://rashx.org/faq)
+- [Pricing](https://rashx.org/pricing)
+- [Book a demo](https://rashx.org/demo)
+
+## Official channels
+- X: https://x.com/rashxsa
+- LinkedIn: https://www.linkedin.com/company/rashx
+- Instagram: https://www.instagram.com/rashx.sa
+- Facebook: https://www.facebook.com/rashx.sa
+- TikTok: https://www.tiktok.com/@rashx.sa
+- Telegram: https://t.me/rashxsa
+- Snapchat: https://snapchat.com/t/MuwsbAAK
+
+## Optional
+- [Arabic home page](https://rashx.org/)
+- [English home page](https://rashx.org/?lang=en)
+- [Full reference](https://rashx.org/llms-full.txt)
+- [Sitemap](https://rashx.org/sitemap.xml)

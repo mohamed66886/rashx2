@@ -6,6 +6,7 @@
  * Audience: Salon & Beauty Center Owners, Operational Managers, and Decision Makers in Saudi Arabia.
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import { getLang } from '@/lib/lang';
 import { generatePageMetadata } from '@/lib/metadata';
@@ -42,6 +43,7 @@ export default async function AboutPage() {
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
       {/* ── Official Public Website Header ───────────────────────── */}
+      <PageJsonLd path="/about" lang={lang} />
       <Header lang={lang} />
 
       {/* ── Section A: About Hero ─────────────────────────────────── */}

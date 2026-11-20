@@ -6,6 +6,7 @@
  * Purpose: Interactive walkthrough scheduling for salon and spa owners in Saudi Arabia.
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import { getLang } from '@/lib/lang';
 import { generatePageMetadata } from '@/lib/metadata';
@@ -38,14 +39,15 @@ export default async function DemoPage() {
 
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
+      <PageJsonLd path="/demo" lang={lang} />
       <Header lang={lang} />
 
-      <main id="main-content">
+      <div id="page-content">
         <DemoHero lang={lang} />
         <DemoHighlights lang={lang} />
         <DemoForm lang={lang} />
         <DemoCTA lang={lang} />
-      </main>
+      </div>
 
       <Footer lang={lang} />
     </div>

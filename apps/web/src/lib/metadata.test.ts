@@ -11,7 +11,7 @@ describe('Metadata Generator', () => {
       lang: 'ar',
     });
 
-    expect(meta.title).toBe('عن راش إكس');
+    expect(meta.title).toEqual({ absolute: 'عن راش إكس' });
     expect(meta.description).toBe('وصف عن راش إكس');
     expect(meta.alternates?.canonical).toBe(`${SITE_URL}/about`);
     expect(meta.openGraph?.locale).toBe('ar_SA');
@@ -26,7 +26,13 @@ describe('Metadata Generator', () => {
       lang: 'en',
     });
 
-    expect(meta.title).toBe('About RASHX');
+    expect(meta.title).toEqual({ absolute: 'About RASHX' });
+    expect(meta.alternates?.canonical).toBe(`${SITE_URL}/about?lang=en`);
+    expect(meta.alternates?.languages).toMatchObject({
+      ar: `${SITE_URL}/about`,
+      en: `${SITE_URL}/about?lang=en`,
+      'x-default': `${SITE_URL}/about`,
+    });
     expect(meta.openGraph?.locale).toBe('en_US');
     expect(meta.openGraph?.alternateLocale).toBe('ar_SA');
   });

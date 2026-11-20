@@ -6,6 +6,7 @@
  * Audience: Salon owners, beauty center decision-makers, and business partners in Saudi Arabia.
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import { getLang } from '@/lib/lang';
 import { generatePageMetadata } from '@/lib/metadata';
@@ -40,6 +41,7 @@ export default async function ContactPage() {
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
       {/* ── Official Public Website Header ───────────────────────── */}
+      <PageJsonLd path="/contact" lang={lang} />
       <Header lang={lang} />
 
       {/* ── Section A: Contact Hero ───────────────────────────────── */}

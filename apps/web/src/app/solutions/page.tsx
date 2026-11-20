@@ -5,6 +5,7 @@
  * Visual Direction: Absolute Flat, Clean, Borderless & Shadowless Architecture
  */
 
+import { PageJsonLd } from '@/components/seo';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { Route } from 'next';
@@ -43,6 +44,7 @@ export default async function SolutionsHubPage() {
   return (
     <div className="min-h-screen bg-[--surface-background] text-[--surface-foreground] transition-colors duration-200">
       {/* ── Official Public Website Header ───────────────────────── */}
+      <PageJsonLd path="/solutions" lang={lang} />
       <Header lang={lang} />
 
       {/* ── Hero Section ─────────────────────────────────────────── */}

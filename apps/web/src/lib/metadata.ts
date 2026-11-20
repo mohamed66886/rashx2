@@ -11,7 +11,7 @@ import {
   SITE_NAME,
   DEFAULT_OG_IMAGE,
   TWITTER_HANDLE,
-  buildCanonicalUrl,
+  buildHreflangUrl,
   buildHreflangAlternates,
   buildRobots,
 } from '@rashx/seo/metadata';
@@ -41,12 +41,15 @@ export function generatePageMetadata({
   publishedTime,
   modifiedTime,
 }: GenerateMetadataOptions): Metadata {
-  const canonicalUrl = buildCanonicalUrl(path);
+  // Self-referencing canonical per language variant (ar = clean URL, en = ?lang=en).
+  // Pointing the English variant at the Arabic URL would stop English from being indexed.
+  const canonicalUrl = buildHreflangUrl(path, lang);
   const alternates = buildHreflangAlternates(path);
   const locale = lang === 'ar' ? 'ar_SA' : 'en_US';
 
   return {
-    title,
+    // `absolute` skips the root `%s | RASHX` template: page titles already carry the brand.
+    title: { absolute: title },
     description,
     metadataBase: new URL(SITE_URL),
     alternates: {

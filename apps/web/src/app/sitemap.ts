@@ -1,29 +1,116 @@
 import type { MetadataRoute } from 'next';
-import { SITE_URL } from '@rashx/seo/metadata';
+import { SITE_URL, buildHreflangUrl } from '@rashx/seo/metadata';
 
 /**
- * Production Sitemap Configuration
+ * Production sitemap — one entry per indexable public route.
  *
- * Generates /sitemap.xml at build/runtime.
- * Excludes internal or review routes such as /brand.
+ * - Arabic is the canonical URL (ADR 0003), English is `?lang=en`.
+ * - Every entry lists both language alternates plus x-default.
+ * - `lastModified` is intentionally omitted: Google only trusts it when it is
+ *   accurate per page. Add it later from real content timestamps.
+ * - Excluded on purpose: /brand/* (internal review, noindex), /support/report,
+ *   /salons/search, /register-interest (utility / form pages).
  */
-export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
+const PUBLIC_PATHS = [
+  '',
+  '/about',
+  '/acceptable-use',
+  '/accessibility-statement',
+  '/apps',
+  '/blog',
+  '/branding',
+  '/careers',
+  '/careers/internships',
+  '/case-studies',
+  '/compliance',
+  '/compliance/e-invoicing',
+  '/consultation',
+  '/contact',
+  '/cookies',
+  '/custom-domains',
+  '/customer-experience',
+  '/data-processing',
+  '/demo',
+  '/developers',
+  '/developers/api',
+  '/downloads',
+  '/faq',
+  '/features',
+  '/founder',
+  '/founder/message',
+  '/gallery',
+  '/get-started',
+  '/help',
+  '/help/guides',
+  '/help/technical',
+  '/industries',
+  '/industries/barbershops',
+  '/industries/beauty-centers',
+  '/industries/beauty-salons',
+  '/industries/multi-branch',
+  '/industries/personal-care',
+  '/industries/spa',
+  '/integrations',
+  '/media',
+  '/milestones',
+  '/news',
+  '/newsroom',
+  '/newsroom/press',
+  '/partners',
+  '/partners/apply',
+  '/partners/program',
+  '/platform',
+  '/pricing',
+  '/pricing/compare',
+  '/privacy',
+  '/provider-experience',
+  '/quote',
+  '/refund-policy',
+  '/reliability',
+  '/sales',
+  '/salons',
+  '/security',
+  '/security-disclosure',
+  '/security/access-control',
+  '/security/account-protection',
+  '/security/tenant-isolation',
+  '/sla',
+  '/solutions',
+  '/solutions/analytics',
+  '/solutions/booking',
+  '/solutions/branches',
+  '/solutions/crm',
+  '/solutions/hr',
+  '/solutions/inventory',
+  '/solutions/loyalty',
+  '/solutions/management',
+  '/solutions/notifications',
+  '/solutions/pos',
+  '/solutions/purchasing',
+  '/solutions/sales',
+  '/solutions/services',
+  '/solutions/subscriptions',
+  '/status',
+  '/story',
+  '/subscription-terms',
+  '/support',
+  '/team',
+  '/terms',
+  '/values',
+  '/vision',
+  '/websites',
+  '/white-label',
+] as const;
 
-  return [
-    {
-      url: SITE_URL,
-      lastModified,
-      changeFrequency: 'weekly',
-      priority: 1.0,
-      alternates: {
-        languages: {
-          ar: SITE_URL,
-          en: `${SITE_URL}?lang=en`,
-          'x-default': SITE_URL,
-        },
+export default function sitemap(): MetadataRoute.Sitemap {
+  return PUBLIC_PATHS.map((path) => ({
+    url: path === '' ? SITE_URL : `${SITE_URL}${path}`,
+    alternates: {
+      languages: {
+        ar: buildHreflangUrl(path || '/', 'ar'),
+        en: buildHreflangUrl(path || '/', 'en'),
+        'x-default': buildHreflangUrl(path || '/', 'ar'),
       },
     },
-  ];
+  }));
 }
-
