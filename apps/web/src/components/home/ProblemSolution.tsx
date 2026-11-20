@@ -8,36 +8,32 @@ export interface ProblemSolutionProps {
   className?: string;
 }
 
-/**
- * Layout per screen:
- *  - mobile  (< sm): vertical "chain" — compact cards linked by a centered dashed line that drops into the hub
- *  - tablet  (sm–lg): 2×2 grid, a "+" joint in the middle, one line into the hub
- *  - desktop (lg+): 4 tilted/staggered "scattered" cards, animated SVG lines converging into the hub
- *  - hub: text + orbit diagram (stacked on small screens, side by side on lg+)
- */
-
-// Tones for the icon tiles (palette colors only)
-const TONES = [
-  'bg-[#91B8C0]/30',
-  'bg-[#F0C5AE]/50',
-  'bg-[#C78360]/20',
-  'bg-[#6E9BA4]/25',
+const ICON_TONES = [
+  'bg-[#91B8C0]/25 text-[#54453D]',
+  'bg-[#F0C5AE]/45 text-[#54453D]',
+  'bg-[#C78360]/20 text-[#54453D]',
+  'bg-[#6E9BA4]/25 text-[#54453D]',
 ] as const;
 
-// Desktop-only "scattered" tilt per card
-const TILTS = [
-  'lg:-rotate-2 lg:translate-y-3 lg:hover:rotate-0 lg:hover:translate-y-0',
-  'lg:rotate-1 lg:translate-y-0 lg:hover:rotate-0 lg:hover:-translate-y-1',
-  'lg:-rotate-1 lg:translate-y-4 lg:hover:rotate-0 lg:hover:translate-y-1',
-  'lg:rotate-2 lg:translate-y-1 lg:hover:rotate-0 lg:hover:-translate-y-0.5',
+const DARK_ICON_TONES = [
+  'bg-[#91B8C0]/20 text-[#91B8C0]',
+  'bg-[#F0C5AE]/20 text-[#F0C5AE]',
+  'bg-[#C78360]/25 text-[#F0C5AE]',
+  'bg-[#6E9BA4]/25 text-[#91B8C0]',
 ] as const;
 
-// Converging paths (viewBox 0 0 1000 100, 4 equal columns → 125 / 375 / 625 / 875)
-const CONVERGE_PATHS = [
-  'M125 0 C125 70, 500 36, 500 100',
-  'M375 0 C375 62, 500 46, 500 100',
-  'M625 0 C625 62, 500 46, 500 100',
-  'M875 0 C875 70, 500 36, 500 100',
+// Desktop horizontal convergence paths (4 card centers → hub center)
+const DESKTOP_FLOW_PATHS = [
+  'M0 12 C48 12, 52 50, 100 50',
+  'M0 37.3 C48 37.3, 52 50, 100 50',
+  'M0 62.7 C48 62.7, 52 50, 100 50',
+  'M0 88 C48 88, 52 50, 100 50',
+] as const;
+
+// Tablet dual-column merge paths (left col 25% & right col 75% → center 50%)
+const TABLET_MERGE_PATHS = [
+  'M150 0 C150 42, 300 24, 300 68',
+  'M450 0 C450 42, 300 24, 300 68',
 ] as const;
 
 export function ProblemSolution({ lang, className }: ProblemSolutionProps) {
@@ -49,24 +45,28 @@ export function ProblemSolution({ lang, className }: ProblemSolutionProps) {
           number: '01',
           title: 'المواعيد',
           description: 'حجوزات متفرقة وصعوبة المتابعة.',
+          syncedOutcome: 'حجوزات منظمة تلقائياً',
           icon: Calendar,
         },
         {
           number: '02',
           title: 'العملاء',
           description: 'بيانات موزعة وتجربة غير متسقة.',
+          syncedOutcome: 'ملف عميل موحد',
           icon: UserRound,
         },
         {
           number: '03',
           title: 'الفريق',
           description: 'متابعة الموظفين والمهام يدويًا.',
+          syncedOutcome: 'جداول ومهام واضحة',
           icon: Users,
         },
         {
           number: '04',
           title: 'المبيعات',
           description: 'صعوبة متابعة الأداء والإيرادات.',
+          syncedOutcome: 'رؤية لحظية للإيرادات',
           icon: TrendingUp,
         },
       ]
@@ -75,298 +75,581 @@ export function ProblemSolution({ lang, className }: ProblemSolutionProps) {
           number: '01',
           title: 'Appointments',
           description: 'Scattered bookings and difficult follow-ups.',
+          syncedOutcome: 'Auto-synced bookings',
           icon: Calendar,
         },
         {
           number: '02',
           title: 'Customers',
           description: 'Disconnected information and inconsistent experiences.',
+          syncedOutcome: 'Unified client profiles',
           icon: UserRound,
         },
         {
           number: '03',
           title: 'Team',
           description: 'Manual employee and task coordination.',
+          syncedOutcome: 'Clear shifts & tasks',
           icon: Users,
         },
         {
           number: '04',
           title: 'Sales',
           description: 'Limited visibility into performance and revenue.',
+          syncedOutcome: 'Real-time revenue view',
           icon: TrendingUp,
         },
       ];
 
-  const isolatedLabel = isAr ? 'منفصل' : 'Isolated';
-  const brandLabel = isAr ? 'راش إكس' : 'RASHX';
-
-  // Orbit node positions (top / end / bottom / start of the ring)
-  const orbitNodes = [
-    'left-1/2 top-[8%]',
-    'left-[92%] top-1/2',
-    'left-1/2 top-[92%]',
-    'left-[8%] top-1/2',
-  ] as const;
+  const copy = isAr
+    ? {
+        sectionTitle: 'إدارة صالونك المفروض ما تكون معقدة.',
+        beforeLabel: 'قبل التوحيد · أدوات متفرقة',
+        isolatedLabel: 'منفصل',
+        mergeLabel: 'توحيد في نظام واحد',
+        badge: 'المنظومة الموحدة',
+        brand: 'راش إكس',
+        hubTitle: 'كل أعمالك في منظومة واحدة.',
+        hubSubtitle:
+          'إدارة مترابطة تمنحك رؤية أوضح وتحكمًا أكبر في تفاصيل صالونك.',
+        syncedBar: '4 أقسام مترابطة في الوقت الفعلي',
+        syncedTag: 'متصل',
+        pillarsAria: 'الأقسام المترابطة',
+      }
+    : {
+        sectionTitle: "Managing your salon shouldn't be complicated.",
+        beforeLabel: 'BEFORE · FRAGMENTED TOOLS',
+        isolatedLabel: 'Isolated',
+        mergeLabel: 'Unified into one core',
+        badge: 'CONNECTED OPERATING SYSTEM',
+        brand: 'RASHX',
+        hubTitle: 'Your entire business, connected in one system.',
+        hubSubtitle:
+          'An integrated management experience that gives you a clearer view and greater control over your salon.',
+        syncedBar: '4 synced modules · Real-time',
+        syncedTag: 'Synced',
+        pillarsAria: 'Connected Pillars',
+      };
 
   return (
     <section
       id="problem-solution"
-      className={`relative overflow-hidden bg-white py-16 sm:py-20 lg:py-28 xl:py-32 transition-colors duration-200 ${className ?? ''}`}
+      className={`relative overflow-hidden bg-white py-16 sm:py-20 lg:py-28 xl:py-32 ${className ?? ''}`}
       dir={isAr ? 'rtl' : 'ltr'}
     >
       <style>{`
-        @keyframes rx-ps-flow { to { stroke-dashoffset: -28; } }
-        .rx-ps-flow { animation: rx-ps-flow 1.6s linear infinite; }
-        @media (prefers-reduced-motion: reduce) { .rx-ps-flow { animation: none; } }
+        @keyframes rx-ps-dash {
+          to { stroke-dashoffset: -24; }
+        }
+        .rx-ps-dash {
+          animation: rx-ps-dash 1.4s linear infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .rx-ps-dash { animation: none; }
+        }
       `}</style>
 
-
       <PageContainer size="full">
-        <div className="relative">
-          {/* ── Section Header ───────────────────────────────────── */}
-          <div className="mx-auto max-w-3xl text-center">
-            <SectionTitle
-              title={
-                isAr
-                  ? 'إدارة صالونك ما المفروض تكون معقدة.'
-                  : "Managing your salon shouldn't be complicated."
-              }
-              align="center"
-            />
-            <p className="mx-auto mt-4 sm:mt-5 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-[#75645B]">
-              {isAr
-                ? 'لما كل جزء من شغلك يُدار بطريقة مختلفة، بتفقد الصورة الكاملة.'
-                : "When every part of your business is managed separately, it's difficult to see the full picture."}
-            </p>
+        {/* ── Section Header ───────────────────────────────────────── */}
+        <div className="mx-auto max-w-3xl text-center">
+          <SectionTitle title={copy.sectionTitle} align="center" />
+        </div>
+
+        {/* ============================================================
+            1. MOBILE LAYOUT (< md): Vertical Story Funnel
+           ============================================================ */}
+        <div className="mt-10 md:hidden">
+          <div className="mb-4 flex items-center justify-center">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#FAF9F8] px-3.5 py-1 text-[0.7rem] font-semibold tracking-wide text-[#75645B]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#C78360]" />
+              {copy.beforeLabel}
+            </span>
           </div>
 
-          {/* ── Fragmented operations ────────────────────────────── */}
-          <div className="relative mt-12 sm:mt-14 lg:mt-20">
-            <div className="relative z-10 flex flex-col sm:grid sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-5 xl:gap-7">
-              {challenges.map((challenge, i) => {
-                const Icon = challenge.icon;
-                return (
-                  <div key={challenge.title} className="contents">
-                    <article
-                      className={`group relative isolate flex h-full flex-col overflow-hidden rounded-2xl bg-[#FAF9F8] p-5 sm:p-6 xl:p-7 transition-all duration-300 motion-reduce:transition-none lg:min-h-[13rem] xl:min-h-[14.5rem] ${TILTS[i]}`}
+          {/* Fragmented vertical rail + compact cards */}
+          <div className="relative space-y-3 ps-5">
+            <span
+              aria-hidden="true"
+              className="absolute bottom-5 start-1.5 top-5 w-[1.5px] bg-[#C78360]/30"
+            />
+            {challenges.map((challenge, i) => {
+              const Icon = challenge.icon;
+              return (
+                <article
+                  key={challenge.title}
+                  className="relative rounded-2xl bg-[#FAF9F8] p-4"
+                >
+                  {/* Rail node */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute -start-[1.21875rem] top-1/2 flex h-3.5 w-3.5 -translate-y-1/2 items-center justify-center rounded-full bg-[#F0C5AE]"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#C78360]" />
+                  </span>
+
+                  <div className="flex items-start gap-3.5">
+                    <div
+                      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${ICON_TONES[i]}`}
                     >
-                      {/* Oversized index watermark */}
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute -bottom-3 end-3 select-none font-mono text-[4.5rem] font-black leading-none text-[#54453D]/[0.05] sm:text-[5.5rem] xl:text-[7rem]"
-                      >
-                        {challenge.number}
-                      </span>
-
-                      <div className="relative flex items-start gap-4 sm:flex-col sm:gap-5">
-                        {/* Icon + "isolated" tag */}
-                        <div className="flex shrink-0 items-center sm:w-full sm:justify-between">
-                          <div
-                            className={`inline-flex h-11 w-11 items-center justify-center rounded-xl text-[#54453D] xl:h-12 xl:w-12 ${TONES[i]}`}
-                          >
-                            <Icon className="h-5 w-5 xl:h-6 xl:w-6" aria-hidden="true" />
-                          </div>
-                          <span className="hidden items-center gap-1.5 rounded-full bg-[#54453D]/5 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-[#75645B] sm:inline-flex">
-                            <svg
-                              viewBox="0 0 16 16"
-                              className="h-3 w-3"
-                              fill="none"
-                              aria-hidden="true"
-                            >
-                              <path
-                                d="M1.5 8h4M10.5 8h4"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                              />
-                            </svg>
-                            {isolatedLabel}
-                          </span>
-                        </div>
-
-                        <div className="min-w-0">
-                          <h3 className="text-lg font-bold tracking-tight text-[#54453D] sm:text-xl xl:text-2xl">
-                            {challenge.title}
-                          </h3>
-                          <p className="mt-1.5 text-sm leading-relaxed text-[#75645B] sm:mt-2 sm:text-base">
-                            {challenge.description}
-                          </p>
-                        </div>
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-base font-bold text-[#54453D]">
+                          {challenge.title}
+                        </h3>
+                        <span className="rounded-full bg-white px-2.5 py-0.5 text-[0.65rem] font-semibold text-[#75645B]">
+                          {copy.isolatedLabel}
+                        </span>
                       </div>
-                    </article>
-
-                    {/* Mobile chain link between cards (centered) */}
-                    {i < challenges.length - 1 && (
-                      <div
-                        aria-hidden="true"
-                        className="mx-auto flex flex-col items-center sm:hidden"
-                      >
-                        <span className="h-3 w-[1px] bg-[#C78360]/40" />
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#C78360]" />
-                        <span className="h-3 w-[1px] bg-[#C78360]/40" />
-                      </div>
-                    )}
+                      <p className="mt-1 text-sm leading-relaxed text-[#75645B]">
+                        {challenge.description}
+                      </p>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
+                </article>
+              );
+            })}
+          </div>
 
-            {/* Tablet joint: a "+" where the four pieces meet */}
+          {/* Vertical Funnel Bridge */}
+          <div
+            aria-hidden="true"
+            className="relative flex flex-col items-center py-2"
+          >
+            <svg className="h-7 w-6" viewBox="0 0 24 28" fill="none">
+              <path
+                d="M12 0V28"
+                stroke="#54453D"
+                strokeOpacity="0.15"
+                strokeWidth="2"
+              />
+              <path
+                d="M12 0V28"
+                className="rx-ps-dash"
+                stroke="#C78360"
+                strokeWidth="2"
+                strokeDasharray="4 6"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#F0C5AE]/45 px-3.5 py-1 text-xs font-bold text-[#54453D]">
+              <span className="h-2 w-2 rounded-full bg-[#C78360] motion-safe:animate-pulse" />
+              {copy.mergeLabel}
+            </span>
+            <svg className="h-7 w-6" viewBox="0 0 24 28" fill="none">
+              <path
+                d="M12 0V28"
+                stroke="#54453D"
+                strokeOpacity="0.15"
+                strokeWidth="2"
+              />
+              <path
+                d="M12 0V28"
+                className="rx-ps-dash"
+                stroke="#C78360"
+                strokeWidth="2"
+                strokeDasharray="4 6"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+
+          {/* Mobile Solution Hub */}
+          <div className="relative overflow-hidden rounded-[1.75rem] bg-[#54453D] px-5 py-7 text-[#FAF9F8]">
             <div
               aria-hidden="true"
-              className="absolute left-1/2 top-1/2 z-20 hidden h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-base font-extrabold leading-none text-[#54453D] sm:flex lg:hidden ring-4 ring-[#F0C5AE]"
-            >
-              +
-            </div>
-          </div>
-
-          {/* ── Connector zone → hub ─────────────────────────────── */}
-          <div className="relative z-0 h-10 sm:h-14 lg:h-24 xl:h-28" aria-hidden="true">
-            {/* Desktop: converging animated lines */}
-            <svg
-              className="absolute inset-0 hidden h-full w-full overflow-visible lg:block"
-              viewBox="0 0 1000 100"
-              preserveAspectRatio="none"
-              fill="none"
-            >
-              {CONVERGE_PATHS.map((d) => (
-                <path
-                  key={`base-${d}`}
-                  d={d}
-                  stroke="#54453D"
-                  strokeOpacity="0.1"
-                  strokeWidth="2"
-                  vectorEffect="non-scaling-stroke"
-                />
-              ))}
-              {CONVERGE_PATHS.map((d) => (
-                <path
-                  key={`flow-${d}`}
-                  d={d}
-                  className="rx-ps-flow"
-                  stroke="#C78360"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeDasharray="6 8"
-                  vectorEffect="non-scaling-stroke"
-                />
-              ))}
-            </svg>
-
-            {/* Mobile + tablet: single centered dashed line */}
-            <div className="absolute inset-y-0 left-1/2 w-[1px] -translate-x-1/2 bg-[#C78360]/40 lg:hidden" />
-
-            {/* Convergence node (sits on the hub's top edge) */}
-            <div className="absolute bottom-0 left-1/2 z-20 h-10 w-10 -translate-x-1/2 translate-y-1/2">
-              <span className="absolute inset-0 rounded-full bg-[#F0C5AE] motion-safe:animate-ping" />
-              <span className="absolute inset-0 flex items-center justify-center rounded-full bg-white ring-4 ring-[#F0C5AE]">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#54453D]" />
-              </span>
-            </div>
-          </div>
-
-          {/* ── Solution hub ─────────────────────────────────────── */}
-          <div className="relative overflow-hidden rounded-[1.75rem] bg-[#F0C5AE] px-5 pb-8 pt-12 text-[#54453D] sm:rounded-3xl sm:px-8 sm:pb-10 sm:pt-14 lg:rounded-[2rem] lg:px-12 lg:pb-12 lg:pt-16 xl:px-16 xl:pb-14">
-            {/* Decorative rings (SVG vectors) */}
-            <svg
+              className="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-[#F0C5AE]/[0.08]"
+            />
+            <div
               aria-hidden="true"
-              className="pointer-events-none absolute -end-24 -top-24 h-72 w-72"
-              viewBox="0 0 288 288"
-              fill="none"
-            >
-              <circle cx="144" cy="144" r="143" stroke="#54453D" strokeOpacity="0.1" strokeWidth="1" />
-            </svg>
-            <svg
-              aria-hidden="true"
-              className="pointer-events-none absolute -bottom-32 -start-20 h-80 w-80"
-              viewBox="0 0 320 320"
-              fill="none"
-            >
-              <circle cx="160" cy="160" r="159" stroke="#54453D" strokeOpacity="0.1" strokeWidth="1" />
-            </svg>
+              className="pointer-events-none absolute -bottom-16 -start-16 h-44 w-44 rounded-full bg-[#91B8C0]/[0.08]"
+            />
 
-            <div className="relative grid items-center gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-20">
-              {/* Copy */}
-              <div className="flex flex-col items-center text-center lg:items-start lg:text-start">
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#54453D]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#54453D]" aria-hidden="true" />
-                  <span>{isAr ? 'المنظومة الموحدة' : 'CONNECTED OPERATING SYSTEM'}</span>
-                </div>
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[0.7rem] font-bold tracking-wider text-[#F0C5AE]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#F0C5AE]" />
+                {copy.badge}
+              </div>
 
-                <h3 className="mt-5 text-2xl font-extrabold leading-tight tracking-tight text-balance text-[#54453D] sm:text-3xl md:text-4xl xl:text-5xl">
-                  {isAr
-                    ? 'كل أعمالك في منظومة واحدة.'
-                    : 'Your entire business, connected in one system.'}
-                </h3>
+              <h3 className="mt-4 text-2xl font-extrabold leading-snug tracking-tight text-balance">
+                {copy.hubTitle}
+              </h3>
 
-                <p className="mt-3 max-w-xl text-base font-medium leading-relaxed text-balance text-[#54453D]/90 sm:mt-4 sm:text-lg md:text-xl">
-                  {isAr
-                    ? 'إدارة مترابطة تمنحك رؤية أوضح وتحكمًا أكبر في تفاصيل صالونك.'
-                    : 'An integrated management experience that gives you a clearer view and greater control over your salon.'}
-                </p>
+              <p className="mt-2.5 text-sm leading-relaxed text-[#FAF9F8]/80">
+                {copy.hubSubtitle}
+              </p>
 
+              {/* 2×2 Connected Matrix with Central Core */}
+              <div className="relative mt-6">
                 <ul
-                  className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:mt-8 sm:gap-3 lg:justify-start"
-                  aria-label={isAr ? 'الأقسام المترابطة' : 'Connected Pillars'}
+                  aria-label={copy.pillarsAria}
+                  className="grid grid-cols-2 gap-2.5"
                 >
-                  {challenges.map((c) => {
+                  {challenges.map((c, i) => {
                     const Icon = c.icon;
                     return (
                       <li
                         key={c.title}
-                        className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-[#54453D] sm:px-3.5 sm:text-sm"
+                        className="rounded-2xl bg-white/[0.08] p-3.5"
                       >
-                        <Icon className="h-4 w-4 text-[#C78360]" aria-hidden="true" />
-                        {c.title}
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ${DARK_ICON_TONES[i]}`}
+                          >
+                            <Icon className="h-4 w-4" aria-hidden="true" />
+                          </span>
+                          <span className="h-2 w-2 rounded-full bg-[#91B8C0]" />
+                        </div>
+                        <p className="mt-2.5 text-sm font-bold text-[#FAF9F8]">
+                          {c.title}
+                        </p>
+                        <p className="mt-0.5 text-[0.7rem] text-[#FAF9F8]/70">
+                          {c.syncedOutcome}
+                        </p>
                       </li>
                     );
                   })}
                 </ul>
-              </div>
 
-              {/* Orbit diagram: four pillars wired to one core */}
-              <div
-                aria-hidden="true"
-                className="relative mx-auto aspect-square w-full max-w-[15rem] sm:max-w-[19rem] lg:max-w-[22rem] xl:max-w-[27rem]"
-              >
-                <div className="absolute inset-0 rounded-full border border-dashed border-[#54453D]/30 motion-safe:animate-[spin_40s_linear_infinite]" />
-                <div className="absolute inset-[18%] rounded-full border border-[#54453D]/15 bg-white/30" />
-
-                <svg
-                  className="absolute inset-0 h-full w-full"
-                  viewBox="0 0 100 100"
-                  fill="none"
+                {/* Center Brand Medallion */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#54453D] p-1"
                 >
-                  <path
-                    d="M50 50V8M50 50H92M50 50V92M50 50H8"
-                    stroke="#54453D"
-                    strokeOpacity="0.35"
-                    strokeWidth="0.6"
-                    strokeDasharray="1.6 2.2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-
-                {/* Core */}
-                <div className="absolute left-1/2 top-1/2 h-[28%] w-[28%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="absolute inset-0 rounded-full bg-[#54453D]/30 motion-safe:animate-ping" />
-                  <span className="absolute inset-0 flex items-center justify-center rounded-full bg-[#54453D] text-[0.7rem] font-extrabold tracking-tight text-[#FAF9F8] sm:text-xs xl:text-sm">
-                    {brandLabel}
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F0C5AE] text-[0.65rem] font-black tracking-tight text-[#54453D]">
+                    {copy.brand}
                   </span>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                {/* Pillar nodes */}
+        {/* ============================================================
+            2. TABLET LAYOUT (md → lg): 2×2 Bento → Dual-Branch Dock
+           ============================================================ */}
+        <div className="mt-12 hidden md:block lg:hidden">
+          <div className="mb-4 flex items-center justify-between">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#75645B]">
+              <span className="h-2 w-2 rounded-full bg-[#C78360]" />
+              {copy.beforeLabel}
+            </span>
+            <span className="text-xs font-medium text-[#75645B]">01 — 04</span>
+          </div>
+
+          {/* 2×2 Problem Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {challenges.map((challenge, i) => {
+              const Icon = challenge.icon;
+              return (
+                <article
+                  key={challenge.title}
+                  className="relative overflow-hidden rounded-2xl bg-[#FAF9F8] p-5"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -bottom-3 end-4 select-none font-mono text-6xl font-black leading-none text-[#54453D]/[0.05]"
+                  >
+                    {challenge.number}
+                  </span>
+
+                  <div className="relative flex items-center justify-between">
+                    <div
+                      className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${ICON_TONES[i]}`}
+                    >
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-[#75645B]">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#C78360]/70" />
+                      {copy.isolatedLabel}
+                    </span>
+                  </div>
+
+                  <h3 className="relative mt-4 text-lg font-bold text-[#54453D]">
+                    {challenge.title}
+                  </h3>
+                  <p className="relative mt-1.5 text-sm leading-relaxed text-[#75645B]">
+                    {challenge.description}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+
+          {/* Tablet Dual-Branch Merge Bridge */}
+          <div className="relative h-16" aria-hidden="true">
+            <svg
+              className="h-full w-full"
+              viewBox="0 0 600 68"
+              preserveAspectRatio="none"
+              fill="none"
+            >
+              {TABLET_MERGE_PATHS.map((d) => (
+                <path
+                  key={`tb-base-${d}`}
+                  d={d}
+                  stroke="#54453D"
+                  strokeOpacity="0.14"
+                  strokeWidth="2"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+              {TABLET_MERGE_PATHS.map((d) => (
+                <path
+                  key={`tb-flow-${d}`}
+                  d={d}
+                  className="rx-ps-dash"
+                  stroke="#C78360"
+                  strokeWidth="2"
+                  strokeDasharray="6 8"
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+            </svg>
+
+            <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-1/2 rounded-full bg-white p-1">
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#F0C5AE] px-4 py-1 text-xs font-extrabold text-[#54453D]">
+                <span className="h-2 w-2 rounded-full bg-[#54453D]" />
+                {copy.brand}
+              </span>
+            </div>
+          </div>
+
+          {/* Tablet Solution Hub: Header + Horizontal Connected Dock */}
+          <div className="relative overflow-hidden rounded-3xl bg-[#54453D] px-8 pb-8 pt-11 text-[#FAF9F8]">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -top-24 left-1/2 h-56 w-96 -translate-x-1/2 rounded-full bg-[#F0C5AE]/[0.08]"
+            />
+
+            <div className="relative text-center">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1 text-xs font-bold tracking-wider text-[#F0C5AE]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#F0C5AE]" />
+                {copy.badge}
+              </span>
+
+              <h3 className="mx-auto mt-4 max-w-xl text-3xl font-extrabold leading-tight tracking-tight text-balance">
+                {copy.hubTitle}
+              </h3>
+
+              <p className="mx-auto mt-3 max-w-lg text-base leading-relaxed text-[#FAF9F8]/80">
+                {copy.hubSubtitle}
+              </p>
+            </div>
+
+            {/* Connected Horizontal 4-Module Dock */}
+            <div className="relative mt-8">
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-10 top-1/2 h-[2px] -translate-y-1/2 bg-[#F0C5AE]/25"
+              />
+              <ul
+                aria-label={copy.pillarsAria}
+                className="relative grid grid-cols-4 gap-3"
+              >
                 {challenges.map((c, i) => {
                   const Icon = c.icon;
                   return (
-                    <div
+                    <li
                       key={c.title}
-                      className={`absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl bg-white text-[#54453D] sm:h-12 sm:w-12 xl:h-14 xl:w-14 ${orbitNodes[i]}`}
+                      className="rounded-2xl bg-[#54453D]"
                     >
-                      <Icon className="h-5 w-5 xl:h-6 xl:w-6" />
-                    </div>
+                      <div className="flex h-full flex-col items-center rounded-2xl bg-white/[0.08] p-4 text-center">
+                        <span
+                          className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${DARK_ICON_TONES[i]}`}
+                        >
+                          <Icon className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                        <span className="mt-3 text-sm font-bold text-[#FAF9F8]">
+                          {c.title}
+                        </span>
+                        <span className="mt-1 text-[0.7rem] leading-snug text-[#FAF9F8]/70">
+                          {c.syncedOutcome}
+                        </span>
+                      </div>
+                    </li>
                   );
                 })}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================================
+            3. DESKTOP LAYOUT (lg+): 12-Col Architectural Split
+               Fragmented Stack (5) → Flow Bridge (1) → Unified Hub (6)
+           ============================================================ */}
+        <div className="mt-16 hidden lg:block xl:mt-20">
+          <div className="grid grid-cols-12 items-stretch">
+            {/* Start 5 cols: Stacked Fragmented Operations */}
+            <div className="col-span-5 grid grid-rows-4 gap-3.5 xl:gap-4">
+              {challenges.map((challenge, i) => {
+                const Icon = challenge.icon;
+                return (
+                  <article
+                    key={challenge.title}
+                    className="group relative flex items-center gap-4 overflow-hidden rounded-2xl bg-[#FAF9F8] px-5 py-4 transition-colors duration-200 hover:bg-[#F0C5AE]/20 xl:px-6 xl:py-5"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -bottom-2 end-4 select-none font-mono text-5xl font-black leading-none text-[#54453D]/[0.045] transition-colors group-hover:text-[#C78360]/[0.12] xl:text-6xl"
+                    >
+                      {challenge.number}
+                    </span>
+
+                    <div
+                      className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105 ${ICON_TONES[i]}`}
+                    >
+                      <Icon className="h-5 w-5 xl:h-6 xl:w-6" aria-hidden="true" />
+                    </div>
+
+                    <div className="relative min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-lg font-bold tracking-tight text-[#54453D] xl:text-xl">
+                          {challenge.title}
+                        </h3>
+                        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-[#75645B]">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#C78360]/70" />
+                          {copy.isolatedLabel}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm leading-relaxed text-[#75645B] xl:text-[0.95rem]">
+                        {challenge.description}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            {/* Center 1 col: Horizontal Animated Convergence Cables */}
+            <div className="relative col-span-1" aria-hidden="true">
+              <svg
+                className={`h-full w-full overflow-visible ${isAr ? '-scale-x-100' : ''}`}
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                fill="none"
+              >
+                {DESKTOP_FLOW_PATHS.map((d) => (
+                  <path
+                    key={`dt-base-${d}`}
+                    d={d}
+                    stroke="#54453D"
+                    strokeOpacity="0.12"
+                    strokeWidth="2"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                ))}
+                {DESKTOP_FLOW_PATHS.map((d) => (
+                  <path
+                    key={`dt-flow-${d}`}
+                    d={d}
+                    className="rx-ps-dash"
+                    stroke="#C78360"
+                    strokeWidth="2"
+                    strokeDasharray="5 8"
+                    strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                ))}
+              </svg>
+            </div>
+
+            {/* End 6 cols: Unified Dark Espresso Command Hub */}
+            <div className="relative col-span-6 flex">
+              {/* Convergence Anchor Node */}
+              <div
+                aria-hidden="true"
+                className="absolute -start-5 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white p-1"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F0C5AE]">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#54453D]" />
+                </span>
+              </div>
+
+              <div className="relative flex w-full flex-col justify-between overflow-hidden rounded-[2rem] bg-[#54453D] p-8 text-[#FAF9F8] xl:p-10">
+                {/* Flat Ambient Shapes */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -end-20 -top-20 h-64 w-64 rounded-full bg-[#F0C5AE]/[0.07]"
+                />
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -bottom-24 -start-16 h-64 w-64 rounded-full bg-[#91B8C0]/[0.07]"
+                />
+
+                {/* Top Copy Block */}
+                <div className="relative">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1 text-xs font-bold tracking-wider text-[#F0C5AE]">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#F0C5AE]" />
+                      {copy.badge}
+                    </span>
+
+                    <span className="inline-flex items-center gap-2 rounded-full bg-[#F0C5AE] px-3 py-1 text-xs font-black tracking-tight text-[#54453D]">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#54453D] motion-safe:animate-pulse" />
+                      {copy.brand}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-6 text-3xl font-extrabold leading-tight tracking-tight text-balance xl:text-4xl">
+                    {copy.hubTitle}
+                  </h3>
+
+                  <p className="mt-3 max-w-xl text-base leading-relaxed text-[#FAF9F8]/80 xl:text-lg">
+                    {copy.hubSubtitle}
+                  </p>
+                </div>
+
+                {/* Bottom Connected Architecture Matrix */}
+                <div className="relative mt-8 rounded-2xl bg-white/[0.07] p-4 xl:p-5">
+                  <div className="mb-3.5 flex items-center justify-between rounded-xl bg-white/[0.06] px-3.5 py-2.5">
+                    <span className="inline-flex items-center gap-2 text-xs font-semibold text-[#FAF9F8]/85">
+                      <span className="h-2 w-2 rounded-full bg-[#91B8C0] motion-safe:animate-pulse" />
+                      {copy.syncedBar}
+                    </span>
+                    <span className="font-mono text-[0.7rem] font-bold text-[#F0C5AE]">
+                      100%
+                    </span>
+                  </div>
+
+                  <ul
+                    aria-label={copy.pillarsAria}
+                    className="grid grid-cols-2 gap-3"
+                  >
+                    {challenges.map((c, i) => {
+                      const Icon = c.icon;
+                      return (
+                        <li
+                          key={c.title}
+                          className="flex items-start gap-3 rounded-xl bg-[#54453D]/75 p-3.5 transition-colors duration-200 hover:bg-[#54453D]"
+                        >
+                          <span
+                            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${DARK_ICON_TONES[i]}`}
+                          >
+                            <Icon className="h-4 w-4" aria-hidden="true" />
+                          </span>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-sm font-bold text-[#FAF9F8]">
+                                {c.title}
+                              </span>
+                              <span className="rounded-full bg-[#91B8C0]/15 px-2 py-0.5 text-[0.65rem] font-semibold text-[#91B8C0]">
+                                {copy.syncedTag}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs leading-snug text-[#FAF9F8]/70">
+                              {c.syncedOutcome}
+                            </p>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>

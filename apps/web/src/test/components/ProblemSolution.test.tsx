@@ -4,22 +4,15 @@ import { ProblemSolution } from '@/components/home';
 
 describe('RASHX — Problem & Solution Section Suite', () => {
   describe('Arabic Content & RTL Verification (Default)', () => {
-    it('renders exact Arabic section title and supporting intro text', () => {
+    it('renders exact Arabic section title', () => {
       render(<ProblemSolution lang="ar" />);
 
       // Section title rendered via SectionTitle
       expect(
         screen.getByRole('heading', {
           level: 2,
-          name: 'إدارة صالونك ما المفروض تكون معقدة.',
+          name: 'إدارة صالونك المفروض ما تكون معقدة.',
         })
-      ).toBeInTheDocument();
-
-      // Supporting introductory text
-      expect(
-        screen.getByText(
-          'لما كل جزء من شغلك يُدار بطريقة مختلفة، بتفقد الصورة الكاملة.'
-        )
       ).toBeInTheDocument();
     });
 
@@ -86,7 +79,7 @@ describe('RASHX — Problem & Solution Section Suite', () => {
   });
 
   describe('English Content & LTR Verification (?lang=en)', () => {
-    it('renders exact English section title and supporting intro text', () => {
+    it('renders exact English section title', () => {
       render(<ProblemSolution lang="en" />);
 
       // Section title rendered via SectionTitle
@@ -95,13 +88,6 @@ describe('RASHX — Problem & Solution Section Suite', () => {
           level: 2,
           name: "Managing your salon shouldn't be complicated.",
         })
-      ).toBeInTheDocument();
-
-      // Supporting introductory text
-      expect(
-        screen.getByText(
-          "When every part of your business is managed separately, it's difficult to see the full picture."
-        )
       ).toBeInTheDocument();
     });
 
