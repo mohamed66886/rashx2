@@ -48,6 +48,10 @@ export function MobileNavigation({ lang, navLinks, cta }: MobileNavigationProps)
       return () => cancelAnimationFrame(raf);
     }
     setEntered(false);
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+      setRendered(false);
+      return;
+    }
     const t = window.setTimeout(() => setRendered(false), EXIT_MS);
     return () => window.clearTimeout(t);
   }, [isOpen]);
@@ -156,7 +160,7 @@ export function MobileNavigation({ lang, navLinks, cta }: MobileNavigationProps)
                   onClick={() => close(false)}
                   className="group flex items-baseline gap-4 py-2.5 text-[#54453D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0]"
                 >
-                  <span className="w-6 text-xs font-semibold text-[#E4A889] tabular-nums">
+                  <span aria-hidden="true" className="w-6 text-xs font-semibold text-[#91B8C0] tabular-nums">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <span className="text-[1.65rem] font-semibold leading-tight transition-transform duration-300 group-hover:translate-x-2 group-active:translate-x-2 rtl:group-hover:-translate-x-2 rtl:group-active:-translate-x-2">

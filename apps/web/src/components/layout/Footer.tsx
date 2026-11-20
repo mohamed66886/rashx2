@@ -60,10 +60,10 @@ function FooterColumn({
       <details className="group/acc rounded-2xl bg-[#54453D]/[0.04] lg:hidden">
         <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 text-sm font-bold text-[#54453D] transition-colors duration-200 active:bg-[#54453D]/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0] [&::-webkit-details-marker]:hidden">
           <span className="flex items-center gap-2.5">
-            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#E4A889]" />
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#91B8C0]" />
             {title}
           </span>
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#F0C5AE]/45">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#F0C5AE]/45 text-[#54453D]">
             <svg
               viewBox="0 0 24 24"
               width="16"
@@ -100,7 +100,7 @@ function FooterColumn({
       {/* ── ديسكتوب: عمود مفتوح ──────────────────────────────── */}
       <div className="hidden flex-col gap-5 lg:flex">
         <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#54453D]">
-          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#E4A889]" />
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#91B8C0]" />
           {title}
         </h3>
         <ul className="flex flex-col gap-2.5 text-xs">
@@ -113,7 +113,7 @@ function FooterColumn({
                 {item.label}
                 <span
                   aria-hidden="true"
-                  className="absolute inset-x-0 -bottom-0.5 h-px origin-[var(--rx-origin,left)] scale-x-0 bg-[#E4A889] transition-transform duration-300 group-hover/fl:scale-x-100 rtl:[--rx-origin:right]"
+                  className="absolute inset-x-0 -bottom-0.5 h-px origin-[var(--rx-origin,left)] scale-x-0 bg-[#F0C5AE] transition-transform duration-300 group-hover/fl:scale-x-100 rtl:[--rx-origin:right]"
                 />
               </Link>
             </li>
@@ -274,10 +274,10 @@ export function Footer({ lang, className }: FooterProps) {
             </p>
 
             <div className="flex flex-wrap items-center gap-2 text-xs text-[#54453D]/70">
-              <span className="whitespace-nowrap rounded-full bg-[#F0C5AE]/35 px-3 py-1.5">
+              <span className="whitespace-nowrap rounded-full bg-[#F0C5AE]/35 px-3 py-1.5 text-[#54453D]">
                 {isAr ? 'المملكة العربية السعودية · الرياض' : 'Kingdom of Saudi Arabia · Riyadh'}
               </span>
-              <span className="whitespace-nowrap rounded-full bg-[#F0C5AE]/35 px-3 py-1.5">
+              <span className="whitespace-nowrap rounded-full bg-[#91B8C0]/35 px-3 py-1.5 text-[#54453D]">
                 {isAr ? 'التأسيس: 2026' : 'Founded: 2026'}
               </span>
             </div>
@@ -287,7 +287,7 @@ export function Footer({ lang, className }: FooterProps) {
               href="tel:+966548082945"
               className="group/phone inline-flex w-fit items-center gap-2.5 text-xs font-medium text-[#54453D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0]"
             >
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#54453D] text-white transition-transform duration-300 group-hover/phone:-rotate-12 group-hover/phone:scale-110">
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#91B8C0] text-[#54453D] transition-all duration-300 group-hover/phone:bg-[#F0C5AE] group-hover/phone:-rotate-12 group-hover/phone:scale-110">
                 <Phone className="h-3.5 w-3.5" aria-hidden="true" />
               </span>
               <span dir="ltr">+966 54 808 2945</span>
@@ -303,7 +303,7 @@ export function Footer({ lang, className }: FooterProps) {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="grid h-11 w-11 place-items-center rounded-full bg-[#F0C5AE]/35 sm:h-10 sm:w-10 text-[#54453D] transition-all duration-300 hover:-translate-y-1 hover:bg-[#54453D] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0] focus-visible:ring-offset-2"
+                    className="grid h-11 w-11 place-items-center rounded-full bg-[#F0C5AE]/35 sm:h-10 sm:w-10 text-[#54453D] transition-all duration-300 hover:-translate-y-1 hover:bg-[#91B8C0] hover:text-[#54453D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0] focus-visible:ring-offset-2"
                     aria-label={social.name}
                     title={social.name}
                   >
@@ -318,12 +318,12 @@ export function Footer({ lang, className }: FooterProps) {
               href={routes.external.app}
               target="_blank"
               rel="noopener noreferrer"
-              className="group/portal flex w-full items-center justify-between gap-2 rounded-full bg-[#54453D] py-1.5 ps-5 pe-1.5 text-sm font-semibold sm:inline-flex sm:w-fit sm:justify-start sm:py-1 sm:ps-4 sm:pe-1 sm:text-xs text-white transition-all duration-300 hover:bg-[#3F332D] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#54453D] focus-visible:ring-offset-2"
+              className="group/portal flex w-full items-center justify-between gap-2 rounded-full bg-[#54453D] py-1.5 ps-5 pe-1.5 text-sm font-semibold sm:inline-flex sm:w-fit sm:justify-start sm:py-1 sm:ps-4 sm:pe-1 sm:text-xs text-white transition-all duration-300 hover:bg-[#54453D]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0] focus-visible:ring-offset-2"
             >
               <span className="whitespace-nowrap">
                 {isAr ? 'بوابة المنظومة السحابية' : 'Cloud Platform Portal'}
               </span>
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-[#F0C5AE] text-[#54453D] transition-transform duration-500 group-hover/portal:rotate-45">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-[#F0C5AE] text-[#54453D] transition-all duration-500 group-hover/portal:bg-[#91B8C0] group-hover/portal:rotate-45">
                 <ExternalLink className="h-3 w-3" aria-hidden="true" />
               </span>
             </a>
@@ -389,7 +389,7 @@ export function Footer({ lang, className }: FooterProps) {
             aria-label={isAr ? 'صُنع بحب في الرياض' : 'Made with love in Riyadh'}
           >
             <span aria-hidden="true">{isAr ? 'صُنع بـ' : 'Made with'}</span>
-            <HeartSvg className="rx-heart h-5 w-5 text-[#D9534F]" />
+            <HeartSvg className="rx-heart h-5 w-5 text-[#F0C5AE]" />
             <span aria-hidden="true">{isAr ? 'في الريــــــــاض' : 'in Riyadh'}</span>
           </p>
         </Reveal>
