@@ -32,6 +32,8 @@ export interface RevealProps {
   /** يشتغل مرة واحدة بس (الافتراضي) أو كل مرة يدخل الشاشة */
   once?: boolean;
   threshold?: number;
+  /** هامش الـ viewport. للعناصر في آخر الصفحة استخدم '0px' عشان تظهر فعلاً */
+  rootMargin?: string;
   as?: 'div' | 'section' | 'li' | 'article' | 'span' | 'h1' | 'h2' | 'h3' | 'p';
   className?: string;
 }
@@ -49,6 +51,7 @@ export function Reveal({
   duration = 800,
   once = true,
   threshold = 0.15,
+  rootMargin = '0px 0px -8% 0px',
   as = 'div',
   className = '',
 }: RevealProps) {
@@ -74,11 +77,11 @@ export function Reveal({
           setShown(false);
         }
       },
-      { threshold, rootMargin: '0px 0px -8% 0px' },
+      { threshold, rootMargin },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [once, threshold]);
+  }, [once, threshold, rootMargin]);
 
   const style: CSSProperties = {
     transitionDuration: `${duration}ms`,
