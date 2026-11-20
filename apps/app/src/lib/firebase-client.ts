@@ -10,3 +10,4 @@ export {
   getTypedClientDoc,
   firestorePaths,
 } from '@rashx/database/client';
+

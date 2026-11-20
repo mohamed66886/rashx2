@@ -36,3 +36,4 @@ export interface VerifiedUser {
   issuedAt: number; // Seconds since Unix epoch
   expiresAt: number; // Seconds since Unix epoch
 }
+

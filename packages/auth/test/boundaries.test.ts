@@ -27,3 +27,4 @@ describe('Server / Client Boundary Enforcement', () => {
     expect(exportedKeys).not.toContain('getFirebaseAdminAuth');
   });
 });
+

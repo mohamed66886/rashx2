@@ -79,3 +79,4 @@ export function normalizePrivateKey(key: string): string {
 export function getFirebaseAdminConfig(): FirebaseAdminConfig {
   return validateAdminConfig(process.env);
 }
+

@@ -52,3 +52,4 @@ export function validateClientConfig(
 export function getFirebaseClientConfig(): FirebaseClientConfig {
   return validateClientConfig(process.env);
 }
+

@@ -55,3 +55,4 @@ describe('Firebase Initialization Reuse & Singletons', () => {
     expect(app2).toBeDefined();
   });
 });
+

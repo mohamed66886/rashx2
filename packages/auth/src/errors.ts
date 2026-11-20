@@ -45,3 +45,4 @@ export class UnauthenticatedError extends AuthError {
     super(message, 'UNAUTHENTICATED');
   }
 }
+

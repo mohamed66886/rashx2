@@ -73,3 +73,4 @@ describe('Firebase Admin Configuration Validation', () => {
     expect(normalizePrivateKey(escaped)).toBe('line1\nline2\nline3');
   });
 });
+

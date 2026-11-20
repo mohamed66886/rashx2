@@ -49,3 +49,4 @@ describe('Firebase Client Configuration Validation', () => {
     expect(config.appId).toBe('1:1234567890:web:abcdef123456');
   });
 });
+

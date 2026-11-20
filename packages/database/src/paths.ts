@@ -70,3 +70,4 @@ export const firestorePaths = {
   auditLog: (tenantId: string, logId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/audit_logs/${validateSegment('logId', logId)}` as const,
 };
+

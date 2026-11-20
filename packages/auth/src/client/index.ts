@@ -17,3 +17,4 @@ export {
 } from './config.js';
 
 export type { FirebaseClientConfig } from '../types.js';
+
