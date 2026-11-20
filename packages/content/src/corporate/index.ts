@@ -9,5 +9,5 @@ export {
   FOUNDER_OG_PHOTO,
 } from './founder';
 export type { FounderProfile, FounderFaqItem } from './founder';
-export { calculateAge, formatAge, getCairoYearMonth } from './age';
-export type { BirthMonth } from './age';
+export { calculateAge, formatAge, getCairoDate } from './age';
+export type { BirthDate } from './age';

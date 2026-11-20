@@ -11,7 +11,7 @@
  */
 
 import type { LocalizedString, TeamMember } from '../types';
-import type { BirthMonth } from './age';
+import type { BirthDate } from './age';
 
 export const founder: TeamMember = {
   id: 'mohamed-rashad',
@@ -44,8 +44,8 @@ export const founderProfiles = {
 } as const;
 
 export interface FounderProfile {
-  /** Only month and year are public. */
-  birth: BirthMonth;
+  /** Full birth date, published by the founder's own choice. */
+  birth: BirthDate;
   /** Every spelling people actually search or write. Shown on the page and in JSON-LD. */
   aliases: { ar: readonly string[]; en: readonly string[] };
   birthPlace: LocalizedString;
@@ -59,7 +59,7 @@ export interface FounderProfile {
 }
 
 export const founderProfile: FounderProfile = {
-  birth: { year: 2004, month: 12 },
+  birth: { year: 2004, month: 12, day: 1 },
 
   aliases: {
     ar: ['محمد رشاد', 'محمد البهي', 'محمد عبده رشاد', 'محمد رشاد البهي'],
@@ -78,12 +78,12 @@ export const founderProfile: FounderProfile = {
   },
 
   education: {
-    ar: 'كلية الحاسبات والمعلومات، جامعة كفر الشيخ',
-    en: 'Faculty of Computers and Information, Kafrelsheikh University',
+    ar: 'علوم الحاسب، الجامعة الأوروبية في ليفكي (EUL)',
+    en: 'Computer Science, European University of Lefke (EUL)',
   },
 
-  // Self-reported (latest statement). Update here if it changes.
-  yearsOfExperience: 3,
+  // Self-reported by the founder (4+ years). Update here if it changes.
+  yearsOfExperience: 4,
 
   summary: {
     ar: 'مبرمج ومطوّر برمجيات مصري، ومؤسس منصة راش إكس (RASHX) لإدارة الصالونات ومراكز التجميل والسبا.',
@@ -92,13 +92,13 @@ export const founderProfile: FounderProfile = {
 
   intro: {
     ar: [
-      'محمد عبده رشاد البهي، ويُعرف أيضًا باسم محمد رشاد أو محمد البهي، مبرمج ومطوّر برمجيات مصري ومؤسس منصة راش إكس. وُلد في ديسمبر 2004 في قرية منشأة عبد الرحمن التابعة لمركز دكرنس بمحافظة الدقهلية في مصر.',
-      'شغفه بالبرمجة والتكنولوجيا بدأ منذ صغره، ودرس في كلية الحاسبات والمعلومات بجامعة كفر الشيخ، وهو نشط في IEEE. لديه خبرة نحو ثلاث سنوات في مجال البرمجيات، وعمل على تصميم وتطوير تطبيقات وأنظمة لجهات في مصر وتركيا ودول الخليج.',
+      'محمد عبده رشاد البهي، ويُعرف أيضًا باسم محمد رشاد أو محمد البهي، مبرمج ومطوّر برمجيات مصري ومؤسس منصة راش إكس. وُلد في 1 ديسمبر 2004 في قرية منشأة عبد الرحمن التابعة لمركز دكرنس بمحافظة الدقهلية في مصر.',
+      'شغفه بالبرمجة والتكنولوجيا بدأ منذ صغره، ودرس علوم الحاسب في الجامعة الأوروبية في ليفكي (EUL)، وهو معتمد من IEEE ونشط فيها. لديه خبرة تزيد على أربع سنوات في مجال البرمجيات، وعمل على تصميم وتطوير تطبيقات وأنظمة لجهات في مصر وتركيا ودول الخليج.',
       'في عام 2026 أسس راش إكس، وهي منصة سحابية تجمع الحجوزات وإدارة العملاء والموارد البشرية والمبيعات والمخزون والفوترة الإلكترونية (ZATCA) في نظام واحد للمنشآت النسائية والرجالية في المملكة العربية السعودية.',
     ],
     en: [
-      'Mohamed Abdou Rashad El-Bahy, also known as Mohamed Rashad or Mohamed El-Bahy, is an Egyptian software developer and the founder of RASHX. He was born in December 2004 in Mansha\'at Abd El-Rahman village, Dakarnis district, Dakahlia Governorate, Egypt.',
-      'He has been passionate about programming and technology since childhood. He studied at the Faculty of Computers and Information at Kafrelsheikh University and is active in IEEE. He has about three years of experience in software and has worked on designing and developing apps and systems for organizations in Egypt, Turkey and the Gulf.',
+      'Mohamed Abdou Rashad El-Bahy, also known as Mohamed Rashad or Mohamed El-Bahy, is an Egyptian software developer and the founder of RASHX. He was born on 1 December 2004 in Mansha\'at Abd El-Rahman village, Dakarnis district, Dakahlia Governorate, Egypt.',
+      'He has been passionate about programming and technology since childhood. He studied Computer Science at the European University of Lefke (EUL), is IEEE-certified and active in IEEE. He has more than four years of experience in software and has worked on designing and developing apps and systems for organizations in Egypt, Turkey and the Gulf.',
       'In 2026 he founded RASHX, a cloud platform that brings bookings, CRM, HR, sales, inventory and ZATCA e-invoicing into one system for beauty salons, barbershops and spas in Saudi Arabia.',
     ],
   },
@@ -107,22 +107,22 @@ export const founderProfile: FounderProfile = {
     {
       title: { ar: 'التعليم', en: 'Education' },
       text: {
-        ar: 'كلية الحاسبات والمعلومات، جامعة كفر الشيخ.',
-        en: 'Faculty of Computers and Information, Kafrelsheikh University.',
+        ar: 'علوم الحاسب، الجامعة الأوروبية في ليفكي (EUL).',
+        en: 'Computer Science, European University of Lefke (EUL).',
       },
     },
     {
       title: { ar: 'IEEE', en: 'IEEE' },
       text: {
-        ar: 'عضو طلابي في IEEE، وأمين سر فرع جامعة كفر الشيخ ضمن العمل التطوعي (يناير – أكتوبر 2026).',
-        en: 'IEEE Student Member and volunteer Secretary of the Kafrelsheikh University branch (January – October 2026).',
+        ar: 'معتمد من IEEE، وعضو طلابي، وأمين سر فرع جامعة كفر الشيخ ضمن العمل التطوعي (يناير – أكتوبر 2026).',
+        en: 'IEEE-certified, IEEE Student Member and volunteer Secretary of the Kafrelsheikh University branch (January – October 2026).',
       },
     },
     {
       title: { ar: 'الخبرة', en: 'Experience' },
       text: {
-        ar: 'نحو 3 سنوات في تطوير البرمجيات، مع أعمال لجهات في مصر وتركيا ودول الخليج.',
-        en: 'About 3 years in software development, with work for organizations in Egypt, Turkey and the Gulf.',
+        ar: 'أكثر من 4 سنوات في تطوير البرمجيات، مع أعمال لجهات في مصر وتركيا ودول الخليج.',
+        en: 'More than 4 years in software development, with work for organizations in Egypt, Turkey and the Gulf.',
       },
     },
     {
@@ -136,7 +136,7 @@ export const founderProfile: FounderProfile = {
 
   milestones: [
     {
-      when: { ar: 'ديسمبر 2004', en: 'December 2004' },
+      when: { ar: '1 ديسمبر 2004', en: '1 December 2004' },
       text: {
         ar: 'الميلاد في منشأة عبد الرحمن، دكرنس، الدقهلية.',
         en: "Born in Mansha'at Abd El-Rahman, Dakarnis, Dakahlia.",
@@ -198,11 +198,11 @@ export function getFounderFaq(lang: 'ar' | 'en', ageText: string): FounderFaqIte
       {
         question: 'من هو محمد عبده رشاد البهي؟',
         answer:
-          'محمد عبده رشاد البهي (ويُعرف أيضًا بمحمد رشاد ومحمد البهي) مبرمج ومطوّر برمجيات مصري، ومؤسس منصة راش إكس (RASHX) لإدارة الصالونات ومراكز التجميل والسبا. وُلد في ديسمبر 2004 في محافظة الدقهلية بمصر.',
+          'محمد عبده رشاد البهي (ويُعرف أيضًا بمحمد رشاد ومحمد البهي) مبرمج ومطوّر برمجيات مصري، ومؤسس منصة راش إكس (RASHX) لإدارة الصالونات ومراكز التجميل والسبا. وُلد في 1 ديسمبر 2004 في محافظة الدقهلية بمصر.',
       },
       {
         question: 'كم عمر محمد عبده رشاد البهي؟',
-        answer: `وُلد محمد عبده رشاد البهي في ديسمبر 2004، وعمره الآن ${ageText}.`,
+        answer: `وُلد محمد عبده رشاد البهي في 1 ديسمبر 2004، وعمره الآن ${ageText}.`,
       },
       {
         question: 'من أين محمد عبده رشاد البهي؟',
@@ -212,17 +212,17 @@ export function getFounderFaq(lang: 'ar' | 'en', ageText: string): FounderFaqIte
       {
         question: 'أين درس محمد عبده رشاد البهي؟',
         answer:
-          'درس في كلية الحاسبات والمعلومات بجامعة كفر الشيخ، وهو نشط في IEEE.',
+          'درس علوم الحاسب في الجامعة الأوروبية في ليفكي (EUL)، وهو معتمد من IEEE ونشط فيها.',
       },
       {
         question: 'ما علاقة محمد عبده رشاد البهي بـ IEEE؟',
         answer:
-          'هو عضو طلابي في IEEE، وشغل منصب أمين سر في فرع جامعة كفر الشيخ ضمن العمل التطوعي من يناير إلى أكتوبر 2026.',
+          'هو معتمد من IEEE وعضو طلابي فيها، وشغل منصب أمين سر في فرع جامعة كفر الشيخ ضمن العمل التطوعي من يناير إلى أكتوبر 2026.',
       },
       {
         question: 'ما خبرة محمد عبده رشاد البهي في البرمجة؟',
         answer:
-          'لديه خبرة نحو ثلاث سنوات في مجال البرمجيات، وعمل على تصميم وتطوير تطبيقات وأنظمة لجهات في مصر وتركيا ودول الخليج، وأسس راش إكس عام 2026.',
+          'لديه خبرة تزيد على أربع سنوات في مجال البرمجيات، وعمل على تصميم وتطوير تطبيقات وأنظمة لجهات في مصر وتركيا ودول الخليج، وأسس راش إكس عام 2026.',
       },
       {
         question: 'ما هي راش إكس (RASHX)؟',
@@ -241,11 +241,11 @@ export function getFounderFaq(lang: 'ar' | 'en', ageText: string): FounderFaqIte
     {
       question: 'Who is Mohamed Abdou Rashad El-Bahy?',
       answer:
-        'Mohamed Abdou Rashad El-Bahy, also known as Mohamed Rashad or Mohamed El-Bahy, is an Egyptian software developer and the founder of RASHX, a platform for managing beauty salons, beauty centers and spas. He was born in December 2004 in Dakahlia, Egypt.',
+        'Mohamed Abdou Rashad El-Bahy, also known as Mohamed Rashad or Mohamed El-Bahy, is an Egyptian software developer and the founder of RASHX, a platform for managing beauty salons, beauty centers and spas. He was born on 1 December 2004 in Dakahlia, Egypt.',
     },
     {
       question: 'How old is Mohamed Abdou Rashad El-Bahy?',
-      answer: `Mohamed Abdou Rashad El-Bahy was born in December 2004 and is ${ageText}.`,
+      answer: `Mohamed Abdou Rashad El-Bahy was born on 1 December 2004 and is ${ageText}.`,
     },
     {
       question: 'Where is Mohamed Abdou Rashad El-Bahy from?',
@@ -255,17 +255,17 @@ export function getFounderFaq(lang: 'ar' | 'en', ageText: string): FounderFaqIte
     {
       question: 'Where did Mohamed Abdou Rashad El-Bahy study?',
       answer:
-        'He studied at the Faculty of Computers and Information at Kafrelsheikh University and is active in IEEE.',
+        'He studied Computer Science at the European University of Lefke (EUL) and is IEEE-certified and active in IEEE.',
     },
     {
       question: 'What is his connection to IEEE?',
       answer:
-        'He is an IEEE Student Member and served as volunteer Secretary of the IEEE Kafrelsheikh University branch from January to October 2026.',
+        'He is IEEE-certified, an IEEE Student Member, and served as volunteer Secretary of the IEEE Kafrelsheikh University branch from January to October 2026.',
     },
     {
       question: 'How much programming experience does he have?',
       answer:
-        'He has about three years of experience in software and has worked on designing and developing apps and systems for organizations in Egypt, Turkey and the Gulf. He founded RASHX in 2026.',
+        'He has more than four years of experience in software and has worked on designing and developing apps and systems for organizations in Egypt, Turkey and the Gulf. He founded RASHX in 2026.',
     },
     {
       question: 'What is RASHX?',

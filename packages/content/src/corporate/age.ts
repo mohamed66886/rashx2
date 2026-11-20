@@ -1,36 +1,38 @@
 /**
  * Age helpers.
  *
- * Only the birth month and year are public, so age is calculated at month
- * granularity: a person born in December 2004 is treated as having turned a year
- * older at the start of December. The "current" month is read in Africa/Cairo so
- * the age rolls over on Egyptian time, not UTC.
+ * Age is exact to the day. "Today" is read in Africa/Cairo so the age rolls over
+ * at Egyptian midnight, not UTC midnight.
  */
 
-export interface BirthMonth {
+export interface BirthDate {
   /** Four-digit year, e.g. 2004. */
   year: number;
   /** Month number, 1 (January) to 12 (December). */
   month: number;
+  /** Day of month, 1-31. */
+  day: number;
 }
 
-/** Current year and month (1-12) in Africa/Cairo. */
-export function getCairoYearMonth(now: Date = new Date()): BirthMonth {
+/** Current calendar date in Africa/Cairo. */
+export function getCairoDate(now: Date = new Date()): BirthDate {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: 'Africa/Cairo',
     year: 'numeric',
     month: 'numeric',
+    day: 'numeric',
   }).formatToParts(now);
 
-  const year = Number(parts.find((part) => part.type === 'year')?.value);
-  const month = Number(parts.find((part) => part.type === 'month')?.value);
-  return { year, month };
+  const pick = (type: string) => Number(parts.find((part) => part.type === type)?.value);
+  return { year: pick('year'), month: pick('month'), day: pick('day') };
 }
 
-/** Whole years completed since `birth`, at month granularity. */
-export function calculateAge(birth: BirthMonth, now: Date = new Date()): number {
-  const current = getCairoYearMonth(now);
-  return current.year - birth.year - (current.month < birth.month ? 1 : 0);
+/** Whole years completed since `birth`. */
+export function calculateAge(birth: BirthDate, now: Date = new Date()): number {
+  const today = getCairoDate(now);
+  const hadBirthday =
+    today.month > birth.month || (today.month === birth.month && today.day >= birth.day);
+  return today.year - birth.year - (hadBirthday ? 0 : 1);
 }
 
 /** "21 عامًا" / "21 years old". Western digits, matching the rest of the site. */

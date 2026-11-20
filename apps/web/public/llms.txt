@@ -7,7 +7,7 @@ Each facility gets its own branded digital ecosystem on a RASHX subdomain: a pub
 ## Facts
 - Company: RASHX – راش إكس (technology and digital solutions for the beauty sector)
 - Founded: 2026
-- Founder: Mohamed Abdo Rashad El-Bahy (محمد عبده رشاد البهي), also known as Mohamed Rashad / محمد رشاد / محمد البهي; Egyptian software developer, born December 2004 in Dakahlia, Egypt; studied at Kafrelsheikh University; active in IEEE
+- Founder: Mohamed Abdo Rashad El-Bahy (محمد عبده رشاد البهي), also known as Mohamed Rashad / محمد رشاد / محمد البهي; Egyptian software developer, born 1 December 2004 in Dakahlia, Egypt; studied Computer Science at the European University of Lefke (EUL); IEEE-certified
 - Website: https://rashx.org
 - Phone: +966 54 808 2945
 - Market: Saudi Arabia

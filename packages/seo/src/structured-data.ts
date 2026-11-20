@@ -72,7 +72,7 @@ export interface FounderProfileSchemaInput {
   name: string;
   /** Every other spelling: Arabic name, short forms, handles. */
   alternateNames: readonly string[];
-  /** Partial ISO 8601 date, e.g. "2004-12". Month precision only on purpose. */
+  /** ISO 8601 date, e.g. "2004-12-01". */
   birthDate: string;
   birthPlace: { name: string; addressRegion: string; addressCountry: string };
   description: string;

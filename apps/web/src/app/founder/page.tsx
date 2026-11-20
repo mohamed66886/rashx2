@@ -9,7 +9,7 @@
  * Search / answer-engine design:
  * - H1 carries the full name; "also known as" spellings are visible text, not hidden.
  * - The first paragraph is a self-contained definition an answer engine can quote.
- * - Age is computed from the birth month on every request (never hard-coded).
+ * - Age is computed from the birth date on every request (never hard-coded).
  * - Person + ProfilePage + FAQPage + Breadcrumb JSON-LD, all matching visible content.
  * - Photos come from public/images/founder/ and are skipped if the files are missing.
  */
@@ -46,8 +46,8 @@ const NAME = {
 } as const;
 
 const MONTH_YEAR = {
-  ar: 'ديسمبر 2004',
-  en: 'December 2004',
+  ar: '1 ديسمبر 2004',
+  en: '1 December 2004',
 } as const;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -60,8 +60,8 @@ export async function generateMetadata(): Promise<Metadata> {
       ? 'محمد عبده رشاد البهي (محمد رشاد) | مبرمج ومؤسس راش إكس'
       : 'Mohamed Abdo Rashad El-Bahy | Software Developer & Founder of RASHX',
     description: isAr
-      ? 'محمد عبده رشاد البهي، المعروف أيضًا بمحمد رشاد ومحمد البهي: مبرمج مصري من الدقهلية ومؤسس منصة راش إكس. درس في كلية الحاسبات والمعلومات بجامعة كفر الشيخ ونشط في IEEE.'
-      : 'Mohamed Abdo Rashad El-Bahy (Mohamed Rashad, Mohamed El-Bahy): Egyptian software developer from Dakahlia and founder of RASHX. Studied at Kafrelsheikh University and active in IEEE.',
+      ? 'محمد عبده رشاد البهي، المعروف أيضًا بمحمد رشاد ومحمد البهي: مبرمج مصري من الدقهلية ومؤسس منصة راش إكس. درس علوم الحاسب في الجامعة الأوروبية في ليفكي (EUL) ومعتمد من IEEE.'
+      : 'Mohamed Abdo Rashad El-Bahy (Mohamed Rashad, Mohamed El-Bahy): Egyptian software developer from Dakahlia and founder of RASHX. Studied Computer Science at EUL and IEEE-certified.',
     path: '/founder',
     lang,
     ogImage: photos.og ? `${SITE_URL}${photos.og}` : undefined,
@@ -93,7 +93,7 @@ export default async function FounderPage() {
     lang,
     name: NAME.en,
     alternateNames: [NAME.ar, ...profile.aliases.ar, ...profile.aliases.en],
-    birthDate: `${profile.birth.year}-${String(profile.birth.month).padStart(2, '0')}`,
+    birthDate: `${profile.birth.year}-${String(profile.birth.month).padStart(2, '0')}-${String(profile.birth.day).padStart(2, '0')}`,
     birthPlace: {
       name: "Mansha'at Abd El-Rahman, Dakarnis, Dakahlia, Egypt",
       addressRegion: 'Dakahlia',
@@ -104,8 +104,8 @@ export default async function FounderPage() {
     sameAs: [founderProfiles.linkedin, founderProfiles.instagram, founderProfiles.github],
     knowsAbout: profile.expertise.en,
     education: {
-      name: 'Kafrelsheikh University',
-      faculty: 'Faculty of Computers and Information',
+      name: 'European University of Lefke',
+      faculty: 'Computer Science',
     },
   });
 
@@ -120,8 +120,8 @@ export default async function FounderPage() {
     {
       label: isAr ? 'الخبرة' : 'Experience',
       value: isAr
-        ? `نحو ${profile.yearsOfExperience} سنوات في البرمجيات`
-        : `About ${profile.yearsOfExperience} years in software`,
+        ? `أكثر من ${profile.yearsOfExperience} سنوات في البرمجيات`
+        : `More than ${profile.yearsOfExperience} years in software`,
     },
     { label: isAr ? 'الشركة' : 'Company', value: isAr ? 'راش إكس (RASHX)، مؤسس' : 'RASHX, founder' },
   ];
@@ -165,9 +165,11 @@ export default async function FounderPage() {
                     {isAr ? 'الدقهلية، مصر' : 'Dakahlia, Egypt'}
                   </li>
                   <li className="rounded-full bg-[#F0C5AE]/40 px-4 py-1.5">
-                    {isAr ? 'جامعة كفر الشيخ' : 'Kafrelsheikh University'}
+                    {isAr ? 'جامعة EUL ليفكي' : 'EUL Lefke'}
                   </li>
-                  <li className="rounded-full bg-[#F0C5AE]/40 px-4 py-1.5">IEEE</li>
+                  <li className="rounded-full bg-[#F0C5AE]/40 px-4 py-1.5">
+                    {isAr ? 'معتمد من IEEE' : 'IEEE-certified'}
+                  </li>
                 </ul>
               </div>
 
