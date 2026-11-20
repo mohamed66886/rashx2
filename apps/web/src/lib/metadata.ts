@@ -128,12 +128,14 @@ export function generateRootMetadata(): Metadata {
     },
     icons: {
       icon: [
-        { url: '/icons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+        { url: '/icons/favicon.svg', type: 'image/svg+xml' },
         { url: '/icons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/icons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       ],
-      apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180' }],
+      apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+      shortcut: '/favicon.ico',
       other: [
-        { rel: 'mask-icon', url: '/icons/favicon.svg', color: '#7c3aed' },
+        { rel: 'mask-icon', url: '/icons/favicon.svg', color: '#54453D' },
       ],
     },
     manifest: '/manifest.webmanifest',
