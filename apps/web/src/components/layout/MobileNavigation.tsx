@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import type { Route } from 'next';
@@ -22,182 +22,202 @@ export interface MobileNavigationProps {
   };
 }
 
+const EXIT_MS = 700;
+
+/**
+ * موبايل: قائمة full-screen بتتفتح بدائرة (clip-path) من زرار الفتح،
+ * روابط كبيرة مرقّمة بتظهر ورا بعض.
+ */
 export function MobileNavigation({ lang, navLinks, cta }: MobileNavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [rendered, setRendered] = useState(false);
+  const [entered, setEntered] = useState(false);
   const [mounted, setMounted] = useState(false);
+
   const isAr = lang === 'ar';
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  // Set mounted flag for safe client-side portal rendering
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
-    setMounted(true);
+    if (isOpen) {
+      setRendered(true);
+      const raf = requestAnimationFrame(() => requestAnimationFrame(() => setEntered(true)));
+      return () => cancelAnimationFrame(raf);
+    }
+    setEntered(false);
+    const t = window.setTimeout(() => setRendered(false), EXIT_MS);
+    return () => window.clearTimeout(t);
+  }, [isOpen]);
+
+  const close = useCallback((returnFocus = true) => {
+    setIsOpen(false);
+    if (returnFocus) triggerRef.current?.focus();
   }, []);
 
-  // Close drawer on Escape key press
   useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-        triggerRef.current?.focus();
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        close();
+        return;
       }
-    }
-
-    if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      if (e.key !== 'Tab' || !panelRef.current) return;
+      const f = panelRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])');
+      if (!f.length) return;
+      const first = f[0]!;
+      const last = f[f.length - 1]!;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
-  }, [isOpen]);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, close]);
 
-  // Lock body scroll when mobile drawer is open
   useEffect(() => {
-    if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      // Focus close button on open
-      closeButtonRef.current?.focus();
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-    return undefined;
-  }, [isOpen]);
+    if (!rendered) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [rendered]);
 
-  const handleLinkClick = () => {
-    setIsOpen(false);
-  };
+  useEffect(() => {
+    if (entered) closeRef.current?.focus();
+  }, [entered]);
 
-  const menuOpenLabel = isAr ? 'فتح القائمة الرئيسية' : 'Open main menu';
-  const menuCloseLabel = isAr ? 'إغلاق القائمة الرئيسية' : 'Close main menu';
-  const drawerCloseLabel = isAr ? 'إغلاق القائمة' : 'Close menu';
+  // نقطة بداية الدائرة = مكان زرار الفتح (يمين في LTR، شمال في RTL)
+  const origin = isAr ? '8% 4%' : '92% 4%';
 
-  const drawerContent = isOpen ? (
+  const overlay = rendered ? (
     <div
       role="dialog"
       id="mobile-navigation-drawer"
       aria-modal="true"
       aria-label={isAr ? 'قائمة التنقل' : 'Navigation menu'}
-      className="fixed inset-0 z-[100] flex"
       dir={isAr ? 'rtl' : 'ltr'}
+      className="fixed inset-0 z-[100] bg-[#FAF9F8]"
+      style={{
+        clipPath: entered ? `circle(150% at ${origin})` : `circle(0% at ${origin})`,
+        transition: `clip-path ${EXIT_MS}ms cubic-bezier(.76,0,.24,1)`,
+      }}
     >
-      {/* Backdrop (Full screen overlay, semi-transparent) */}
-      <div
-        className="fixed inset-0 bg-[#54453D]/60 backdrop-blur-sm transition-opacity duration-200"
-        onClick={() => {
-          setIsOpen(false);
-          triggerRef.current?.focus();
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Drawer Panel (Solid Opaque White, Zero Borders, Zero Shadows) */}
-      <div
-        className={`fixed inset-y-0 ${
-          isAr ? 'right-0' : 'left-0'
-        } z-[101] flex h-full w-[85%] max-w-sm flex-col justify-between bg-white p-6 overflow-y-auto transition-transform duration-300 ease-out`}
-      >
-        {/* Top Bar inside Drawer */}
-        <div>
-          <div className="flex items-center justify-between">
-            <Link
-              href={(isAr ? '/' : '/?lang=en') as Route}
-              onClick={handleLinkClick}
-              className="inline-flex items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0]"
-            >
-              <RashxLockupBilingual height={30} color="ink" />
-              <span className="sr-only">
-                {isAr ? 'راش إكس - الرئيسية' : 'RASHX - Home'}
-              </span>
-            </Link>
-
-            <button
-              ref={closeButtonRef}
-              type="button"
-              onClick={() => {
-                setIsOpen(false);
-                triggerRef.current?.focus();
-              }}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#54453D] hover:bg-[#FAF9F8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0] focus-visible:ring-offset-2"
-              aria-label={drawerCloseLabel}
-            >
-              <X className="h-5 w-5 text-[#54453D]" aria-hidden="true" />
-            </button>
-          </div>
-
-          {/* Navigation Links */}
-          <nav
-            className="mt-8"
-            aria-label={isAr ? 'روابط التنقل للجوال' : 'Mobile navigation links'}
+      <div ref={panelRef} className="relative flex h-full flex-col overflow-y-auto px-6 pb-8 pt-5">
+        {/* Top */}
+        <div
+          className={`flex items-center justify-between transition-all duration-500 delay-300 ${
+            entered ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0'
+          }`}
+        >
+          <Link
+            href={(isAr ? '/' : '/?lang=en') as Route}
+            onClick={() => close(false)}
+            className="inline-flex items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0]"
           >
-            <ul className="flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href as Route}
-                    onClick={handleLinkClick}
-                    className="flex min-h-[44px] items-center rounded-xl px-4 py-3 text-base font-medium text-[#54453D] transition-colors duration-200 hover:bg-[#FAF9F8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0] focus-visible:ring-offset-2"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+            <RashxLockupBilingual height={30} color="ink" />
+            <span className="sr-only">{isAr ? 'راش إكس - الرئيسية' : 'RASHX - Home'}</span>
+          </Link>
+
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={() => close()}
+            aria-label={isAr ? 'إغلاق القائمة' : 'Close menu'}
+            className="grid h-11 w-11 place-items-center rounded-full bg-[#54453D] text-white transition-transform duration-500 hover:rotate-90 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#54453D] focus-visible:ring-offset-2"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
         </div>
 
-        {/* Bottom Actions inside Drawer */}
-        <div className="mt-8 flex flex-col gap-4">
-          <div className="flex items-center justify-between py-2">
-            <span className="text-xs font-semibold text-[#75645B]">
-              {isAr ? 'اللغة' : 'Language'}
-            </span>
+        {/* Links */}
+        <nav
+          className="mt-10 flex-1"
+          aria-label={isAr ? 'روابط التنقل للجوال' : 'Mobile navigation links'}
+        >
+          <ul className="flex flex-col">
+            {navLinks.map((link, i) => (
+              <li
+                key={link.href + i}
+                style={{ transitionDelay: entered ? `${300 + i * 55}ms` : '0ms' }}
+                className={`transition-all duration-700 ease-[cubic-bezier(.22,1,.36,1)] ${
+                  entered ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                }`}
+              >
+                <Link
+                  href={link.href as Route}
+                  onClick={() => close(false)}
+                  className="group flex items-baseline gap-4 py-2.5 text-[#54453D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0]"
+                >
+                  <span className="w-6 text-xs font-semibold text-[#E4A889] tabular-nums">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="text-[1.65rem] font-semibold leading-tight transition-transform duration-300 group-hover:translate-x-2 group-active:translate-x-2 rtl:group-hover:-translate-x-2 rtl:group-active:-translate-x-2">
+                    {link.label}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Bottom */}
+        <div
+          style={{ transitionDelay: entered ? `${300 + navLinks.length * 55}ms` : '0ms' }}
+          className={`mt-8 flex flex-col gap-4 transition-all duration-700 ${
+            entered ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-[#75645B]">{isAr ? 'اللغة' : 'Language'}</span>
             <LanguageSwitcher currentLang={lang} />
           </div>
 
           <Link
             href={cta.href as Route}
-            onClick={handleLinkClick}
-            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-xl bg-[#F0C5AE] px-4 py-3 text-sm font-semibold text-[#54453D] transition-colors duration-200 hover:bg-[#E4A889] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#54453D] focus-visible:ring-offset-2"
+            onClick={() => close(false)}
+            className="group/cta flex min-h-[56px] items-center justify-between rounded-full bg-[#54453D] py-1.5 ps-6 pe-1.5 text-base font-semibold text-white active:scale-[.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#54453D] focus-visible:ring-offset-2"
           >
             {cta.label}
+            <span
+              aria-hidden="true"
+              className="grid h-11 w-11 place-items-center rounded-full bg-[#F0C5AE] text-[#54453D] rtl:-scale-x-100"
+            >
+              →
+            </span>
           </Link>
 
-          <div className="text-center text-[11px] text-[#75645B]">
-            <p>
-              {isAr
-                ? 'راش إكس لتقنية المعلومات · 2026'
-                : 'RASHX Information Technology · 2026'}
-            </p>
-          </div>
+          <p className="text-center text-[11px] text-[#75645B]">
+            {isAr ? 'راش إكس لتقنية المعلومات · 2026' : 'RASHX Information Technology · 2026'}
+          </p>
         </div>
       </div>
     </div>
   ) : null;
 
   return (
-    <div className="md:hidden">
-      {/* ── Accessible Mobile Menu Trigger Button ──────────────────── */}
+    <div className="lg:hidden">
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-[#54453D] transition-colors duration-200 hover:bg-[#FAF9F8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0] focus-visible:ring-offset-2"
-        aria-label={isOpen ? menuCloseLabel : menuOpenLabel}
+        onClick={() => setIsOpen((p) => !p)}
+        aria-label={isOpen ? (isAr ? 'إغلاق القائمة الرئيسية' : 'Close main menu') : isAr ? 'فتح القائمة الرئيسية' : 'Open main menu'}
         aria-expanded={isOpen}
         aria-controls="mobile-navigation-drawer"
         aria-haspopup="dialog"
+        className="grid h-11 w-11 place-items-center rounded-full bg-[#54453D] text-white transition-transform duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#54453D] focus-visible:ring-offset-2"
       >
-        {isOpen ? (
-          <X className="h-5 w-5 text-[#54453D]" aria-hidden="true" />
-        ) : (
-          <Menu className="h-5 w-5 text-[#54453D]" aria-hidden="true" />
-        )}
+        <Menu className="h-5 w-5" aria-hidden="true" />
       </button>
 
-      {/* ── Accessible Modal Drawer Portaled to document.body ──────── */}
-      {mounted && drawerContent ? createPortal(drawerContent, document.body) : null}
+      {mounted && overlay ? createPortal(overlay, document.body) : null}
     </div>
   );
 }
