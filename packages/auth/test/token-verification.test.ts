@@ -2,15 +2,17 @@ import { describe, it, expect } from 'vitest';
 import {
   verifyIdToken,
   verifySessionCookie,
+  createSessionCookie,
+  revokeRefreshTokens,
   mapFirebaseAdminAuthError,
   mapDecodedTokenToVerifiedUser,
-} from '../src/server/verify.js';
+} from '../src/server/verify';
 import {
   UnauthenticatedError,
   TokenRevokedError,
   TokenExpiredError,
   InvalidTokenError,
-} from '../src/errors.js';
+} from '../src/errors';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 
 describe('Token Verification & Error Mapping', () => {
@@ -82,5 +84,16 @@ describe('Token Verification & Error Mapping', () => {
     expect(verified.claims.sub).toBeUndefined();
     expect(verified.claims.firebase).toBeUndefined();
   });
-});
 
+  it('should validate inputs for createSessionCookie and revokeRefreshTokens', async () => {
+    await expect(createSessionCookie('')).rejects.toThrow(UnauthenticatedError);
+    await expect(createSessionCookie('   ')).rejects.toThrow(UnauthenticatedError);
+    await expect(createSessionCookie(null as any)).rejects.toThrow(UnauthenticatedError);
+    await expect(createSessionCookie('valid-token', 1000)).rejects.toThrow(InvalidTokenError);
+    await expect(createSessionCookie('valid-token', 20 * 24 * 60 * 60 * 1000)).rejects.toThrow(InvalidTokenError);
+
+    await expect(revokeRefreshTokens('')).rejects.toThrow(UnauthenticatedError);
+    await expect(revokeRefreshTokens('   ')).rejects.toThrow(UnauthenticatedError);
+    await expect(revokeRefreshTokens(null as any)).rejects.toThrow(UnauthenticatedError);
+  });
+});

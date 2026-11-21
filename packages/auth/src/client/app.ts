@@ -7,8 +7,8 @@
 
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
-import { getFirebaseClientConfig } from './config.js';
-import type { FirebaseClientConfig } from '../types.js';
+import { getFirebaseClientConfig } from './config';
+import type { FirebaseClientConfig } from '../types';
 
 let clientAppInstance: FirebaseApp | null = null;
 let clientAuthInstance: Auth | null = null;

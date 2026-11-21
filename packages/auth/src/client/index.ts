@@ -9,12 +9,17 @@ export {
   getFirebaseClientApp,
   getFirebaseAuth,
   resetFirebaseClientApp,
-} from './app.js';
+} from './app';
 
 export {
   validateClientConfig,
   getFirebaseClientConfig,
-} from './config.js';
+} from './config';
 
-export type { FirebaseClientConfig } from '../types.js';
+export {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
 
+export type { FirebaseClientConfig } from '../types';

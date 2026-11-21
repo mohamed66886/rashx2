@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import * as clientModule from '../src/client/index.js';
-import * as rootModule from '../src/index.js';
+import * as clientModule from '../src/client';
+import * as rootModule from '../src';
 
 describe('Server / Client Boundary Enforcement', () => {
   it('client entrypoint must not export Admin SDK or server-only primitives', () => {
@@ -27,4 +27,3 @@ describe('Server / Client Boundary Enforcement', () => {
     expect(exportedKeys).not.toContain('getFirebaseAdminAuth');
   });
 });
-

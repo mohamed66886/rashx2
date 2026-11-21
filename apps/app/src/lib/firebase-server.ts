@@ -3,6 +3,7 @@ import 'server-only';
 export {
   getFirebaseAdminApp,
   getFirebaseAdminAuth,
+  getFirebaseAdminStorage,
   verifyIdToken,
   verifySessionCookie,
 } from '@rashx/auth/server';
@@ -12,5 +13,8 @@ export {
   getTypedAdminCollection,
   getTypedAdminDoc,
   firestorePaths,
+  TenantRepository,
+  TenantProvisioningError,
+  TenantProvisioningErrorCode,
 } from '@rashx/database/server';
 

@@ -1,13 +1,13 @@
 import 'server-only';
 import type { DecodedIdToken } from 'firebase-admin/auth';
-import { getFirebaseAdminAuth } from './app.js';
+import { getFirebaseAdminAuth } from './app';
 import {
   InvalidTokenError,
   TokenExpiredError,
   TokenRevokedError,
   UnauthenticatedError,
-} from '../errors.js';
-import type { VerifiedUser } from '../types.js';
+} from '../errors';
+import type { VerifiedUser } from '../types';
 
 export async function verifyIdToken(
   token: string | undefined | null,
@@ -38,6 +38,44 @@ export async function verifySessionCookie(
     const auth = getFirebaseAdminAuth();
     const decoded = await auth.verifySessionCookie(sessionCookie.trim(), checkRevoked);
     return mapDecodedTokenToVerifiedUser(decoded);
+  } catch (error: any) {
+    throw mapFirebaseAdminAuthError(error);
+  }
+}
+
+export async function createSessionCookie(
+  idToken: string | undefined | null,
+  expiresInMs: number = 5 * 24 * 60 * 60 * 1000 // 5 days default
+): Promise<string> {
+  if (!idToken || typeof idToken !== 'string' || idToken.trim() === '') {
+    throw new UnauthenticatedError('Missing or empty authentication token for session creation.');
+  }
+
+  // Firebase enforces expiresIn between 5 minutes and 14 days
+  const MIN_EXPIRES_MS = 5 * 60 * 1000;
+  const MAX_EXPIRES_MS = 14 * 24 * 60 * 60 * 1000;
+  if (expiresInMs < MIN_EXPIRES_MS || expiresInMs > MAX_EXPIRES_MS) {
+    throw new InvalidTokenError(
+      `Session cookie duration must be between 5 minutes and 14 days (received ${expiresInMs}ms).`
+    );
+  }
+
+  try {
+    const auth = getFirebaseAdminAuth();
+    return await auth.createSessionCookie(idToken.trim(), { expiresIn: expiresInMs });
+  } catch (error: any) {
+    throw mapFirebaseAdminAuthError(error);
+  }
+}
+
+export async function revokeRefreshTokens(uid: string | undefined | null): Promise<void> {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
+    throw new UnauthenticatedError('Missing or empty user ID for token revocation.');
+  }
+
+  try {
+    const auth = getFirebaseAdminAuth();
+    await auth.revokeRefreshTokens(uid.trim());
   } catch (error: any) {
     throw mapFirebaseAdminAuthError(error);
   }

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateClientConfig } from '../src/client/config.js';
-import { ConfigurationError } from '../src/errors.js';
+import { validateClientConfig } from '../src/client/config';
+import { ConfigurationError } from '../src/errors';
 
 describe('Firebase Client Configuration Validation', () => {
   it('should throw ConfigurationError when all env vars are missing', () => {
@@ -49,4 +49,3 @@ describe('Firebase Client Configuration Validation', () => {
     expect(config.appId).toBe('1:1234567890:web:abcdef123456');
   });
 });
-

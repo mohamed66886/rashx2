@@ -23,9 +23,18 @@ export const firestorePaths = {
   customers: () => 'customers' as const,
   customer: (uid: string) => `customers/${validateSegment('uid', uid)}` as const,
 
+  slugs: () => 'slugs' as const,
+  slug: (slugVal: string) => `slugs/${validateSegment('slug', slugVal)}` as const,
+
+  tenantSlugs: () => 'tenant_slugs' as const,
+  tenantSlug: (slugVal: string) => `tenant_slugs/${validateSegment('slug', slugVal)}` as const,
+
   // Tenant collections & subcollections
   tenants: () => 'tenants' as const,
   tenant: (tenantId: string) => `tenants/${validateSegment('tenantId', tenantId)}` as const,
+
+  publicProfile: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/public_profile/profile` as const,
 
   memberships: (tenantId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/memberships` as const,
@@ -40,10 +49,30 @@ export const firestorePaths = {
   branch: (tenantId: string, branchId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/branches/${validateSegment('branchId', branchId)}` as const,
 
+  publicBranches: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/public_branches` as const,
+  publicBranch: (tenantId: string, branchId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/public_branches/${validateSegment('branchId', branchId)}` as const,
+
   staff: (tenantId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/staff` as const,
   staffMember: (tenantId: string, staffId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/staff/${validateSegment('staffId', staffId)}` as const,
+
+  staffCompensation: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/staff_compensation` as const,
+  staffCompensationMember: (tenantId: string, staffId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/staff_compensation/${validateSegment('staffId', staffId)}` as const,
+
+  staffConfidential: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/staff_confidential` as const,
+  staffConfidentialMember: (tenantId: string, staffId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/staff_confidential/${validateSegment('staffId', staffId)}` as const,
+
+  publicRoster: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/public_roster` as const,
+  publicStaffMember: (tenantId: string, staffId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/public_roster/${validateSegment('staffId', staffId)}` as const,
 
   services: (tenantId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/services` as const,
@@ -65,9 +94,19 @@ export const firestorePaths = {
   slotLock: (tenantId: string, lockId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/slot_locks/${validateSegment('lockId', lockId)}` as const,
 
+  scheduleLocks: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/schedule_locks` as const,
+  scheduleLock: (tenantId: string, staffUid: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/schedule_locks/${validateSegment('staffUid', staffUid)}` as const,
+
   auditLogs: (tenantId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/audit_logs` as const,
   auditLog: (tenantId: string, logId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/audit_logs/${validateSegment('logId', logId)}` as const,
+
+  commercialRegistrations: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/commercial_registration` as const,
+  commercialRegistration: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/commercial_registration/record` as const,
 };
 

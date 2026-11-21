@@ -45,5 +45,5 @@ export function getTypedClientDoc<T extends DocumentData = DocumentData>(
   return doc(db, documentPath) as DocumentReference<T, T>;
 }
 
-export { firestorePaths } from '../paths.js';
-export type { BaseEntity, FirestoreDocumentData } from '../types.js';
+export { firestorePaths } from '../paths';
+export type { BaseEntity, FirestoreDocumentData } from '../types';

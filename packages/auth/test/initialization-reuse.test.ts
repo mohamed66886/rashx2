@@ -1,14 +1,14 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   getFirebaseClientApp,
   getFirebaseAuth,
   resetFirebaseClientApp,
-} from '../src/client/app.js';
+} from '../src/client/app';
 import {
   getFirebaseAdminApp,
   getFirebaseAdminAuth,
   resetFirebaseAdminApp,
-} from '../src/server/app.js';
+} from '../src/server/app';
 
 describe('Firebase Initialization Reuse & Singletons', () => {
   beforeEach(() => {
@@ -49,10 +49,8 @@ describe('Firebase Initialization Reuse & Singletons', () => {
 
     const app1 = getFirebaseClientApp(mockConfig);
     resetFirebaseClientApp();
-    // After reset, clientAppInstance is cleared
     const app2 = getFirebaseClientApp(mockConfig);
     expect(app1).toBeDefined();
     expect(app2).toBeDefined();
   });
 });
-

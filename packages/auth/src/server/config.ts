@@ -1,6 +1,6 @@
 import 'server-only';
-import { ConfigurationError } from '../errors.js';
-import type { FirebaseAdminConfig } from '../types.js';
+import { ConfigurationError } from '../errors';
+import type { FirebaseAdminConfig } from '../types';
 
 export function validateAdminConfig(
   env: Record<string, string | undefined>
@@ -10,9 +10,16 @@ export function validateAdminConfig(
   if (rawServiceAccount) {
     try {
       let jsonString = rawServiceAccount;
+      // Strip surrounding quotes if wrapped
+      if (
+        (jsonString.startsWith('"') && jsonString.endsWith('"')) ||
+        (jsonString.startsWith("'") && jsonString.endsWith("'"))
+      ) {
+        jsonString = jsonString.slice(1, -1);
+      }
       // If it starts with base64 pattern and not '{', attempt base64 decode
-      if (!rawServiceAccount.startsWith('{')) {
-        jsonString = Buffer.from(rawServiceAccount, 'base64').toString('utf8');
+      if (!jsonString.startsWith('{')) {
+        jsonString = Buffer.from(jsonString, 'base64').toString('utf8');
       }
       const parsed = JSON.parse(jsonString);
 
@@ -72,11 +79,18 @@ export function validateAdminConfig(
 }
 
 export function normalizePrivateKey(key: string): string {
+  let cleaned = key.trim();
+  // Strip surrounding double or single quotes if present
+  if (
+    (cleaned.startsWith('"') && cleaned.endsWith('"')) ||
+    (cleaned.startsWith("'") && cleaned.endsWith("'"))
+  ) {
+    cleaned = cleaned.slice(1, -1);
+  }
   // Normalize escaped newlines common in environment variable stores (e.g. Vercel, .env)
-  return key.replace(/\\n/g, '\n');
+  return cleaned.replace(/\\n/g, '\n');
 }
 
 export function getFirebaseAdminConfig(): FirebaseAdminConfig {
   return validateAdminConfig(process.env);
 }
-

@@ -5,6 +5,8 @@ export {
   getFirebaseAdminAuth,
   verifyIdToken,
   verifySessionCookie,
+  createSessionCookie,
+  revokeRefreshTokens,
 } from '@rashx/auth/server';
 
 export {
@@ -12,5 +14,10 @@ export {
   getTypedAdminCollection,
   getTypedAdminDoc,
   firestorePaths,
+  getTenantResolver,
+  TenantResolver,
+  MembershipRepository,
+  type TenantContext,
+  type TenantResolutionOutcome,
 } from '@rashx/database/server';
 

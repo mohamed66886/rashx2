@@ -5,8 +5,8 @@
  * Fails closed with actionable ConfigurationError if any required variable is missing.
  */
 
-import { ConfigurationError } from '../errors.js';
-import type { FirebaseClientConfig } from '../types.js';
+import { ConfigurationError } from '../errors';
+import type { FirebaseClientConfig } from '../types';
 
 export function validateClientConfig(
   env: Record<string, string | undefined>
@@ -52,4 +52,3 @@ export function validateClientConfig(
 export function getFirebaseClientConfig(): FirebaseClientConfig {
   return validateClientConfig(process.env);
 }
-

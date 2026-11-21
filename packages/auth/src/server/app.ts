@@ -1,11 +1,13 @@
 import 'server-only';
 import { initializeApp, getApps, cert, applicationDefault, type App } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
-import { getFirebaseAdminConfig } from './config.js';
-import type { FirebaseAdminConfig } from '../types.js';
+import { getStorage, type Storage } from 'firebase-admin/storage';
+import { getFirebaseAdminConfig } from './config';
+import type { FirebaseAdminConfig } from '../types';
 
 let adminAppInstance: App | null = null;
 let adminAuthInstance: Auth | null = null;
+let adminStorageInstance: Storage | null = null;
 
 export function getFirebaseAdminApp(customConfig?: FirebaseAdminConfig): App {
   if (adminAppInstance) {
@@ -50,6 +52,16 @@ export function getFirebaseAdminAuth(customConfig?: FirebaseAdminConfig): Auth {
   return adminAuthInstance;
 }
 
+export function getFirebaseAdminStorage(customConfig?: FirebaseAdminConfig): Storage {
+  if (adminStorageInstance) {
+    return adminStorageInstance;
+  }
+
+  const app = getFirebaseAdminApp(customConfig);
+  adminStorageInstance = getStorage(app);
+  return adminStorageInstance;
+}
+
 /**
  * Resets the admin singleton instances.
  * Intended primarily for testing environments.
@@ -57,4 +69,5 @@ export function getFirebaseAdminAuth(customConfig?: FirebaseAdminConfig): Auth {
 export function resetFirebaseAdminApp(): void {
   adminAppInstance = null;
   adminAuthInstance = null;
+  adminStorageInstance = null;
 }

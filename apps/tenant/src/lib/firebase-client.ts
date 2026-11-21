@@ -2,6 +2,9 @@ export {
   getFirebaseClientApp,
   getFirebaseAuth,
   validateClientConfig,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
 } from '@rashx/auth/client';
 
 export {
