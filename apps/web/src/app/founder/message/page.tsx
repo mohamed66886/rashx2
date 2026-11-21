@@ -21,7 +21,7 @@ import { generatePageMetadata } from '@/lib/metadata';
 import { Header, Footer } from '@/components/layout';
 import { PageContainer } from '@rashx/ui';
 import { SectionTitle } from '@/components/sections';
-import { ArrowLeft, ArrowRight, Sparkles } from '@rashx/icons';
+import { ArrowLeft, ArrowRight } from '@rashx/icons';
 import { routes } from '@/lib/routes';
 
 export async function generateMetadata(): Promise<Metadata> {

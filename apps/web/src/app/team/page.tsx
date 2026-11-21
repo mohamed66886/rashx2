@@ -43,7 +43,7 @@ import {
 import { routes } from '@/lib/routes';
 import { founderProfile, founderProfiles } from '@rashx/content';
 
-export interface TeamMember {
+interface TeamMember {
   id: string;
   name: {
     ar: string;
@@ -96,7 +96,7 @@ export interface TeamMember {
  *   accentTone: 'teal',
  * }
  */
-export const TEAM_MEMBERS: TeamMember[] = [];
+const TEAM_MEMBERS: TeamMember[] = [];
 
 function resolveTeamPhoto(publicPath?: string): string | null {
   if (!publicPath) return null;
