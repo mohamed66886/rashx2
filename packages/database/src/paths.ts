@@ -29,6 +29,10 @@ export const firestorePaths = {
   tenantSlugs: () => 'tenant_slugs' as const,
   tenantSlug: (slugVal: string) => `tenant_slugs/${validateSegment('slug', slugVal)}` as const,
 
+  tenantProvisionings: () => 'tenant_provisioning' as const,
+  tenantProvisioning: (ownerUid: string) =>
+    `tenant_provisioning/${validateSegment('ownerUid', ownerUid)}` as const,
+
   // Tenant collections & subcollections
   tenants: () => 'tenants' as const,
   tenant: (tenantId: string) => `tenants/${validateSegment('tenantId', tenantId)}` as const,

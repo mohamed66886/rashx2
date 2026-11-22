@@ -56,6 +56,38 @@ export const CommercialRegistrationDocSchema = z
 
 export type CommercialRegistrationDoc = z.infer<typeof CommercialRegistrationDocSchema>;
 
+export const ProvisioningStatusEnum = z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']);
+export type ProvisioningStatus = z.infer<typeof ProvisioningStatusEnum>;
+
+export const ProvisioningStepEnum = z.enum([
+  'USER_CREATED',
+  'TENANT_PROVISIONED',
+  'CERTIFICATE_UPLOADED',
+  'CR_METADATA_SAVED',
+]);
+export type ProvisioningStep = z.infer<typeof ProvisioningStepEnum>;
+
+/**
+ * Tenant Provisioning Tracking Document (`/tenant_provisioning/{ownerUid}`).
+ * Tracks multi-step onboarding lifecycle, supporting safe idempotent recovery and retries.
+ */
+export const TenantProvisioningDocSchema = z
+  .object({
+    ownerUid: z.string().min(1, 'Owner UID is required'),
+    tenantId: z.string().optional(),
+    slug: SlugFormatSchema.optional(),
+    status: ProvisioningStatusEnum,
+    step: ProvisioningStepEnum,
+    crNumber: SaudiCrNumberSchema.optional(),
+    certificateStoragePath: z.string().optional(),
+    createdAt: z.string().datetime({ message: 'createdAt must be an ISO 8601 datetime string' }),
+    updatedAt: z.string().datetime({ message: 'updatedAt must be an ISO 8601 datetime string' }),
+    error: z.string().max(1000).optional(),
+  })
+  .strict();
+
+export type TenantProvisioningDoc = z.infer<typeof TenantProvisioningDocSchema>;
+
 /**
  * Operational Tenant Document Schema (`/tenants/{tenantId}`).
  * Contains complete corporate, billing, and lifecycle data.

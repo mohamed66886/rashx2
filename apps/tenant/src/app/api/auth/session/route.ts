@@ -6,18 +6,18 @@ import {
   getAuthoritativeTenant,
 } from '@/lib/tenant-auth';
 import { MembershipRepository, getFirebaseAdminFirestore, firestorePaths } from '@/lib/firebase-server';
+import { validateCsrf } from '@/lib/csrf';
+import { getSessionCookieConfig, SESSION_DURATION_MS } from '@/lib/session-cookie';
 
 export const dynamic = 'force-dynamic';
 
-const SESSION_DURATION_MS = 5 * 24 * 60 * 60 * 1000; // 5 days
-
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  // 1. CSRF Protection
-  const csrfHeader = request.headers.get('x-rashx-csrf');
-  if (csrfHeader !== '1') {
+  // 1. Strict CSRF & Host Authority Verification
+  const csrfResult = validateCsrf(request, { requireJson: true });
+  if (!csrfResult.valid) {
     return NextResponse.json(
-      { error: 'طلب غير مصرح به: فشل التحقق من أمان الجلسة (CSRF)' },
-      { status: 403 }
+      { error: csrfResult.error },
+      { status: csrfResult.statusCode || 403 }
     );
   }
 
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // 7. Issue Response with Host-Specific __Host- Cookie
+  // 7. Issue Response with Host-Specific Session Cookie
   const response = NextResponse.json(
     {
       status: 'success',
@@ -104,14 +104,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     { status: 200 }
   );
 
+  const cookieConfig = getSessionCookieConfig();
   response.cookies.set({
-    name: '__Host-rashx_session',
+    name: cookieConfig.name,
     value: sessionCookie,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: Math.floor(SESSION_DURATION_MS / 1000),
+    ...cookieConfig.options,
   });
 
   return response;

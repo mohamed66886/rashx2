@@ -11,7 +11,12 @@ export function LogoutButton() {
   const handleLogout = () => {
     startTransition(async () => {
       try {
-        await fetch('/api/auth/logout', { method: 'POST' });
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'X-RASHX-CSRF': '1',
+          },
+        });
         const auth = getFirebaseAuth();
         await signOut(auth);
       } catch {

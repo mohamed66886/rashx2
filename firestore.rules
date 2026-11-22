@@ -231,6 +231,16 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    /**
+     * Tenant Provisioning Tracking Records (/tenant_provisioning/{ownerUid})
+     * Read restricted to the owner user or platform admin for recovery status checks.
+     * Direct client writes are strictly forbidden (Server Admin SDK only).
+     */
+    match /tenant_provisioning/{ownerUid} {
+      allow read: if isAuthenticated() && (request.auth.uid == ownerUid || isPlatformAdmin());
+      allow write: if false;
+    }
+
     match /slugs/{slug} {
       allow read: if true;
       allow write: if false;

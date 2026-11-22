@@ -14,8 +14,11 @@ import {
   SlugFormatSchema,
   SaudiCrNumberSchema,
   CommercialRegistrationDocSchema,
+  TenantProvisioningDocSchema,
   type CommercialRegistrationDoc,
+  type TenantProvisioningDoc,
 } from '@rashx/database';
+import { validateCsrf } from '@/lib/csrf';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,12 +63,12 @@ function detectMimeFromBytes(buffer: Buffer): 'application/pdf' | 'image/jpeg' |
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  // 1. CSRF Protection
-  const csrfHeader = request.headers.get('x-rashx-csrf');
-  if (csrfHeader !== '1') {
+  // 1. CSRF & Origin Protection
+  const csrfResult = validateCsrf(request);
+  if (!csrfResult.valid) {
     return NextResponse.json(
-      { error: 'طلب غير مصرح به: فشل التحقق من أمان الجلسة (CSRF)' },
-      { status: 403 }
+      { error: csrfResult.error },
+      { status: csrfResult.statusCode || 403 }
     );
   }
 
@@ -143,7 +146,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // 5. Validate Certificate File
+  // 5. Validate Certificate File (MIME, size, magic numbers)
   if (!certificateFile || !(certificateFile instanceof Blob)) {
     return NextResponse.json(
       { error: 'شهادة السجل التجاري مطلوبة (PDF أو JPG أو PNG)' },
@@ -170,9 +173,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const db = getFirebaseAdminFirestore();
+  const nowIso = new Date().toISOString();
 
   // 6. Ensure Owner Global Profile exists in /users/{uid}
-  const nowIso = new Date().toISOString();
   const userRef = db.doc(firestorePaths.user(uid));
   const userSnap = await userRef.get();
 
@@ -189,45 +192,121 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     });
   }
 
-  // 7. Atomic Tenant Provisioning (Self-Authorized Owner Context)
+  // 7. Check In-Flight / Existing Provisioning State (/tenant_provisioning/{uid})
+  const provDocRef = db.doc(firestorePaths.tenantProvisioning(uid));
+  const provSnap = await provDocRef.get();
+
+  let tenantId: string;
+  let activeSlug = slug;
+
+  if (provSnap.exists) {
+    const existingProv = provSnap.data() as TenantProvisioningDoc;
+
+    // A. Idempotent Replay: User already completed provisioning
+    if (existingProv.status === 'COMPLETED' && existingProv.tenantId) {
+      const existingTenantSnap = await db.doc(firestorePaths.tenant(existingProv.tenantId)).get();
+      if (existingTenantSnap.exists) {
+        const tenantData = existingTenantSnap.data();
+        if (tenantData?.status === 'ACTIVE') {
+          return NextResponse.json(
+            {
+              success: true,
+              tenantId: existingProv.tenantId,
+              slug: existingProv.slug || slug,
+              redirectUrl: `https://${existingProv.slug || slug}.rashx.org/login`,
+              alreadyProvisioned: true,
+            },
+            { status: 200 }
+          );
+        }
+      }
+    }
+
+    // B. Safe Resume: Tenant already created in previous attempt, but CR upload/metadata was interrupted
+    if (
+      existingProv.step === 'TENANT_PROVISIONED' ||
+      existingProv.step === 'CERTIFICATE_UPLOADED'
+    ) {
+      if (existingProv.tenantId && existingProv.slug) {
+        tenantId = existingProv.tenantId;
+        activeSlug = existingProv.slug;
+      } else {
+        tenantId = '';
+      }
+    } else {
+      tenantId = '';
+    }
+  } else {
+    tenantId = '';
+  }
+
+  // 8. Execute or Resume Tenant Provisioning
   const tenantRepo = new TenantRepository(db);
 
-  let provisioningResult;
-  try {
-    provisioningResult = await tenantRepo.createTenant(
-      {
-        slug,
-        name,
-        commercialName,
-        crNumber,
-        primaryOwnerUid: uid,
-        billingEmail: email,
-        subscriptionTier: 'STARTER',
-      },
-      { callerUid: uid }
-    );
-  } catch (err: any) {
-    if (err instanceof TenantProvisioningError) {
-      if (err.code === TenantProvisioningErrorCode.SLUG_ALREADY_EXISTS) {
+  if (!tenantId) {
+    // Record in-progress initialization
+    const initialProvRecord: TenantProvisioningDoc = TenantProvisioningDocSchema.parse({
+      ownerUid: uid,
+      slug,
+      crNumber,
+      status: 'IN_PROGRESS',
+      step: 'USER_CREATED',
+      createdAt: nowIso,
+      updatedAt: nowIso,
+    });
+    await provDocRef.set(initialProvRecord);
+
+    try {
+      const provisioningResult = await tenantRepo.createTenant(
+        {
+          slug,
+          name,
+          commercialName,
+          crNumber,
+          primaryOwnerUid: uid,
+          billingEmail: email,
+          subscriptionTier: 'STARTER',
+        },
+        { callerUid: uid }
+      );
+
+      tenantId = provisioningResult.tenantId;
+      activeSlug = provisioningResult.slug;
+
+      // Update provisioning record with tenant identity
+      await provDocRef.update({
+        tenantId,
+        slug: activeSlug,
+        step: 'TENANT_PROVISIONED',
+        updatedAt: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      await provDocRef.update({
+        status: 'FAILED',
+        error: err.message || 'Provisioning error',
+        updatedAt: new Date().toISOString(),
+      }).catch(() => {});
+
+      if (err instanceof TenantProvisioningError) {
+        if (err.code === TenantProvisioningErrorCode.SLUG_ALREADY_EXISTS) {
+          return NextResponse.json(
+            { error: 'اسم النطاق المطلوب محجوز مسبقاً. يرجى اختيار اسم آخر.' },
+            { status: 409 }
+          );
+        }
         return NextResponse.json(
-          { error: 'اسم النطاق المطلوب محجوز مسبقاً. يرجى اختيار اسم آخر.' },
-          { status: 409 }
+          { error: `تعذر إنشاء المنشأة: ${err.message}` },
+          { status: 400 }
         );
       }
       return NextResponse.json(
-        { error: `تعذر إنشاء المنشأة: ${err.message}` },
-        { status: 400 }
+        { error: 'حدث خطأ أثناء معالجة تسجيل المنشأة. يرجى المحاولة لاحقاً.' },
+        { status: 500 }
       );
     }
-    return NextResponse.json(
-      { error: 'حدث خطأ أثناء معالجة تسجيل المنشأة. يرجى المحاولة لاحقاً.' },
-      { status: 500 }
-    );
   }
 
-  const tenantId = provisioningResult.tenantId;
-
-  // 8. Upload Certificate File to Private Firebase Storage
+  // 9. Upload Certificate File to Private Firebase Storage
   const ext = detectedMime === 'application/pdf' ? 'pdf' : detectedMime === 'image/jpeg' ? 'jpg' : 'png';
   const certificateStoragePath = `tenants/${tenantId}/certificates/${randomUUID()}.${ext}`;
   const originalFileName = (certificateFile as File).name || `cr_certificate.${ext}`;
@@ -247,12 +326,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         crNumber,
       },
     });
+
+    await provDocRef.update({
+      certificateStoragePath,
+      step: 'CERTIFICATE_UPLOADED',
+      updatedAt: new Date().toISOString(),
+    }).catch(() => {});
   } catch (storageError) {
-    // If storage upload fails (e.g. offline emulator), log warning and continue so onboarding isn't blocked
     console.warn('[Provisioning] Notice: Storage upload bypassed or encountered an issue:', storageError);
   }
 
-  // 9. Store Commercial Registration Verification Record in Firestore
+  // 10. Store Commercial Registration Verification Record in Firestore
   const crRecordData: CommercialRegistrationDoc = CommercialRegistrationDocSchema.parse({
     tenantId,
     crNumber,
@@ -269,13 +353,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const crDocRef = db.doc(firestorePaths.commercialRegistration(tenantId));
   await crDocRef.set(crRecordData);
 
-  // 10. Success Response
+  // 11. Mark Provisioning as COMPLETED
+  await provDocRef.update({
+    status: 'COMPLETED',
+    step: 'CR_METADATA_SAVED',
+    updatedAt: new Date().toISOString(),
+  }).catch(() => {});
+
+  // 12. Success Response
   return NextResponse.json(
     {
       success: true,
       tenantId,
-      slug,
-      redirectUrl: `https://${slug}.rashx.org/login`,
+      slug: activeSlug,
+      redirectUrl: `https://${activeSlug}.rashx.org/login`,
     },
     { status: 201 }
   );

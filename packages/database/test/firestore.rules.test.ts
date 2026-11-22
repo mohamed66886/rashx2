@@ -724,6 +724,18 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
       uploadedAt: '2026-11-20T20:00:00.000Z',
       updatedAt: '2026-11-20T20:00:00.000Z',
     });
+
+    // Seed Tenant Provisioning record
+    await seedDoc(`tenant_provisioning/${userOwnerA}`, {
+      ownerUid: userOwnerA,
+      slug: 'salon-alpha',
+      name: 'Salon Alpha Riyadh',
+      tenantId: tenantA,
+      status: 'COMPLETED',
+      step: 'CR_METADATA_SAVED',
+      createdAt: '2026-11-20T20:00:00.000Z',
+      updatedAt: '2026-11-20T20:00:00.000Z',
+    });
   });
 
   // ===========================================================================
@@ -1718,6 +1730,30 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
       const res = await writeDoc(
         `tenants/${tenantA}/commercial_registration/record`,
         { status: 'APPROVED' },
+        userOwnerA
+      );
+      expect(res.status).toBe(403);
+    });
+
+    it('99. Owner can read their own tenant provisioning tracking record', async () => {
+      const res = await readDoc(`tenant_provisioning/${userOwnerA}`, userOwnerA);
+      expect(res.status).toBe(200);
+    });
+
+    it('100. Platform Admin can read any tenant provisioning tracking record', async () => {
+      const res = await readDoc(`tenant_provisioning/${userOwnerA}`, userSuperAdmin);
+      expect(res.status).toBe(200);
+    });
+
+    it('101. Another user CANNOT read foreign tenant provisioning tracking record', async () => {
+      const res = await readDoc(`tenant_provisioning/${userOwnerA}`, userOwnerB);
+      expect(res.status).toBe(403);
+    });
+
+    it('102. Direct client writes to tenant provisioning records are STRICTLY DENIED', async () => {
+      const res = await writeDoc(
+        `tenant_provisioning/${userOwnerA}`,
+        { status: 'COMPLETED' },
         userOwnerA
       );
       expect(res.status).toBe(403);

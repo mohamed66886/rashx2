@@ -11,6 +11,12 @@ import {
   type TenantContext,
 } from './firebase-server';
 import { getAuthoritativeTenant } from './tenant';
+import {
+  getSessionCookieConfig,
+  extractSessionCookie,
+  PROD_COOKIE_NAME,
+  DEV_COOKIE_NAME,
+} from './session-cookie';
 import type { MembershipRole } from '@rashx/database';
 
 export {
@@ -19,6 +25,10 @@ export {
   createSessionCookie,
   revokeRefreshTokens,
   getAuthoritativeTenant,
+  getSessionCookieConfig,
+  extractSessionCookie,
+  PROD_COOKIE_NAME,
+  DEV_COOKIE_NAME,
 };
 
 export interface TenantSession {
@@ -42,7 +52,7 @@ export interface TenantSession {
  */
 export async function getTenantSession(): Promise<TenantSession | null> {
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get('__Host-rashx_session')?.value;
+  const sessionCookie = extractSessionCookie(cookieStore);
 
   if (!sessionCookie) {
     return null;

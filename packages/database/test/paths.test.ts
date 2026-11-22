@@ -13,6 +13,8 @@ describe('Firestore Canonical Paths & Validation', () => {
     expect(firestorePaths.slug('al-olaya-spa')).toBe('slugs/al-olaya-spa');
     expect(firestorePaths.tenantSlugs()).toBe('tenant_slugs');
     expect(firestorePaths.tenantSlug('al-olaya-spa')).toBe('tenant_slugs/al-olaya-spa');
+    expect(firestorePaths.tenantProvisionings()).toBe('tenant_provisioning');
+    expect(firestorePaths.tenantProvisioning('usr_owner1')).toBe('tenant_provisioning/usr_owner1');
   });
 
   it('should construct valid tenant-scoped collection and document paths', () => {
