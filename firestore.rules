@@ -1,0 +1,473 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // AUTHORITATIVE SECURITY HELPERS (Evaluation Budget: <= 3 Document Lookups)
+    // =========================================================================
+
+    /**
+     * Verifies that the client request carries an authenticated Firebase UID.
+     */
+    function isAuthenticated() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    /**
+     * Verifies whether the authenticated user is registered as a platform administrator.
+     * Must be verified against the secure platform_admins collection.
+     */
+    function isPlatformAdmin() {
+      return isAuthenticated()
+        && exists(/databases/$(database)/documents/platform_admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/platform_admins/$(request.auth.uid)).data.isActive == true;
+    }
+
+    /**
+     * Verifies that the authenticated user possesses an ACTIVE membership in the requested tenant.
+     * Evaluated authoritatively against `/tenants/{tenantId}/memberships/{uid}`.
+     */
+    function isTenantMemberActive(tenantId) {
+      return isAuthenticated()
+        && exists(/databases/$(database)/documents/tenants/$(tenantId)/memberships/$(request.auth.uid))
+        && get(/databases/$(database)/documents/tenants/$(tenantId)/memberships/$(request.auth.uid)).data.status == 'ACTIVE';
+    }
+
+    /**
+     * Extracts the organizational role of the active member within the specified tenant.
+     */
+    function getTenantRole(tenantId) {
+      return get(/databases/$(database)/documents/tenants/$(tenantId)/memberships/$(request.auth.uid)).data.role;
+    }
+
+    /**
+     * Evaluates whether the authenticated user is an ACTIVE OWNER of the tenant.
+     */
+    function isTenantOwner(tenantId) {
+      return isTenantMemberActive(tenantId) && getTenantRole(tenantId) == 'OWNER';
+    }
+
+    /**
+     * Evaluates whether the authenticated user has managerial access (OWNER or MANAGER).
+     */
+    function isTenantManager(tenantId) {
+      return isTenantMemberActive(tenantId)
+        && (getTenantRole(tenantId) == 'OWNER' || getTenantRole(tenantId) == 'MANAGER');
+    }
+
+    /**
+     * Evaluates whether the tenant is publicly active and published for customer discovery.
+     */
+    function isTenantPubliclyActive(tenantId) {
+      return exists(/databases/$(database)/documents/tenants/$(tenantId))
+        && get(/databases/$(database)/documents/tenants/$(tenantId)).data.status == 'ACTIVE'
+        && get(/databases/$(database)/documents/tenants/$(tenantId)).data.isPublished == true;
+    }
+
+    // =========================================================================
+    // FIELD VALIDATION HELPERS: APPOINTMENTS
+    // =========================================================================
+
+    function isTerminalAppointment(status) {
+      return status in ['COMPLETED', 'CANCELLED', 'NO_SHOW'];
+    }
+
+    function isValidAppointmentTiming(startTime, endTime) {
+      return (startTime is string && endTime is string && endTime > startTime)
+        || (startTime is timestamp && endTime is timestamp && endTime > startTime);
+    }
+
+    function isValidStaffBranchAssignment(tenantId, staffId, branchId) {
+      return exists(/databases/$(database)/documents/tenants/$(tenantId)/staff/$(staffId))
+        && get(/databases/$(database)/documents/tenants/$(tenantId)/staff/$(staffId)).data.isActive == true
+        && exists(/databases/$(database)/documents/tenants/$(tenantId)/branches/$(branchId))
+        && get(/databases/$(database)/documents/tenants/$(tenantId)/branches/$(branchId)).data.isActive == true
+        && branchId in get(/databases/$(database)/documents/tenants/$(tenantId)/staff/$(staffId)).data.assignedBranchIds;
+    }
+
+    function isValidStaffStatusTransition(currentStatus, newStatus) {
+      // Direct client updates for staff: strictly non-terminal, operational status transitions only.
+      // Schedule-releasing or terminal transitions (COMPLETED, NO_SHOW, CANCELLED) MUST use AppointmentRepository.
+      return (currentStatus == 'CONFIRMED' && newStatus == 'IN_PROGRESS')
+        || (currentStatus == newStatus);
+    }
+
+    function isValidManagerStatusTransition(currentStatus, newStatus) {
+      // Direct client updates for managers: strictly non-terminal, operational status transitions only.
+      // Schedule-releasing or terminal transitions (CANCELLED, COMPLETED, NO_SHOW) MUST use AppointmentRepository.
+      return (currentStatus == newStatus)
+        || (currentStatus == 'PENDING' && newStatus == 'CONFIRMED')
+        || (currentStatus == 'CONFIRMED' && newStatus == 'IN_PROGRESS');
+    }
+
+    function appointmentImmutableFieldsPreserved() {
+      return request.resource.data.tenantId == resource.data.tenantId
+        && request.resource.data.customerId == resource.data.customerId
+        && request.resource.data.serviceId == resource.data.serviceId
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.priceHalalas == resource.data.priceHalalas
+        && request.resource.data.paymentStatus == resource.data.paymentStatus;
+    }
+
+    function staffAppointmentUpdateAllowed(tenantId) {
+      return isTenantMemberActive(tenantId)
+        && !isTerminalAppointment(resource.data.status)
+        && resource.data.staffId == request.auth.uid
+        && request.resource.data.staffId == resource.data.staffId
+        && request.resource.data.branchId == resource.data.branchId
+        && request.resource.data.scheduledStartTime == resource.data.scheduledStartTime
+        && request.resource.data.scheduledEndTime == resource.data.scheduledEndTime
+        && appointmentImmutableFieldsPreserved()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'notes', 'updatedAt'])
+        && isValidStaffStatusTransition(resource.data.status, request.resource.data.status)
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    function managerAppointmentUpdateAllowed(tenantId) {
+      return isTenantManager(tenantId)
+        && !isTerminalAppointment(resource.data.status)
+        && appointmentImmutableFieldsPreserved()
+        && request.resource.data.staffId == resource.data.staffId
+        && request.resource.data.branchId == resource.data.branchId
+        && request.resource.data.scheduledStartTime == resource.data.scheduledStartTime
+        && request.resource.data.scheduledEndTime == resource.data.scheduledEndTime
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'notes', 'updatedAt'])
+        && isValidManagerStatusTransition(resource.data.status, request.resource.data.status)
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    // =========================================================================
+    // FIELD VALIDATION HELPERS: BRANCHES & SERVICES
+    // =========================================================================
+
+    function isValidBranchCreate(tenantId, branchId) {
+      return isTenantManager(tenantId)
+        && request.resource.data.id == branchId
+        && request.resource.data.tenantId == tenantId
+        && request.resource.data.name is string && request.resource.data.name.size() > 0
+        && request.resource.data.city is string && request.resource.data.city.size() > 0
+        && request.resource.data.isActive is bool;
+    }
+
+    function isValidBranchUpdate(tenantId) {
+      return isTenantManager(tenantId)
+        && request.resource.data.tenantId == resource.data.tenantId
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function isValidServiceCreate(tenantId, serviceId) {
+      return isTenantManager(tenantId)
+        && request.resource.data.id == serviceId
+        && request.resource.data.tenantId == tenantId
+        && request.resource.data.name is string && request.resource.data.name.size() > 0
+        && request.resource.data.category is string && request.resource.data.category.size() > 0
+        && request.resource.data.priceHalalas is int && request.resource.data.priceHalalas >= 0
+        && request.resource.data.durationMinutes is int && request.resource.data.durationMinutes > 0;
+    }
+
+    function isValidServiceUpdate(tenantId) {
+      return isTenantManager(tenantId)
+        && request.resource.data.tenantId == resource.data.tenantId
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    // =========================================================================
+    // ROOT COLLECTIONS
+    // =========================================================================
+
+    /**
+     * Global User Profiles (/users/{uid})
+     * Self-registration and self-profile updates strictly validated against allowlisted keys.
+     * Prevents self-granting of roles, disabled status mutation, or platform privilege escalation.
+     */
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isPlatformAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == userId
+        && request.resource.data.id == userId
+        && request.resource.data.disabled == false
+        && request.resource.data.keys().hasOnly(['id', 'email', 'displayName', 'photoUrl', 'phoneNumber', 'disabled', 'createdAt', 'updatedAt']);
+      allow update: if isAuthenticated() && request.auth.uid == userId
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.disabled == resource.data.disabled
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'photoUrl', 'phoneNumber', 'updatedAt']);
+      allow delete: if false;
+    }
+
+    /**
+     * Customer Global Profiles (/customers/{customerId})
+     * Self-registration and updates strictly validated against allowlisted keys.
+     * Prevents tampering with loyalty points, outstanding balances, VIP status, or tenant associations.
+     */
+    match /customers/{customerId} {
+      allow read: if isAuthenticated() && (request.auth.uid == customerId || isPlatformAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == customerId
+        && request.resource.data.id == customerId
+        && request.resource.data.keys().hasOnly(['id', 'email', 'displayName', 'phoneNumber', 'preferredLocale', 'createdAt', 'updatedAt']);
+      allow update: if isAuthenticated() && request.auth.uid == customerId
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'phoneNumber', 'preferredLocale', 'updatedAt']);
+      allow delete: if false;
+    }
+
+    /**
+     * Platform Administrators Registry (/platform_admins/{adminId})
+     * Read restricted strictly to active platform admins; writes strictly server-side.
+     */
+    match /platform_admins/{adminId} {
+      allow read: if isPlatformAdmin();
+      allow write: if false;
+    }
+
+    /**
+     * Routing Slugs Index (/tenant_slugs/{slug} and /slugs/{slug})
+     * Publicly readable for DNS and middleware hostname routing.
+     * Writes strictly restricted to trusted server Admin SDK.
+     */
+    match /tenant_slugs/{slug} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    /**
+     * Tenant Provisioning Tracking Records (/tenant_provisioning/{ownerUid})
+     * Read restricted to the owner user or platform admin for recovery status checks.
+     * Direct client writes are strictly forbidden (Server Admin SDK only).
+     */
+    match /tenant_provisioning/{ownerUid} {
+      allow read: if isAuthenticated() && (request.auth.uid == ownerUid || isPlatformAdmin());
+      allow write: if false;
+    }
+
+    match /slugs/{slug} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // TENANT SCOPE (Private Operational Documents & Public Projections)
+    // =========================================================================
+
+    match /tenants/{tenantId} {
+      /**
+       * Operational Tenant Document (/tenants/{tenantId})
+       * Highly confidential: Contains corporate CR, VAT, billing email, primary owner UID,
+       * and subscription tier.
+       * Read restricted strictly to tenant OWNER or platform admin (Least Privilege).
+       * Ordinary STAFF and MANAGERS are denied direct read access.
+       * Zero public read! Writes restricted strictly to trusted server Admin SDK.
+       */
+      allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+      allow write: if false;
+
+      /**
+       * Public Marketing Profile Projection (/tenants/{tenantId}/public_profile/{docId})
+       * Contains non-sensitive marketing metadata (name, slug, logoUrl, socialLinks).
+       * Publicly readable only if tenant is ACTIVE and isPublished == true.
+       * Also accessible to active members for general salon details.
+       */
+      match /public_profile/{docId} {
+        allow read: if isTenantPubliclyActive(tenantId) || isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Membership Records (/tenants/{tenantId}/memberships/{memberUid})
+       * OWNER and MANAGER may read member roster in their own tenant.
+       * Individual STAFF member can read ONLY their own membership record.
+       * Client creation, role changes, and removals are forbidden (Server Admin SDK only).
+       */
+      match /memberships/{memberUid} {
+        allow read: if isTenantManager(tenantId)
+          || (isTenantMemberActive(tenantId) && request.auth.uid == memberUid)
+          || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Membership Summary Mutex Document (/tenants/{tenantId}/membership_summary/{summaryDoc})
+       * Critical invariant: activeOwnerCount >= 1.
+       * Read restricted strictly to tenant OWNER or platform admin.
+       * Client writes forbidden (Server Admin SDK transaction only).
+       */
+      match /membership_summary/{summaryDoc} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Operational Branches (/tenants/{tenantId}/branches/{branchId})
+       * Private operational config: contains internal notes and manager contact info.
+       * Read: Active tenant members or platform admin.
+       * Management: OWNER and MANAGER with strict field and tenantId validation.
+       * Delete: Restricted strictly to OWNER.
+       */
+      match /branches/{branchId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow create: if isValidBranchCreate(tenantId, branchId);
+        allow update: if isValidBranchUpdate(tenantId);
+        allow delete: if isTenantOwner(tenantId);
+      }
+
+      /**
+       * Public Branch Projections (/tenants/{tenantId}/public_branches/{branchId})
+       * Publicly readable only if tenant is publicly active and branch isActive == true.
+       */
+      match /public_branches/{branchId} {
+        allow read: if (isTenantPubliclyActive(tenantId) && resource.data.isActive == true)
+          || isTenantMemberActive(tenantId)
+          || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Operational Staff Records (/tenants/{tenantId}/staff/{staffUid})
+       * Operational profiles: contains displayName, assignedBranchIds, specialties, isActive, employmentStatus.
+       * Read restricted to tenant OWNER, MANAGER (for shift scheduling & branch assignments),
+       * or the specific staff member themselves.
+       * Other staff members cannot read coworkers' operational profiles.
+       * Writes strictly restricted to server Admin SDK.
+       */
+      match /staff/{staffUid} {
+        allow read: if isTenantManager(tenantId)
+          || (isTenantMemberActive(tenantId) && request.auth.uid == staffUid)
+          || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Staff Self-Service Compensation (/tenants/{tenantId}/staff_compensation/{staffUid})
+       * Contains base salary, commission split, and employment status.
+       * Read restricted strictly to tenant OWNER or the specific employee themselves (Self-service payroll transparency).
+       * MANAGERS and peer staff are strictly denied read access!
+       * Client writes strictly forbidden (Server Admin SDK only).
+       */
+      match /staff_compensation/{staffUid} {
+        allow read: if isTenantOwner(tenantId)
+          || (isTenantMemberActive(tenantId) && request.auth.uid == staffUid)
+          || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Confidential Staff HR & Identity Records (/tenants/{tenantId}/staff_confidential/{staffUid})
+       * Highly confidential: Contains nationalId, personalPhone, emergencyContact.
+       * Read restricted strictly to tenant OWNER or platform admin (Authorized HR Records).
+       * STAFF (both self and peers) and MANAGERS are strictly denied direct client read access.
+       * Client writes strictly forbidden (Server Admin SDK only).
+       */
+      match /staff_confidential/{staffUid} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Public Stylist Roster Projection (/tenants/{tenantId}/public_roster/{staffUid})
+       * Publicly readable only if tenant is publicly active and stylist isBookableOnline == true.
+       * Strictly excludes compensation and sensitive PII.
+       */
+      match /public_roster/{staffUid} {
+        allow read: if (isTenantPubliclyActive(tenantId) && resource.data.isBookableOnline == true)
+          || isTenantMemberActive(tenantId)
+          || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Operational Services (/tenants/{tenantId}/services/{serviceId})
+       * Confidential: contains COGS, commissions, supplier SKU, procedure SOP notes.
+       * Read: Active tenant members or platform admin.
+       * Management: OWNER and MANAGER with strict field and tenantId validation.
+       * Delete: Restricted strictly to OWNER.
+       */
+      match /services/{serviceId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow create: if isValidServiceCreate(tenantId, serviceId);
+        allow update: if isValidServiceUpdate(tenantId);
+        allow delete: if isTenantOwner(tenantId);
+      }
+
+      /**
+       * Public Service Catalog (/tenants/{tenantId}/public_services/{serviceId})
+       * Publicly readable only if tenant is publicly active, service status is PUBLISHED,
+       * isVisible == true, and isArchived == false.
+       */
+      match /public_services/{serviceId} {
+        allow read: if (isTenantPubliclyActive(tenantId)
+          && resource.data.status == 'PUBLISHED'
+          && resource.data.isVisible == true
+          && resource.data.isArchived == false)
+          || isTenantMemberActive(tenantId)
+          || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Appointments (/tenants/{tenantId}/appointments/{appointmentId})
+       * Private booking records.
+       * Read: OWNER, MANAGER, the assigned staff member, or the booking customer.
+       * Create: Server-only (enforces slot locking, double-booking prevention, deposit billing).
+       * Update: Strictly validated status progression by assigned staff or management.
+       * Delete: Client deletion forbidden (permanent audit trail).
+       */
+      match /appointments/{appointmentId} {
+        allow read: if isTenantManager(tenantId)
+          || (isTenantMemberActive(tenantId) && resource.data.staffId == request.auth.uid)
+          || (isAuthenticated() && resource.data.customerId == request.auth.uid)
+          || isPlatformAdmin();
+        allow create: if false;
+        allow update: if staffAppointmentUpdateAllowed(tenantId) || managerAppointmentUpdateAllowed(tenantId);
+        allow delete: if false;
+      }
+
+      /**
+       * Slot Locks (/tenants/{tenantId}/slot_locks/{lockId})
+       * Ephemeral hold documents during checkout.
+       */
+      match /slot_locks/{lockId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Staff Schedule Mutex Locks (/tenants/{tenantId}/schedule_locks/{staffUid})
+       * Concurrency mutex document used for Optimistic Concurrency Control (OCC)
+       * across all operations affecting staff availability.
+       * Client direct reads and writes are strictly forbidden (Admin SDK only).
+       */
+      match /schedule_locks/{staffUid} {
+        allow read, write: if false;
+      }
+
+      /**
+       * Audit Logs (/tenants/{tenantId}/audit_logs/{logId})
+       * Append-only trail. Read restricted strictly to tenant OWNER or platform admin.
+       * Ordinary staff cannot inspect audit trail. Client writes strictly forbidden.
+       */
+      match /audit_logs/{logId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Commercial Registration Records (/tenants/{tenantId}/commercial_registration/{docId})
+       * Private verification record holding uploaded certificate metadata.
+       * Read restricted strictly to tenant OWNER or platform admin.
+       * Direct client writes strictly forbidden (Server Admin SDK only).
+       */
+      match /commercial_registration/{docId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+    }
+
+    // =========================================================================
+    // DEFAULT DENY CATCH-ALL
+    // =========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

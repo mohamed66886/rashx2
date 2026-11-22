@@ -173,13 +173,15 @@ export function Header({ lang, className }: HeaderProps) {
   ];
 
   const navItems: NavItem[] = [
+    { label: isAr ? 'الرئيسية' : 'Home', href: homeHref },
     { label: isAr ? 'المنظومة' : 'Platform', href: platformHref },
     { label: isAr ? 'الحلول' : 'Solutions', href: solutionsHref, menu: 'solutions' },
     { label: isAr ? 'القطاعات' : 'Industries', href: industriesHref, menu: 'industries' },
     { label: isAr ? 'الأسعار' : 'Pricing', href: pricingHref },
     { label: isAr ? 'عن راش إكس' : 'About', href: aboutHref },
     { label: isAr ? 'تواصل معنا' : 'Contact', href: contactHref },
-    { label: isAr ? 'المزيد' : 'More', href: brandHref, menu: 'more' },
+    { label: isAr ? 'دليل الهوية' : 'Brand Showcase', href: brandHref },
+    { label: isAr ? 'الركائز الهندسية' : 'Engineering Pillars', href: pillarsHref },
   ];
 
   const mobileLinks: MobileNavLink[] = [
@@ -205,7 +207,7 @@ export function Header({ lang, className }: HeaderProps) {
     }`;
 
   const panelSurface =
-    'overflow-hidden rounded-[28px] bg-[#FAF9F8] p-3 shadow-[0_30px_70px_-24px_rgba(84,69,61,.35)]';
+    'overflow-hidden rounded-[28px] bg-[#FAF9F8] p-3';
 
   const itemStyle = (id: MenuId, i: number) => ({
     transitionDelay: open === id ? `${70 + i * 35}ms` : '0ms',
@@ -216,6 +218,7 @@ export function Header({ lang, className }: HeaderProps) {
   return (
     <div className="relative h-[76px]" dir={isAr ? 'rtl' : 'ltr'}>
       <header
+        dir={isAr ? 'rtl' : 'ltr'}
         className={`fixed inset-x-0 top-0 z-40 flex justify-center px-3 pt-3 transition-transform duration-500 ${EASE} ${
           hidden ? '-translate-y-[130%]' : 'translate-y-0'
         } ${className ?? ''}`}
@@ -312,12 +315,12 @@ export function Header({ lang, className }: HeaderProps) {
 
                 <Link
                   href={cta.href as Route}
-                  className="group/cta hidden shrink-0 items-center gap-3 whitespace-nowrap rounded-full bg-[#54453D] py-1 ps-4 pe-1 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#3F332D] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#54453D] focus-visible:ring-offset-2 lg:inline-flex"
+                  className="group/cta hidden shrink-0 items-center gap-3 whitespace-nowrap rounded-full bg-[#54453D] py-1 ps-4 pe-1 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#54453D]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91B8C0] focus-visible:ring-offset-2 lg:inline-flex"
                 >
                   {cta.label}
                   <span
                     aria-hidden="true"
-                    className="grid h-8 w-8 place-items-center rounded-full bg-[#F0C5AE] text-[#54453D] transition-transform duration-500 group-hover/cta:rotate-45 rtl:-scale-x-100 rtl:group-hover/cta:-rotate-45"
+                    className="grid h-8 w-8 place-items-center rounded-full bg-[#F0C5AE] text-[#54453D] transition-all duration-500 group-hover/cta:bg-[#91B8C0] group-hover/cta:rotate-45 rtl:-scale-x-100 rtl:group-hover/cta:-rotate-45"
                   >
                     →
                   </span>
@@ -336,7 +339,7 @@ export function Header({ lang, className }: HeaderProps) {
             >
               <div
                 ref={barRef}
-                className="h-full w-full rounded-full bg-[#E4A889] will-change-transform"
+                className="h-full w-full rounded-full bg-gradient-to-r from-[#F0C5AE] to-[#91B8C0] will-change-transform"
                 style={{
                   transform: 'scaleX(0)',
                   transformOrigin: isAr ? 'right' : 'left',
@@ -367,7 +370,7 @@ export function Header({ lang, className }: HeaderProps) {
                     style={itemStyle('solutions', i)}
                     className={`group/item flex items-center gap-3 rounded-2xl p-3 transition-all duration-300 hover:bg-white ${itemReveal('solutions')}`}
                   >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#F0C5AE]/40 text-[11px] font-bold text-[#54453D] transition-colors duration-300 group-hover/item:bg-[#F0C5AE]">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#F0C5AE]/40 text-[11px] font-bold text-[#54453D] transition-colors duration-300 group-hover/item:bg-[#91B8C0]">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <span className="flex min-w-0 flex-col">
@@ -398,7 +401,7 @@ export function Header({ lang, className }: HeaderProps) {
                       {item.label}
                       <span
                         aria-hidden="true"
-                        className="text-[#E4A889] opacity-0 transition-all duration-300 group-hover/item:translate-x-1 group-hover/item:opacity-100 rtl:-scale-x-100 rtl:group-hover/item:-translate-x-1"
+                        className="text-[#91B8C0] opacity-0 transition-all duration-300 group-hover/item:translate-x-1 group-hover/item:opacity-100 rtl:-scale-x-100 rtl:group-hover/item:-translate-x-1"
                       >
                         →
                       </span>

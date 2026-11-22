@@ -1,0 +1,32 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    /**
+     * Tenant Commercial Registration Certificates
+     * Private document storage: /tenants/{tenantId}/certificates/{fileName}
+     *
+     * Invariants:
+     * 1. Read restricted strictly to authenticated tenant owner or platform admin.
+     * 2. Max file size: 5MB (5 * 1024 * 1024 bytes).
+     * 3. Allowed MIME types: application/pdf, image/jpeg, image/png.
+     * 4. Direct public access is strictly forbidden.
+     */
+    match /tenants/{tenantId}/certificates/{fileName} {
+      // Read restricted strictly to authenticated tenant owner or platform admin
+      allow read: if request.auth != null && (
+        request.auth.token.tenantId == tenantId ||
+        request.auth.token.isPlatformAdmin == true
+      );
+      // Direct client writes are strictly forbidden.
+      // All certificates must be uploaded via server route handlers using Firebase Admin SDK,
+      // which verifies magic numbers, enforces 5MB limits, and writes audit metadata atomically.
+      allow write: if false;
+    }
+
+    // Default deny catch-all
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

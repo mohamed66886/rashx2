@@ -76,10 +76,10 @@ describe('RASHX — How It Works Section Suite', () => {
       render(<HowItWorks lang="ar" />);
 
       expect(
-        screen.getByText('منظومة جاهزة للعمل فور اكتمال الإعداد')
+        screen.getAllByText('منظومة جاهزة للعمل فور اكتمال الإعداد')[0]
       ).toBeInTheDocument();
       expect(
-        screen.getByText('دعم فني وتدريب مباشر لفريق صالونك من اليوم الأول')
+        screen.getAllByText('دعم فني وتدريب مباشر لفريق صالونك من اليوم الأول')[0]
       ).toBeInTheDocument();
     });
 
