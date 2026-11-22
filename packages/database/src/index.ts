@@ -21,5 +21,6 @@ export * from './branch.schema';
 export * from './staff.schema';
 export * from './service.schema';
 export * from './appointment.schema';
+export * from './certificate-validation';
 
 export const DATABASE_PACKAGE_INITIALIZED = true as const;

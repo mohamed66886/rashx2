@@ -15,52 +15,15 @@ import {
   SaudiCrNumberSchema,
   CommercialRegistrationDocSchema,
   TenantProvisioningDocSchema,
+  ALLOWED_CERTIFICATE_MIME_TYPES,
+  MAX_CERTIFICATE_SIZE_BYTES,
+  detectMimeFromBytes,
   type CommercialRegistrationDoc,
   type TenantProvisioningDoc,
 } from '@rashx/database';
 import { validateCsrf } from '@/lib/csrf';
 
 export const dynamic = 'force-dynamic';
-
-// Allowed MIME types and Magic Bytes
-const ALLOWED_MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
-const MAX_CERTIFICATE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
-
-function detectMimeFromBytes(buffer: Buffer): 'application/pdf' | 'image/jpeg' | 'image/png' | null {
-  if (buffer.length < 4) return null;
-
-  // PDF magic numbers: %PDF (0x25, 0x50, 0x44, 0x46)
-  if (
-    buffer[0] === 0x25 &&
-    buffer[1] === 0x50 &&
-    buffer[2] === 0x44 &&
-    buffer[3] === 0x46
-  ) {
-    return 'application/pdf';
-  }
-
-  // JPEG magic numbers: 0xFF, 0xD8, 0xFF
-  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
-    return 'image/jpeg';
-  }
-
-  // PNG magic numbers: 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A
-  if (
-    buffer.length >= 8 &&
-    buffer[0] === 0x89 &&
-    buffer[1] === 0x50 &&
-    buffer[2] === 0x4e &&
-    buffer[3] === 0x47 &&
-    buffer[4] === 0x0d &&
-    buffer[5] === 0x0a &&
-    buffer[6] === 0x1a &&
-    buffer[7] === 0x0a
-  ) {
-    return 'image/png';
-  }
-
-  return null;
-}
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // 1. CSRF & Origin Protection
@@ -165,7 +128,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const fileBuffer = Buffer.from(fileArrayBuffer);
   const detectedMime = detectMimeFromBytes(fileBuffer);
 
-  if (!detectedMime || !ALLOWED_MIME_TYPES.has(detectedMime)) {
+  if (!detectedMime || !ALLOWED_CERTIFICATE_MIME_TYPES.has(detectedMime)) {
     return NextResponse.json(
       { error: 'نوع الملف غير مدعوم أو غير متطابق. الأنواع المدعومة: PDF أو JPG أو PNG فقط' },
       { status: 400 }

@@ -13,6 +13,11 @@ import {
   ProvisioningStepEnum,
 } from '../src/tenant.schema';
 import { firestorePaths } from '../src/paths';
+import {
+  detectMimeFromBytes,
+  ALLOWED_CERTIFICATE_MIME_TYPES,
+  MAX_CERTIFICATE_SIZE_BYTES,
+} from '../src/certificate-validation';
 
 describe('B.2.6 Session Cookie, CSRF & Provisioning Lifecycle Security', () => {
   const originalEnv = process.env.NODE_ENV;
@@ -247,6 +252,49 @@ describe('B.2.6 Session Cookie, CSRF & Provisioning Lifecycle Security', () => {
       const parsed = TenantProvisioningDocSchema.parse(doc);
       expect(parsed.status).toBe('FAILED');
       expect(parsed.error).toBe('Slug collision occurred');
+    });
+  });
+
+  // =========================================================================
+  // 4. Certificate Storage Security & Magic-Byte Validation
+  // =========================================================================
+  describe('4. Certificate Storage Security & Magic-Byte Validation', () => {
+    it('detects valid PDF magic bytes (%PDF)', () => {
+      const pdfBuffer = Buffer.from([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x35]);
+      expect(detectMimeFromBytes(pdfBuffer)).toBe('application/pdf');
+    });
+
+    it('detects valid JPEG magic bytes (FF D8 FF)', () => {
+      const jpegBuffer = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46]);
+      expect(detectMimeFromBytes(jpegBuffer)).toBe('image/jpeg');
+    });
+
+    it('detects valid PNG magic bytes (89 50 4E 47 0D 0A 1A 0A)', () => {
+      const pngBuffer = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+      expect(detectMimeFromBytes(pngBuffer)).toBe('image/png');
+    });
+
+    it('rejects executable / script / arbitrary text buffers (e.g. MZ, ELF, shell scripts)', () => {
+      const exeBuffer = Buffer.from([0x4d, 0x5a, 0x90, 0x00]); // MZ Windows exe
+      const elfBuffer = Buffer.from([0x7f, 0x45, 0x4c, 0x46]); // ELF Linux binary
+      const scriptBuffer = Buffer.from('#!/bin/bash\necho hack');
+      const textBuffer = Buffer.from('hello world');
+      const tinyBuffer = Buffer.from([0x25, 0x50]); // too short
+
+      expect(detectMimeFromBytes(exeBuffer)).toBeNull();
+      expect(detectMimeFromBytes(elfBuffer)).toBeNull();
+      expect(detectMimeFromBytes(scriptBuffer)).toBeNull();
+      expect(detectMimeFromBytes(textBuffer)).toBeNull();
+      expect(detectMimeFromBytes(tinyBuffer)).toBeNull();
+    });
+
+    it('enforces maximum certificate file size ceiling of 5MB', () => {
+      expect(MAX_CERTIFICATE_SIZE_BYTES).toBe(5 * 1024 * 1024);
+      expect(ALLOWED_CERTIFICATE_MIME_TYPES.has('application/pdf')).toBe(true);
+      expect(ALLOWED_CERTIFICATE_MIME_TYPES.has('image/jpeg')).toBe(true);
+      expect(ALLOWED_CERTIFICATE_MIME_TYPES.has('image/png')).toBe(true);
+      expect(ALLOWED_CERTIFICATE_MIME_TYPES.has('text/html')).toBe(false);
+      expect(ALLOWED_CERTIFICATE_MIME_TYPES.has('application/javascript')).toBe(false);
     });
   });
 });

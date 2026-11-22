@@ -1758,6 +1758,51 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
       );
       expect(res.status).toBe(403);
     });
+
+    it('103. Direct client writes to /tenants/{tenantId} are STRICTLY DENIED (cannot create arbitrary tenant)', async () => {
+      const res = await writeDoc(
+        `tenants/new_rogue_tenant`,
+        { name: 'Rogue Salon', primaryOwnerUid: userOwnerA },
+        userOwnerA
+      );
+      expect(res.status).toBe(403);
+    });
+
+    it('104. Cross-tenant client writes to branches (Tenant A owner writing to Tenant B branch) are STRICTLY DENIED', async () => {
+      const res = await writeDoc(
+        `tenants/${tenantB}/branches/branch_hijack`,
+        { name: 'Hijacked Branch', tenantId: tenantB },
+        userOwnerA
+      );
+      expect(res.status).toBe(403);
+    });
+
+    it('105. Cross-tenant client writes to appointments (Tenant A owner writing to Tenant B appointment) are STRICTLY DENIED', async () => {
+      const res = await writeDoc(
+        `tenants/${tenantB}/appointments/apt_hijack`,
+        { status: 'CONFIRMED', tenantId: tenantB },
+        userOwnerA
+      );
+      expect(res.status).toBe(403);
+    });
+
+    it('106. Direct client writes to /tenant_slugs/{slug} are STRICTLY DENIED', async () => {
+      const res = await writeDoc(
+        `tenant_slugs/rogue-slug`,
+        { tenantId: tenantA },
+        userOwnerA
+      );
+      expect(res.status).toBe(403);
+    });
+
+    it('107. Direct client writes to /tenants/{tenantId}/memberships are STRICTLY DENIED (cannot self-assign OWNER or escalate)', async () => {
+      const res = await writeDoc(
+        `tenants/${tenantA}/memberships/${userStaffA}`,
+        { role: 'OWNER', status: 'ACTIVE' },
+        userStaffA
+      );
+      expect(res.status).toBe(403);
+    });
   });
 });
 
