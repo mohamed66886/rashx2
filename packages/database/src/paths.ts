@@ -112,5 +112,16 @@ export const firestorePaths = {
     `tenants/${validateSegment('tenantId', tenantId)}/commercial_registration` as const,
   commercialRegistration: (tenantId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/commercial_registration/record` as const,
+
+  // Subscription collections & documents
+  subscriptions: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/subscription` as const,
+  subscription: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/subscription/record` as const,
+
+  subscriptionAuditTrail: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/subscription_audit` as const,
+  subscriptionAuditRecord: (tenantId: string, auditId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/subscription_audit/${validateSegment('auditId', auditId)}` as const,
 };
 

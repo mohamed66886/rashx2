@@ -1803,6 +1803,68 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
       );
       expect(res.status).toBe(403);
     });
+
+    it('108. Tenant Owner can read their own tenant subscription document', async () => {
+      // Seed subscription doc
+      await seedDoc(`tenants/${tenantA}/subscription/record`, {
+        tenantId: tenantA,
+        status: 'TRIALING',
+        trialDurationDays: 3,
+      });
+
+      const res = await readDoc(`tenants/${tenantA}/subscription/record`, userOwnerA);
+      expect(res.status).toBe(200);
+    });
+
+    it('109. Ordinary staff cannot read subscription document', async () => {
+      const res = await readDoc(`tenants/${tenantA}/subscription/record`, userStaffA);
+      expect(res.status).toBe(403);
+    });
+
+    it('110. Cross-tenant reading of subscription document is STRICTLY DENIED', async () => {
+      const res = await readDoc(`tenants/${tenantA}/subscription/record`, userOwnerB);
+      expect(res.status).toBe(403);
+    });
+
+    it('111. Direct client write/update to subscription document is STRICTLY DENIED', async () => {
+      const res = await writeDoc(
+        `tenants/${tenantA}/subscription/record`,
+        { status: 'ACTIVE', currentPeriodEndsAt: '2099-01-01T00:00:00.000Z' },
+        userOwnerA
+      );
+      expect(res.status).toBe(403);
+    });
+
+    it('112. Tenant Owner cannot read subscription audit trail (internal notes protected)', async () => {
+      await seedDoc(`tenants/${tenantA}/subscription_audit/audit_secret`, {
+        action: 'MANUALLY_ACTIVATED',
+        actorUid: userSuperAdmin,
+        note: 'Confidential billing details',
+      });
+
+      const res = await readDoc(`tenants/${tenantA}/subscription_audit/audit_secret`, userOwnerA);
+      expect(res.status).toBe(403);
+    });
+
+    it('113. Platform Admin can read subscription audit trail', async () => {
+      await seedDoc(`tenants/${tenantA}/subscription_audit/audit_secret`, {
+        action: 'MANUALLY_ACTIVATED',
+        actorUid: userSuperAdmin,
+        note: 'Confidential billing details',
+      });
+
+      const res = await readDoc(`tenants/${tenantA}/subscription_audit/audit_secret`, userSuperAdmin);
+      expect(res.status).toBe(200);
+    });
+
+    it('114. Direct client write to subscription audit trail is STRICTLY DENIED', async () => {
+      const res = await writeDoc(
+        `tenants/${tenantA}/subscription_audit/audit_tamper`,
+        { action: 'MANUALLY_ACTIVATED', actorUid: userOwnerA },
+        userOwnerA
+      );
+      expect(res.status).toBe(403);
+    });
   });
 });
 

@@ -17,7 +17,16 @@ export {
   getTenantResolver,
   TenantResolver,
   MembershipRepository,
+  SubscriptionRepository,
+  SubscriptionAccessGuard,
   type TenantContext,
   type TenantResolutionOutcome,
 } from '@rashx/database/server';
+
+export {
+  evaluateSubscriptionStatus,
+  type SubscriptionDoc,
+  type SubscriptionStatus,
+  type SubscriptionAccessEvaluation,
+} from '@rashx/database';
 

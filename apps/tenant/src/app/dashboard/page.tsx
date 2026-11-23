@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getTenantSession } from '@/lib/tenant-auth';
+import { getTenantSubscriptionSession } from '@/lib/tenant-auth';
 import { getFirebaseAdminFirestore, firestorePaths } from '@/lib/firebase-server';
 import { LogoutButton } from './logout-button';
 import type { CommercialRegistrationDoc } from '@rashx/database';
@@ -7,13 +7,18 @@ import type { CommercialRegistrationDoc } from '@rashx/database';
 export const dynamic = 'force-dynamic';
 
 export default async function TenantDashboardPage() {
-  const session = await getTenantSession();
+  const sessionData = await getTenantSubscriptionSession();
 
-  if (!session) {
+  if (!sessionData) {
     redirect('/login');
   }
 
-  const { user, tenant, membership } = session;
+  const { user, tenant, membership, subscription, subscriptionEvaluation } = sessionData;
+
+  // Strict Server Guard: if subscription has expired or is restricted, redirect to expired renewal view
+  if (!subscriptionEvaluation?.allowed) {
+    redirect('/subscription-expired');
+  }
 
   // Retrieve Commercial Registration status from private Firestore collection
   const db = getFirebaseAdminFirestore();
@@ -84,6 +89,58 @@ export default async function TenantDashboardPage() {
 
       {/* Main Content Body */}
       <div className="max-w-7xl w-full mx-auto px-6 py-8 flex-1">
+        {/* Subscription Status Alert Banner */}
+        {subscriptionEvaluation?.isTrial ? (
+          <div className="mb-6 p-5 rounded-2xl border border-[#91B8C0]/40 bg-[#91B8C0]/15 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[#2C4349]">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">⏳</span>
+              <div>
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <span>فترة تجربة مجانية (3 أيام)</span>
+                  <span className="rounded-full bg-[#2C4349] text-white px-2 py-0.5 text-[10px] font-mono">
+                    متبقي {subscriptionEvaluation.remainingTrialHours} ساعة
+                  </span>
+                </h3>
+                <p className="text-xs mt-0.5 opacity-90">
+                  صالونكم قيد التجربة التشغيلية الكاملة حتى{' '}
+                  <span className="font-semibold font-mono">
+                    {new Date(subscriptionEvaluation.trialEndsAt).toLocaleString('ar-SA', {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                      timeZone: 'Asia/Riyadh',
+                    })}
+                  </span>
+                  . جميع المزايا التشغيلية متاحة بالكامل.
+                </p>
+              </div>
+            </div>
+
+            <div className="text-xs font-bold bg-white/80 px-3.5 py-1.5 rounded-xl border border-[#91B8C0]/30 self-stretch sm:self-auto text-center shrink-0">
+              باقة التجربة: {subscription?.planId || 'STARTER'}
+            </div>
+          </div>
+        ) : subscriptionEvaluation?.effectiveStatus === 'ACTIVE' ? (
+          <div className="mb-6 p-5 rounded-2xl border border-emerald-200 bg-emerald-50/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-emerald-900">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">💎</span>
+              <div>
+                <h3 className="text-sm font-bold">
+                  اشتراك الصالون مفعل ونشط رسمياً
+                </h3>
+                <p className="text-xs mt-0.5 opacity-90">
+                  تم اعتماد وتفعيل اشتراككم من قبل إدارة المنصة
+                  {subscription?.currentPeriodEndsAt
+                    ? ` وساري حتى ${new Date(subscription.currentPeriodEndsAt).toLocaleDateString('ar-SA', { timeZone: 'Asia/Riyadh' })}.`
+                    : '.'}
+                </p>
+              </div>
+            </div>
+            <div className="text-xs font-bold bg-white/80 px-3.5 py-1.5 rounded-xl border border-emerald-200 self-stretch sm:self-auto text-center shrink-0">
+              باقة: {subscription?.planId || 'STARTER'} (ACTIVE)
+            </div>
+          </div>
+        ) : null}
+
         {/* Verification Status Alert */}
         <div
           className={`mb-8 p-5 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${crBadge.class}`}

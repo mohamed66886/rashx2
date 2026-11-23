@@ -12,5 +12,17 @@ export {
   getTypedAdminCollection,
   getTypedAdminDoc,
   firestorePaths,
+  SubscriptionRepository,
+  SubscriptionAccessGuard,
+  SubscriptionError,
+  SubscriptionUnauthorizedError,
 } from '@rashx/database/server';
+
+export {
+  evaluateSubscriptionStatus,
+  type SubscriptionDoc,
+  type SubscriptionStatus,
+  type SubscriptionAuditDoc,
+  type SubscriptionAccessEvaluation,
+} from '@rashx/database';
 

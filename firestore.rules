@@ -461,6 +461,29 @@ service cloud.firestore {
         allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
         allow write: if false;
       }
+
+      /**
+       * Subscription Document (/tenants/{tenantId}/subscription/{docId})
+       * Safe subscription status and duration information.
+       * Read restricted to tenant OWNER or platform admin.
+       * Direct client writes strictly forbidden (Server Admin SDK only).
+       * Tenant owners cannot self-activate, alter dates, or tamper with statuses.
+       */
+      match /subscription/{docId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Subscription Audit Trail (/tenants/{tenantId}/subscription_audit/{auditId})
+       * Privileged administrative audit logs and internal activation notes.
+       * Read restricted strictly to platform administrators (Not exposed to tenant users).
+       * Direct client writes strictly forbidden (Server Admin SDK only).
+       */
+      match /subscription_audit/{auditId} {
+        allow read: if isPlatformAdmin();
+        allow write: if false;
+      }
     }
 
     // =========================================================================

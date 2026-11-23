@@ -65,6 +65,21 @@ export {
   type AppointmentMutationResult,
 } from './repositories/appointment.repository';
 
+export {
+  SubscriptionRepository,
+  SubscriptionError,
+  SubscriptionNotFoundError,
+  SubscriptionUnauthorizedError,
+  SubscriptionAccessError,
+  type ActivateSubscriptionParams,
+  type SuspendSubscriptionParams,
+} from './repositories/subscription.repository';
+
+export {
+  SubscriptionAccessGuard,
+  type GuardOperationalAccessResult,
+} from './subscription-guard';
+
 // Authoritative Tenant Resolution & Context (Server-only)
 export {
   TenantResolver,

@@ -1,4 +1,5 @@
 import 'server-only';
+import { randomUUID } from 'node:crypto';
 import type {
   Firestore,
   DocumentReference,
@@ -23,6 +24,12 @@ import {
   type MembershipDoc,
   type MembershipSummaryDoc,
 } from '../../membership.schema';
+import {
+  SubscriptionDocSchema,
+  SubscriptionAuditDocSchema,
+  type SubscriptionDoc,
+  type SubscriptionAuditDoc,
+} from '../../subscription.schema';
 import { TrustedSystemContext } from './trusted-context';
 
 /**
@@ -175,7 +182,9 @@ export class TenantRepository {
     // Firestore transactions may retry automatically upon conflict. Generating identifiers
     // outside guarantees that callback retries remain idempotent and reuse the same identity.
     const tenantId = this.generateTenantId();
-    const nowIso = new Date().toISOString();
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const subscriptionAuditId = randomUUID();
 
     // Canonical document references constructed using firestorePaths builders
     const slugRef = this.db.doc(firestorePaths.tenantSlug(slug));
@@ -301,11 +310,51 @@ export class TenantRepository {
           updatedAt: nowIso,
         });
 
+        // Step 7 — Construct Authoritative 3-Day Free Trial Subscription Document
+        const trialEndsMs = now.getTime() + 72 * 60 * 60 * 1000;
+        const trialEndsIso = new Date(trialEndsMs).toISOString();
+
+        const subscriptionRef = this.db.doc(firestorePaths.subscription(tenantId));
+        const subscriptionDocData: SubscriptionDoc = SubscriptionDocSchema.parse({
+          tenantId,
+          planId: parsedInput.subscriptionTier || 'STARTER',
+          status: 'TRIALING',
+          trialStartedAt: nowIso,
+          trialEndsAt: trialEndsIso,
+          trialDurationDays: 3,
+          currentPeriodStartedAt: null,
+          currentPeriodEndsAt: null,
+          activatedAt: null,
+          activatedBy: null,
+          lastActivationNote: null,
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        });
+
+        // Step 8 — Construct Privileged Initial Subscription Audit Document
+        const auditId = subscriptionAuditId;
+        const auditRef = this.db.doc(
+          firestorePaths.subscriptionAuditRecord(tenantId, auditId)
+        );
+        const auditDocData: SubscriptionAuditDoc = SubscriptionAuditDocSchema.parse({
+          id: auditId,
+          tenantId,
+          action: 'TRIAL_CREATED',
+          actorUid: callerUid || ownerUid,
+          previousStatus: 'TRIALING',
+          newStatus: 'TRIALING',
+          durationDays: 3,
+          note: 'Automatic 3-day free trial initialized upon tenant provisioning.',
+          timestamp: nowIso,
+        });
+
         // Writes: All staged within the transaction for atomic commit
         transaction.set(tenantRef, tenantDocData);
         transaction.set(slugRef, slugDocData);
         transaction.set(membershipRef, membershipDocData);
         transaction.set(summaryRef, summaryDocData);
+        transaction.set(subscriptionRef, subscriptionDocData);
+        transaction.set(auditRef, auditDocData);
       });
     } catch (error) {
       if (error instanceof TenantProvisioningError) {

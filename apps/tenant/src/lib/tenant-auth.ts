@@ -113,3 +113,24 @@ export async function getTenantSession(): Promise<TenantSession | null> {
   return null;
 }
 
+/**
+ * Validates session and evaluates authoritative server-time subscription status.
+ * Reusable for Server Components and operational guards.
+ */
+export async function getTenantSubscriptionSession() {
+  const session = await getTenantSession();
+  if (!session) return null;
+
+  const db = getFirebaseAdminFirestore();
+  const subRepo = new (await import('@rashx/database/server')).SubscriptionRepository(db);
+
+  const subscription = await subRepo.getSubscription(session.tenant.tenantId);
+  const evaluation = await subRepo.verifyOperationalAccess(session.tenant.tenantId);
+
+  return {
+    ...session,
+    subscription,
+    subscriptionEvaluation: evaluation,
+  };
+}
+
