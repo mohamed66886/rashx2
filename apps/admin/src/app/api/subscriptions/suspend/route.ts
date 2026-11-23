@@ -69,3 +69,4 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: err?.message || 'خطأ أثناء التعليق' }, { status: 500 });
   }
 }
+

@@ -148,3 +148,4 @@ describe('B.2.8 Subscription Data Model & Evaluation Suite', () => {
     expect(auditRecord.durationDays).toBe(30);
   });
 });
+
