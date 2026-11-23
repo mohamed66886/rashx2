@@ -44,6 +44,25 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       { status: 200 }
     );
   } catch (error: any) {
+    console.error('[API /api/slug/check] Error checking slug availability:', error?.message || error);
+
+    // Development resilience: If Firebase Admin is not configured locally, allow developer to test UI
+    if (process.env.NODE_ENV === 'development' && error?.name === 'ConfigurationError') {
+      console.warn(
+        '[API /api/slug/check] NOTICE: Firebase Admin SDK credentials not configured in local environment (.env.local). Returning simulated availability for local UI testing.'
+      );
+      return NextResponse.json(
+        {
+          available: true,
+          valid: true,
+          slug,
+          reason: 'النطاق متاح (وضع التطوير المحلي)',
+          devNotice: 'Firebase Admin SDK credentials missing in .env.local',
+        },
+        { status: 200 }
+      );
+    }
+
     return NextResponse.json(
       {
         available: false,

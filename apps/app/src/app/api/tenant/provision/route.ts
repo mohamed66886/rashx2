@@ -49,6 +49,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     verifiedUser = await verifyIdToken(idToken, true);
   } catch (authError: any) {
+    console.error('[API /api/tenant/provision] Auth verification error:', authError?.message || authError);
+    if (authError?.name === 'ConfigurationError') {
+      return NextResponse.json(
+        { error: 'إعدادات Firebase Admin مفقودة في الخادم. يرجى تهيئة متغيرات البيئة.' },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { error: 'انتهت صلاحية الجلسة أو أن رمز التحقق غير صالح. يرجى إعادة المحاولة.' },
       { status: 401 }
@@ -135,8 +142,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const db = getFirebaseAdminFirestore();
-  const nowIso = new Date().toISOString();
+  try {
+    const db = getFirebaseAdminFirestore();
+    const nowIso = new Date().toISOString();
 
   // 6. Ensure Owner Global Profile exists in /users/{uid}
   const userRef = db.doc(firestorePaths.user(uid));
@@ -333,4 +341,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     },
     { status: 201 }
   );
+  } catch (err: any) {
+    console.error('[API /api/tenant/provision] Unexpected provisioning error:', err);
+    if (err?.name === 'ConfigurationError') {
+      return NextResponse.json(
+        { error: 'إعدادات Firebase Admin مفقودة في الخادم. يرجى تهيئة متغيرات البيئة.' },
+        { status: 500 }
+      );
+    }
+    return NextResponse.json(
+      { error: err?.message || 'حدث خطأ أثناء معالجة تسجيل المنشأة. يرجى المحاولة لاحقاً.' },
+      { status: 500 }
+    );
+  }
 }

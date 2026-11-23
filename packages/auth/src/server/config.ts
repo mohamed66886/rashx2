@@ -65,6 +65,14 @@ export function validateAdminConfig(
     }
   }
 
+  // Option 4: Local Firebase Emulator
+  if (env.FIRESTORE_EMULATOR_HOST || env.FIREBASE_AUTH_EMULATOR_HOST) {
+    return {
+      projectId: projectId || 'demo-rashx',
+      useApplicationDefault: true,
+    };
+  }
+
   // If none match, fail closed with detailed actionable error
   const missing: string[] = [];
   if (!projectId) missing.push('FIREBASE_PROJECT_ID');
