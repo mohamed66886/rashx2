@@ -24,6 +24,17 @@ import { resolveHostname } from '@rashx/database';
  *    If no trusted host authority is available, the request strictly fails closed with an HTTP 404 error.
  */
 export function middleware(request: NextRequest): NextResponse {
+  const { pathname } = request.nextUrl;
+
+  // 0. Immediately bypass Next.js internal static assets and public files
+  if (
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico' ||
+    /\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|woff|woff2|ttf|eot)$/i.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
   const requestHeaders = new Headers(request.headers);
   requestHeaders.delete('x-rashx-tenant-slug');
   requestHeaders.delete('x-rashx-hostname');

@@ -23,5 +23,22 @@ export * from './service.schema';
 export * from './appointment.schema';
 export * from './certificate-validation';
 export * from './subscription.schema';
+export * from './company.schema';
+export * from './accounting.schema';
+export * from './default-chart-of-accounts';
+export * from './permissions';
+
+// Phase 2: Employees, Providers, Compensation & Commission Policies
+export * from './employee.schema';
+export * from './provider.schema';
+export * from './compensation.schema';
+export * from './commission-policy.schema';
+export * from './invitation.schema';
+export * from './hr-audit.schema';
+
+// Phase 3: Service Catalog, Categories, Pricing & Commission Integration
+export * from './service-category.schema';
+export * from './service-pricing';
+export * from './service-audit.schema';
 
 export const DATABASE_PACKAGE_INITIALIZED = true as const;

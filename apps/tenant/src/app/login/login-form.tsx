@@ -9,6 +9,10 @@ interface LoginFormProps {
   tenantSlug?: string;
 }
 
+const inputCls =
+  'w-full h-[52px] rounded-[14px] border-[1.5px] border-[#9A8C83] bg-white px-4 text-base font-medium text-[#54453D] placeholder:text-[#8A7B72] outline-none focus:border-[#54453D] focus:ring-4 focus:ring-[#91B8C0]/50 transition-shadow text-left';
+const labelCls = 'block text-sm font-bold text-[#54453D] mb-2';
+
 export function LoginForm({ tenantName, tenantSlug }: LoginFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -61,19 +65,14 @@ export function LoginForm({ tenantName, tenantSlug }: LoginFormProps) {
         // 2. Establish Server Session & Authoritative Membership Verification
         const sessionRes = await fetch('/api/auth/session', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-RASHX-CSRF': '1',
-          },
+          headers: { 'Content-Type': 'application/json', 'X-RASHX-CSRF': '1' },
           body: JSON.stringify({ idToken }),
         });
 
         const sessionData = await sessionRes.json();
 
         if (!sessionRes.ok || sessionData.status !== 'success') {
-          throw new Error(
-            sessionData.error || 'ليس لديك صلاحية وصول إلى هذا الصالون'
-          );
+          throw new Error(sessionData.error || 'ليس لديك صلاحية وصول إلى هذا الصالون');
         }
 
         setLoadingState('تم الدخول بنجاح! جاري التوجيه...');
@@ -86,21 +85,22 @@ export function LoginForm({ tenantName, tenantSlug }: LoginFormProps) {
     });
   };
 
+  const busy = isPending || Boolean(loadingState);
+
   return (
     <div className="w-full">
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-2">
-          <span className="font-bold text-red-600">خطأ:</span>
+        <div role="alert" className="mb-6 flex items-start gap-2 rounded-xl border border-[#E8B8A6] bg-[#FDF1EB] p-4 text-sm leading-relaxed text-[#7A2E12]">
+          <span className="font-bold">خطأ:</span>
           <span>{error}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" aria-busy={busy}>
         <div>
-          <label className="block text-xs font-semibold text-[#54453D] mb-1.5 text-right">
-            البريد الإلكتروني
-          </label>
+          <label htmlFor="login-email" className={labelCls}>البريد الإلكتروني</label>
           <input
+            id="login-email"
             type="email"
             dir="ltr"
             required
@@ -108,18 +108,15 @@ export function LoginForm({ tenantName, tenantSlug }: LoginFormProps) {
             placeholder="name@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[#54453D]/20 focus:outline-none focus:ring-2 focus:ring-[#91B8C0] text-sm text-left font-sans"
+            className={inputCls}
           />
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-xs font-semibold text-[#54453D]">
-              كلمة المرور
-            </label>
-          </div>
+          <label htmlFor="login-password" className={labelCls}>كلمة المرور</label>
           <div className="relative">
             <input
+              id="login-password"
               type={showPassword ? 'text' : 'password'}
               dir="ltr"
               required
@@ -127,26 +124,27 @@ export function LoginForm({ tenantName, tenantSlug }: LoginFormProps) {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#54453D]/20 focus:outline-none focus:ring-2 focus:ring-[#91B8C0] text-sm text-left font-sans"
+              className={`${inputCls} pl-[84px]`}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute left-3 top-2.5 text-xs text-[#54453D]/60 hover:text-[#54453D] select-none"
+              aria-pressed={showPassword}
+              className="absolute left-3 top-2.5 h-8 rounded-[10px] bg-[#F0E9E4] px-3 text-[13px] font-bold text-[#54453D] cursor-pointer select-none"
             >
-              {showPassword ? 'إخفاء' : 'عرض'}
+              {showPassword ? 'إخفاء' : 'إظهار'}
             </button>
           </div>
         </div>
 
         <button
           type="submit"
-          disabled={isPending || Boolean(loadingState)}
-          className="w-full py-3.5 px-6 rounded-2xl bg-[#54453D] text-white font-bold text-sm hover:bg-[#433730] active:scale-[0.99] transition-all disabled:opacity-50 disabled:pointer-events-none shadow-xs cursor-pointer mt-2"
+          disabled={busy}
+          className="mt-2 flex h-14 w-full items-center justify-center rounded-2xl bg-[#54453D] px-6 text-base font-bold text-[#FAF9F8] transition hover:bg-[#433730] active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 cursor-pointer"
         >
           {loadingState ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span role="status" className="flex items-center justify-center gap-2.5">
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white motion-reduce:animate-none" />
               <span>{loadingState}</span>
             </span>
           ) : (
@@ -157,4 +155,3 @@ export function LoginForm({ tenantName, tenantSlug }: LoginFormProps) {
     </div>
   );
 }
-

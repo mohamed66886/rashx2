@@ -11,7 +11,7 @@
     "lint": "HOME=/tmp turbo run lint",
     "typecheck": "HOME=/tmp turbo run typecheck",
     "test": "HOME=/tmp turbo run test",
-    "test:rules": "JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH firebase emulators:exec --project demo-rashx --only firestore \"pnpm --filter @rashx/database test:rules\"",
+    "test:rules": "HOME=/tmp JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH firebase emulators:exec --project demo-rashx --only firestore \"pnpm --filter @rashx/database test:rules\"",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\" --ignore-path .gitignore",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json,css}\" --ignore-path .gitignore",
     "clean": "turbo run clean"

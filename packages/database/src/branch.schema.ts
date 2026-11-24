@@ -58,11 +58,17 @@ export const BranchDocSchema = z
     id: z.string().min(1, 'Branch ID must be non-empty'),
     tenantId: z.string().min(1, 'Tenant ID must be non-empty'),
     name: z.string().min(1, 'Branch name is required').max(100),
+    nameEn: z.string().max(100).optional(),
+    code: z.string().max(20).optional(),
+    isMain: z.boolean().default(false),
     city: z.string().min(1, 'City is required').max(100),
     district: z.string().min(1, 'District is required').max(100),
+    region: z.string().max(100).optional(),
+    country: z.string().max(100).default('SA'),
     address: z.string().min(1, 'Physical address is required').max(255),
     coordinates: GeoCoordinatesSchema,
     phone: z.string().min(7, 'Phone number must be at least 7 characters').max(20),
+    email: z.string().email().optional(),
     isActive: z.boolean(),
     operatingHours: OperatingHoursWeeklySchema,
     internalNotes: z.string().max(1000).optional(),
@@ -81,8 +87,12 @@ export const PublicBranchSchema = z
   .object({
     id: z.string().min(1, 'Branch ID must be non-empty'),
     name: z.string().min(1, 'Branch name is required').max(100),
+    nameEn: z.string().max(100).optional(),
+    isMain: z.boolean().default(false),
     city: z.string().min(1, 'City is required').max(100),
     district: z.string().min(1, 'District is required').max(100),
+    region: z.string().max(100).optional(),
+    country: z.string().max(100).default('SA'),
     address: z.string().min(1, 'Physical address is required').max(255),
     coordinates: GeoCoordinatesSchema,
     phone: z.string().min(7).max(20),
@@ -94,17 +104,38 @@ export const PublicBranchSchema = z
 export type PublicBranch = z.infer<typeof PublicBranchSchema>;
 
 /**
+ * Main Branch Pointer Document (`/tenants/{tenantId}/branch_summary/main`).
+ * Serves as an optimistic concurrency mutex ensuring exactly one main branch per tenant.
+ */
+export const MainBranchPointerDocSchema = z
+  .object({
+    tenantId: z.string().min(1, 'Tenant ID must be non-empty'),
+    mainBranchId: z.string().min(1, 'Main branch ID must be non-empty'),
+    updatedAt: z.string().datetime({ message: 'updatedAt must be an ISO 8601 string' }),
+    version: z.number().int().nonnegative().default(1),
+  })
+  .strict();
+
+export type MainBranchPointerDoc = z.infer<typeof MainBranchPointerDocSchema>;
+
+/**
  * Input schema for creating a new branch.
  */
 export const CreateBranchInputSchema = z
   .object({
     tenantId: z.string().min(1, 'Tenant ID is required'),
     name: z.string().min(1, 'Branch name is required').max(100),
+    nameEn: z.string().max(100).optional(),
+    code: z.string().max(20).optional(),
+    isMain: z.boolean().default(false).optional(),
     city: z.string().min(1, 'City is required').max(100),
     district: z.string().min(1, 'District is required').max(100),
+    region: z.string().max(100).optional(),
+    country: z.string().max(100).default('SA').optional(),
     address: z.string().min(1, 'Physical address is required').max(255),
     coordinates: GeoCoordinatesSchema,
     phone: z.string().min(7).max(20),
+    email: z.string().email().optional(),
     operatingHours: OperatingHoursWeeklySchema,
     internalNotes: z.string().max(1000).optional(),
   })
@@ -118,11 +149,17 @@ export type CreateBranchInput = z.infer<typeof CreateBranchInputSchema>;
 export const UpdateBranchInputSchema = z
   .object({
     name: z.string().min(1).max(100).optional(),
+    nameEn: z.string().max(100).optional(),
+    code: z.string().max(20).optional(),
+    isMain: z.boolean().optional(),
     city: z.string().min(1).max(100).optional(),
     district: z.string().min(1).max(100).optional(),
+    region: z.string().max(100).optional(),
+    country: z.string().max(100).optional(),
     address: z.string().min(1).max(255).optional(),
     coordinates: GeoCoordinatesSchema.optional(),
     phone: z.string().min(7).max(20).optional(),
+    email: z.string().email().optional(),
     isActive: z.boolean().optional(),
     operatingHours: OperatingHoursWeeklySchema.optional(),
     internalNotes: z.string().max(1000).optional(),

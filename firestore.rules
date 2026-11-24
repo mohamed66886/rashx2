@@ -157,22 +157,12 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt;
     }
 
-    function isValidServiceCreate(tenantId, serviceId) {
-      return isTenantManager(tenantId)
-        && request.resource.data.id == serviceId
-        && request.resource.data.tenantId == tenantId
-        && request.resource.data.name is string && request.resource.data.name.size() > 0
-        && request.resource.data.category is string && request.resource.data.category.size() > 0
-        && request.resource.data.priceHalalas is int && request.resource.data.priceHalalas >= 0
-        && request.resource.data.durationMinutes is int && request.resource.data.durationMinutes > 0;
+    function isPublicServiceCategoryActive(tenantId, categoryId) {
+      return categoryId is string
+        && exists(/databases/$(database)/documents/tenants/$(tenantId)/public_service_categories/$(categoryId))
+        && get(/databases/$(database)/documents/tenants/$(tenantId)/public_service_categories/$(categoryId)).data.isActive == true;
     }
 
-    function isValidServiceUpdate(tenantId) {
-      return isTenantManager(tenantId)
-        && request.resource.data.tenantId == resource.data.tenantId
-        && request.resource.data.id == resource.data.id
-        && request.resource.data.createdAt == resource.data.createdAt;
-    }
 
     // =========================================================================
     // ROOT COLLECTIONS
@@ -246,6 +236,18 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    /**
+     * Single-Use Invitation Tokens (/invitation_tokens/{tokenHash})
+     * Read: allow get: if true (exact SHA-256 token hash lookup for invite acceptance).
+     *       allow list: if false (collection enumeration strictly forbidden!).
+     * Write: Client direct writes are strictly forbidden (Server Admin SDK only).
+     */
+    match /invitation_tokens/{tokenHash} {
+      allow get: if true;
+      allow list: if false;
+      allow write: if false;
+    }
+
     // =========================================================================
     // TENANT SCOPE (Private Operational Documents & Public Projections)
     // =========================================================================
@@ -308,7 +310,7 @@ service cloud.firestore {
         allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
         allow create: if isValidBranchCreate(tenantId, branchId);
         allow update: if isValidBranchUpdate(tenantId);
-        allow delete: if isTenantOwner(tenantId);
+        allow delete: if isTenantOwner(tenantId) && resource.data.isMain != true;
       }
 
       /**
@@ -319,6 +321,95 @@ service cloud.firestore {
         allow read: if (isTenantPubliclyActive(tenantId) && resource.data.isActive == true)
           || isTenantMemberActive(tenantId)
           || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Main Branch Mutex & Pointer (/tenants/{tenantId}/branch_summary/{summaryDoc})
+       * Concurrency pointer ensuring strictly one main branch per tenant.
+       * Read: Active tenant members or platform admin.
+       * Write: Server Admin SDK only.
+       */
+      match /branch_summary/{summaryDoc} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 2 & 2.3: Employee Confidential Records (/tenants/{tenantId}/employees/{employeeId})
+       * Strictly confidential HR documents containing National ID, PII, emergency contacts,
+       * operational branches, and management notes.
+       * Direct client-side reads (get, list) and writes are STRICTLY DENIED for all clients,
+       * including tenant OWNER, MANAGER, and STAFF.
+       * All access MUST go through authorized Server Actions / Admin SDK with explicit DTO projection
+       * to guarantee field-level masking and zero raw PII exposure.
+       */
+      match /employees/{employeeId} {
+        allow read: if false;
+        allow write: if false;
+
+        /**
+         * Confidential Employee Compensation Subcollection
+         * (/tenants/{tenantId}/employees/{employeeId}/compensations/{compId})
+         * Direct client-side reads and writes are STRICTLY DENIED.
+         */
+        match /compensations/{compId} {
+          allow read: if false;
+          allow write: if false;
+        }
+      }
+
+      /**
+       * Phase 2: Operational Service Providers (/tenants/{tenantId}/providers/{providerId})
+       * Contains internal employee ID linkages, commission configurations, and internal notes.
+       * Read: Restricted to active tenant members or platform admin.
+       * Zero anonymous access! Client writes strictly forbidden (Server Admin SDK only).
+       */
+      match /providers/{providerId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 2: Public Service Provider Projection (/tenants/{tenantId}/public_providers/{providerId})
+       * Sanitized customer-facing read model.
+       * Strictly excludes employeeId, compensation structures, and private notes.
+       * Publicly readable only if tenant is publicly active and provider isPubliclyVisible == true.
+       */
+      match /public_providers/{providerId} {
+        allow read: if (isTenantPubliclyActive(tenantId) && resource.data.isPubliclyVisible == true)
+          || isTenantMemberActive(tenantId)
+          || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 2: Commission Policies (/tenants/{tenantId}/commission_policies/{policyId})
+       * Read: Active tenant members or platform admin.
+       * Write: Server Admin SDK only.
+       */
+      match /commission_policies/{policyId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 2: Invitations (/tenants/{tenantId}/invitations/{invitationId})
+       * Read: OWNER, MANAGER, or platform admin.
+       * Write: Server Admin SDK only.
+       */
+      match /invitations/{invitationId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 2: HR Audit Trail (/tenants/{tenantId}/hr_audit/{auditId})
+       * Read: Restricted strictly to OWNER or platform admin.
+       * Write: Server Admin SDK only.
+       */
+      match /hr_audit/{auditId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
         allow write: if false;
       }
 
@@ -379,28 +470,78 @@ service cloud.firestore {
        * Operational Services (/tenants/{tenantId}/services/{serviceId})
        * Confidential: contains COGS, commissions, supplier SKU, procedure SOP notes.
        * Read: Active tenant members or platform admin.
-       * Management: OWNER and MANAGER with strict field and tenantId validation.
-       * Delete: Restricted strictly to OWNER.
+       * Client direct writes are strictly forbidden (Server Admin SDK only).
        */
       match /services/{serviceId} {
         allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
-        allow create: if isValidServiceCreate(tenantId, serviceId);
-        allow update: if isValidServiceUpdate(tenantId);
-        allow delete: if isTenantOwner(tenantId);
+        allow write: if false;
       }
 
       /**
        * Public Service Catalog (/tenants/{tenantId}/public_services/{serviceId})
-       * Publicly readable only if tenant is publicly active, service status is PUBLISHED,
-       * isVisible == true, and isArchived == false.
+       * Strict publication condition:
+       * - Tenant must be publicly active
+       * - Document belongs to tenant
+       * - status == 'PUBLISHED'
+       * - isVisible == true
+       * - isActive == true
+       * - isArchived == false
+       * - Associated category exists in public_service_categories and is active
+       * Zero bypass via loose OR conditions.
+       * Client direct writes are strictly forbidden (Server Admin SDK only).
        */
       match /public_services/{serviceId} {
-        allow read: if (isTenantPubliclyActive(tenantId)
+        allow get: if (isTenantPubliclyActive(tenantId)
+          && resource.data.tenantId == tenantId
           && resource.data.status == 'PUBLISHED'
           && resource.data.isVisible == true
-          && resource.data.isArchived == false)
+          && resource.data.isActive == true
+          && resource.data.isArchived == false
+          && resource.data.isCategoryActive == true
+          && isPublicServiceCategoryActive(tenantId, resource.data.categoryId))
           || isTenantMemberActive(tenantId)
           || isPlatformAdmin();
+
+        allow list: if (isTenantPubliclyActive(tenantId)
+          && resource.data.status == 'PUBLISHED'
+          && resource.data.isVisible == true
+          && resource.data.isActive == true
+          && resource.data.isArchived == false
+          && resource.data.isCategoryActive == true)
+          || isTenantMemberActive(tenantId)
+          || isPlatformAdmin();
+
+        allow write: if false;
+      }
+
+      /**
+       * Service Categories (/tenants/{tenantId}/service_categories/{categoryId})
+       * Read: Active tenant members or platform admin.
+       * Client direct writes are strictly forbidden (Server Admin SDK only).
+       */
+      match /service_categories/{categoryId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Public Service Categories (/tenants/{tenantId}/public_service_categories/{categoryId})
+       */
+      match /public_service_categories/{categoryId} {
+        allow read: if (isTenantPubliclyActive(tenantId)
+          && resource.data.tenantId == tenantId
+          && resource.data.isActive == true)
+          || isTenantMemberActive(tenantId)
+          || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Service & Category Audit Trail (/tenants/{tenantId}/service_audit/{auditId})
+       * Immutable chronological ledger. Read: OWNER and Platform Admin. Write: Server-only.
+       */
+      match /service_audit/{auditId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
         allow write: if false;
       }
 
@@ -482,6 +623,99 @@ service cloud.firestore {
        */
       match /subscription_audit/{auditId} {
         allow read: if isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Tenant Settings (/tenants/{tenantId}/settings/{docId})
+       * - company: Legal entity profile (Read: tenant members, Write: OWNER)
+       * - tax: VAT & Tax configuration (Read: OWNER/MANAGER, Write: OWNER)
+       * - general: Operating parameters (Read: tenant members, Write: OWNER/MANAGER)
+       * - seo: Public discoverability (Read: tenant members, Write: OWNER/MANAGER)
+       * - accounting: Financial rules & ledger links (Read: OWNER, Write: OWNER)
+       * Note: Client direct writes are restricted; mutation via trusted server APIs is preferred.
+       */
+      match /settings/{docId} {
+        allow read: if (docId == 'tax' || docId == 'accounting')
+          ? (isTenantOwner(tenantId) || isPlatformAdmin())
+          : (isTenantMemberActive(tenantId) || isPlatformAdmin());
+        allow write: if false; // All settings mutations must go through trusted server actions
+      }
+
+      /**
+       * Chart of Accounts (/tenants/{tenantId}/accounts/{accountId})
+       * Read: OWNER and MANAGER.
+       * Write: Server Admin SDK only (enforces hierarchy invariants and posting rules).
+       */
+      match /accounts/{accountId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Fiscal Years & Accounting Periods
+       * (/tenants/{tenantId}/fiscal_years/{yearId})
+       * (/tenants/{tenantId}/accounting_periods/{periodId})
+       * Read: OWNER and MANAGER.
+       * Write: Server Admin SDK only.
+       */
+      match /fiscal_years/{yearId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /accounting_periods/{periodId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Journal Entries & Double-Entry Invariants
+       * (/tenants/{tenantId}/journal_entries/{entryId})
+       * Read: OWNER and MANAGER.
+       * Write: Strictly forbidden to client SDKs (Server Admin SDK transactions only!).
+       */
+      match /journal_entries/{entryId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Sequential Journal Counter (/tenants/{tenantId}/journal_sequence/{seqId})
+       * Strictly forbidden to client SDKs (Server Admin SDK transactions only!).
+       */
+      match /journal_sequence/{seqId} {
+        allow read, write: if false;
+      }
+
+      /**
+       * Account Balances Read Model (/tenants/{tenantId}/account_balances/{accountId})
+       * Read: OWNER and MANAGER.
+       * Write: Server Admin SDK only.
+       */
+      match /account_balances/{accountId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Cost Centers (/tenants/{tenantId}/cost_centers/{centerId})
+       * Read: OWNER and MANAGER.
+       * Write: Server Admin SDK only.
+       */
+      match /cost_centers/{centerId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Accounting Audit Trail (/tenants/{tenantId}/accounting_audit/{auditId})
+       * Append-only ledger mutation audit trail.
+       * Read: OWNER or platform admin.
+       * Write: Server Admin SDK only.
+       */
+      match /accounting_audit/{auditId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
         allow write: if false;
       }
     }

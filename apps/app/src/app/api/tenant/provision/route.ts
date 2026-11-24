@@ -9,6 +9,7 @@ import {
   TenantRepository,
   TenantProvisioningError,
   TenantProvisioningErrorCode,
+  TenantBootstrapService,
 } from '@/lib/firebase-server';
 import {
   SlugFormatSchema,
@@ -243,6 +244,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       tenantId = provisioningResult.tenantId;
       activeSlug = provisioningResult.slug;
+
+      // 8.1 Initialize Tenant Foundation: Main Branch, Accounting Core, Settings & SEO
+      try {
+        const bootstrapService = new TenantBootstrapService(db);
+        await bootstrapService.bootstrapTenant(tenantId, {
+          name,
+          ownerUid: uid,
+          crNumber,
+          billingEmail: email,
+          nowIso,
+        });
+      } catch (bootstrapErr) {
+        console.error('[Provisioning] Warning: Tenant foundation bootstrap non-fatal error:', bootstrapErr);
+      }
 
       // Update provisioning record with tenant identity
       await provDocRef.update({

@@ -16,6 +16,11 @@ export function getFirebaseAdminFirestore(): Firestore {
   }
   const app = getFirebaseAdminApp();
   adminFirestoreInstance = getFirestore(app);
+  try {
+    adminFirestoreInstance.settings({ ignoreUndefinedProperties: true });
+  } catch {
+    // In case settings were already initialized or frozen
+  }
   return adminFirestoreInstance;
 }
 
@@ -79,6 +84,47 @@ export {
   SubscriptionAccessGuard,
   type GuardOperationalAccessResult,
 } from './subscription-guard';
+
+export {
+  BranchRepository,
+  DEFAULT_OPERATING_HOURS,
+} from './repositories/branch.repository';
+
+export { CompanyRepository } from './repositories/company.repository';
+
+export { AccountingRepository } from './repositories/accounting.repository';
+
+export {
+  TenantBootstrapService,
+  generateFiscalPeriods,
+  type BootstrapOptions,
+  type ReconciliationResult,
+  type GeneratedFiscalPeriod,
+} from './tenant-bootstrap.service';
+
+// Phase 2: Employees, Providers, Compensation & Policies Repositories
+export {
+  EmployeeRepository,
+  type EmployeeListOptions,
+} from './repositories/employee.repository';
+
+export {
+  ProviderRepository,
+  type ProviderListOptions,
+} from './repositories/provider.repository';
+
+export { CompensationRepository } from './repositories/compensation.repository';
+
+export { CommissionPolicyRepository } from './repositories/commission-policy.repository';
+
+export { InvitationRepository } from './repositories/invitation.repository';
+
+// Phase 3: Service Catalog & Categories Repositories
+export { ServiceCategoryRepository } from './repositories/service-category.repository';
+export {
+  ServiceRepository,
+  type ServiceListFilter,
+} from './repositories/service.repository';
 
 // Authoritative Tenant Resolution & Context (Server-only)
 export {

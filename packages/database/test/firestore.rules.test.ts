@@ -423,6 +423,8 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
 
     await seedDoc(`tenants/${tenantA}/public_services/service_1`, {
       id: 'service_1',
+      tenantId: tenantA,
+      categoryId: 'cat_1',
       name: 'Executive Royal Cut',
       description: 'Signature cut and beard shaping',
       category: 'Haircut',
@@ -432,7 +434,34 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
       assignedBranchIds: ['branch_1'],
       status: 'PUBLISHED',
       isVisible: true,
+      isActive: true,
       isArchived: false,
+    });
+
+    await seedDoc(`tenants/${tenantA}/service_categories/cat_1`, {
+      id: 'cat_1',
+      tenantId: tenantA,
+      nameAr: 'العناية بالشعر',
+      nameEn: 'Hair Care',
+      displayOrder: 1,
+      isActive: true,
+      createdAt: '2026-11-20T10:00:00.000Z',
+      updatedAt: '2026-11-20T10:00:00.000Z',
+    });
+
+    await seedDoc(`tenants/${tenantA}/public_service_categories/cat_1`, {
+      id: 'cat_1',
+      tenantId: tenantA,
+      nameAr: 'العناية بالشعر',
+      isActive: true,
+    });
+
+    await seedDoc(`tenants/${tenantA}/service_audit/audit_1`, {
+      id: 'audit_1',
+      tenantId: tenantA,
+      actorUid: userOwnerA,
+      operation: 'SERVICE_CREATED',
+      timestamp: '2026-11-20T10:00:00.000Z',
     });
 
     // 8. Seed Private Operational Documents in Tenant A
@@ -1532,9 +1561,30 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
       const res = await queryCollection(`tenants/${tenantA}`, 'public_services', null, [
         { field: 'status', op: 'EQUAL', value: 'PUBLISHED' },
         { field: 'isVisible', op: 'EQUAL', value: true },
+        { field: 'isActive', op: 'EQUAL', value: true },
         { field: 'isArchived', op: 'EQUAL', value: false },
+        { field: 'isCategoryActive', op: 'EQUAL', value: true },
       ]);
       expect(res.status).toBe(200);
+    });
+
+    it('74b. Public user querying published services omitting isActive constraint is REJECTED', async () => {
+      const res = await queryCollection(`tenants/${tenantA}`, 'public_services', null, [
+        { field: 'status', op: 'EQUAL', value: 'PUBLISHED' },
+        { field: 'isVisible', op: 'EQUAL', value: true },
+        { field: 'isArchived', op: 'EQUAL', value: false },
+      ]);
+      expect(res.status).toBe(403);
+    });
+
+    it('74c. Public user querying published services omitting isCategoryActive constraint is REJECTED', async () => {
+      const res = await queryCollection(`tenants/${tenantA}`, 'public_services', null, [
+        { field: 'status', op: 'EQUAL', value: 'PUBLISHED' },
+        { field: 'isVisible', op: 'EQUAL', value: true },
+        { field: 'isActive', op: 'EQUAL', value: true },
+        { field: 'isArchived', op: 'EQUAL', value: false },
+      ]);
+      expect(res.status).toBe(403);
     });
 
     it('75. Public user querying published services WITHOUT constraints is REJECTED', async () => {
@@ -1605,7 +1655,7 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
       expect(res.status).toBe(403);
     });
 
-    it('81. Manager can create a valid service', async () => {
+    it('81. Client direct create of service is denied (Server Admin SDK only)', async () => {
       const res = await writeDoc(
         `tenants/${tenantA}/services/service_new`,
         {
@@ -1619,10 +1669,10 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
         },
         userManagerA
       );
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(403);
     });
 
-    it('82. Manager cannot create service with negative price', async () => {
+    it('82. Owner direct create of service is also denied (Server Admin SDK only)', async () => {
       const res = await writeDoc(
         `tenants/${tenantA}/services/service_negative`,
         {
@@ -1633,19 +1683,19 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
           priceHalalas: -100,
           durationMinutes: 30,
         },
-        userManagerA
+        userOwnerA
       );
       expect(res.status).toBe(403);
     });
 
-    it('83. Manager cannot delete service (restricted to OWNER)', async () => {
+    it('83. Manager cannot delete service (direct client delete denied)', async () => {
       const res = await deleteDoc(`tenants/${tenantA}/services/service_1`, userManagerA);
       expect(res.status).toBe(403);
     });
 
-    it('84. Owner can delete service', async () => {
+    it('84. Owner direct delete of service is denied (Server Admin SDK only)', async () => {
       const res = await deleteDoc(`tenants/${tenantA}/services/service_1`, userOwnerA);
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(403);
     });
   });
 
@@ -1864,6 +1914,586 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
         userOwnerA
       );
       expect(res.status).toBe(403);
+    });
+
+    // =========================================================================
+    // 21. Phase 2.1 & 2.2: Employees, Providers, Compensation & HR Audit Rules
+    // =========================================================================
+    describe('21. Phase 2.1 & 2.2: Employees, Providers, Compensation & HR Audit', () => {
+      const empId1 = 'emp_sarah';
+      const provId1 = 'prov_sarah';
+
+      beforeEach(async () => {
+        // Seed employee linked to userStaffA
+        await seedDoc(`tenants/${tenantA}/employees/${empId1}`, {
+          id: empId1,
+          tenantId: tenantA,
+          employeeNumber: 'EMP-001',
+          fullNameAr: 'سارة العتيبي',
+          linkedUid: userStaffA,
+          employmentStatus: 'ACTIVE',
+          primaryBranchId: 'branch_1',
+        });
+
+        // Seed provider
+        await seedDoc(`tenants/${tenantA}/providers/${provId1}`, {
+          id: provId1,
+          tenantId: tenantA,
+          employeeId: empId1,
+          displayNameAr: 'سارة - أخصائية شعر',
+          status: 'ACTIVE',
+        });
+
+        // Seed public provider projection (visible)
+        await seedDoc(`tenants/${tenantA}/public_providers/${provId1}`, {
+          id: provId1,
+          tenantId: tenantA,
+          displayNameAr: 'سارة - أخصائية شعر',
+          isPubliclyVisible: true,
+        });
+
+        // Seed hidden public provider projection
+        await seedDoc(`tenants/${tenantA}/public_providers/prov_hidden`, {
+          id: 'prov_hidden',
+          tenantId: tenantA,
+          displayNameAr: 'مقدم خدمة مخفي',
+          isPubliclyVisible: false,
+        });
+
+        // Seed compensation record
+        await seedDoc(`tenants/${tenantA}/employees/${empId1}/compensations/comp_1`, {
+          id: 'comp_1',
+          tenantId: tenantA,
+          employeeId: empId1,
+          status: 'ACTIVE',
+          modelType: 'FIXED_SALARY',
+        });
+
+        // Seed HR audit record
+        await seedDoc(`tenants/${tenantA}/hr_audit/audit_1`, {
+          id: 'audit_1',
+          tenantId: tenantA,
+          action: 'EMPLOYEE_CREATED',
+          actorUid: userOwnerA,
+        });
+      });
+
+      it('115. Anonymous / unauthenticated client cannot read employee documents', async () => {
+        const res = await readDoc(`tenants/${tenantA}/employees/${empId1}`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('116. Ordinary staff cannot directly read peer employee documents', async () => {
+        const res = await readDoc(`tenants/${tenantA}/employees/${empId1}`, userStaffB);
+        expect(res.status).toBe(403);
+      });
+
+      it('117. Staff cannot directly read their own employee document via client SDK', async () => {
+        const res = await readDoc(`tenants/${tenantA}/employees/${empId1}`, userStaffA);
+        expect(res.status).toBe(403);
+      });
+
+      it('118. All client-side employee collection listings are denied (staff)', async () => {
+        const res = await queryCollection(`tenants/${tenantA}`, 'employees', userStaffA);
+        expect(res.status).toBe(403);
+      });
+
+      it('119. Tenant Manager cannot directly read or list employee documents via client SDK', async () => {
+        const getRes = await readDoc(`tenants/${tenantA}/employees/${empId1}`, userManagerA);
+        expect(getRes.status).toBe(403);
+
+        const listRes = await queryCollection(`tenants/${tenantA}`, 'employees', userManagerA);
+        expect(listRes.status).toBe(403);
+      });
+
+      it('120. Tenant Owner cannot directly read employee documents through client SDK', async () => {
+        const getRes = await readDoc(`tenants/${tenantA}/employees/${empId1}`, userOwnerA);
+        expect(getRes.status).toBe(403);
+
+        const listRes = await queryCollection(`tenants/${tenantA}`, 'employees', userOwnerA);
+        expect(listRes.status).toBe(403);
+      });
+
+      it('121. Direct client write to employees collection is strictly denied', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/employees/${empId1}`,
+          { fullNameAr: 'تعديل غير مصرح' },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('122. Direct client read to employee compensations subcollection is strictly denied for all roles', async () => {
+        const ownerRes = await readDoc(
+          `tenants/${tenantA}/employees/${empId1}/compensations/comp_1`,
+          userOwnerA
+        );
+        expect(ownerRes.status).toBe(403);
+
+        const mgrRes = await readDoc(
+          `tenants/${tenantA}/employees/${empId1}/compensations/comp_1`,
+          userManagerA
+        );
+        expect(mgrRes.status).toBe(403);
+
+        const staffRes = await readDoc(
+          `tenants/${tenantA}/employees/${empId1}/compensations/comp_1`,
+          userStaffA
+        );
+        expect(staffRes.status).toBe(403);
+      });
+
+      it('123. Anonymous cannot read operational providers document', async () => {
+        const res = await readDoc(`tenants/${tenantA}/providers/${provId1}`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('124. Active tenant member CAN read operational providers document', async () => {
+        const res = await readDoc(`tenants/${tenantA}/providers/${provId1}`, userStaffA);
+        expect(res.status).toBe(200);
+      });
+
+      it('125. Anonymous CAN read public provider projection when isPubliclyVisible == true and tenant is active', async () => {
+        const res = await readDoc(`tenants/${tenantA}/public_providers/${provId1}`, null);
+        expect(res.status).toBe(200);
+      });
+
+      it('126. Anonymous CANNOT read public provider projection when isPubliclyVisible == false', async () => {
+        const res = await readDoc(`tenants/${tenantA}/public_providers/prov_hidden`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('127. Direct client write to providers or public_providers is strictly denied', async () => {
+        const provWrite = await writeDoc(
+          `tenants/${tenantA}/providers/${provId1}`,
+          { displayNameAr: 'تزوير' },
+          userOwnerA
+        );
+        expect(provWrite.status).toBe(403);
+
+        const pubWrite = await writeDoc(
+          `tenants/${tenantA}/public_providers/${provId1}`,
+          { displayNameAr: 'تزوير' },
+          userOwnerA
+        );
+        expect(pubWrite.status).toBe(403);
+      });
+
+      it('128. Cross-tenant employee read attempt is strictly denied', async () => {
+        const crossRes = await readDoc(`tenants/${tenantA}/employees/${empId1}`, userOwnerB);
+        expect(crossRes.status).toBe(403);
+      });
+
+      it('129. HR Audit trail is strictly restricted to OWNER, denied to MANAGER, STAFF, and direct write', async () => {
+        const ownerRes = await readDoc(`tenants/${tenantA}/hr_audit/audit_1`, userOwnerA);
+        expect(ownerRes.status).toBe(200);
+
+        const mgrRes = await readDoc(`tenants/${tenantA}/hr_audit/audit_1`, userManagerA);
+        expect(mgrRes.status).toBe(403);
+
+        const staffRes = await readDoc(`tenants/${tenantA}/hr_audit/audit_1`, userStaffA);
+        expect(staffRes.status).toBe(403);
+
+        const writeRes = await writeDoc(
+          `tenants/${tenantA}/hr_audit/audit_1`,
+          { action: 'TAMPERED' },
+          userOwnerA
+        );
+        expect(writeRes.status).toBe(403);
+      });
+    });
+
+    // =========================================================================
+    // 13. PHASE 3.0: SERVICES CATALOG, CATEGORIES & AUDIT RULES
+    // =========================================================================
+    describe('13. Phase 3.0: Services Catalog, Categories & Audit Rules', () => {
+      it('130. Active tenant member can read service categories', async () => {
+        const res = await readDoc(`tenants/${tenantA}/service_categories/cat_1`, userStaffA);
+        expect(res.status).toBe(200);
+      });
+
+      it('131. Anonymous user cannot read internal service categories', async () => {
+        const res = await readDoc(`tenants/${tenantA}/service_categories/cat_1`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('132. Cross-tenant member cannot read service categories', async () => {
+        const res = await readDoc(`tenants/${tenantA}/service_categories/cat_1`, userOwnerB);
+        expect(res.status).toBe(403);
+      });
+
+      it('133. Manager direct create of service category is denied (Server Admin SDK only)', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/service_categories/cat_new`,
+          {
+            id: 'cat_new',
+            tenantId: tenantA,
+            nameAr: 'العناية بالبشرة',
+            displayOrder: 2,
+            isActive: true,
+          },
+          userManagerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('134. Manager cannot create category with empty or missing nameAr', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/service_categories/cat_bad`,
+          {
+            id: 'cat_bad',
+            tenantId: tenantA,
+            nameAr: '',
+          },
+          userManagerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('135. Staff cannot create service category', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/service_categories/cat_staff`,
+          {
+            id: 'cat_staff',
+            tenantId: tenantA,
+            nameAr: 'تصنيف الموظف',
+          },
+          userStaffA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('136. Manager direct update of service category is denied (Server Admin SDK only)', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/service_categories/cat_1`,
+          {
+            id: 'cat_1',
+            tenantId: tenantA,
+            nameAr: 'العناية بالشعر المحدث',
+          },
+          userManagerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('137. Manager cannot delete service category (direct client delete denied)', async () => {
+        const res = await deleteDoc(`tenants/${tenantA}/service_categories/cat_1`, userManagerA);
+        expect(res.status).toBe(403);
+      });
+
+      it('138. Owner direct delete of service category is denied (Server Admin SDK only)', async () => {
+        const res = await deleteDoc(`tenants/${tenantA}/service_categories/cat_1`, userOwnerA);
+        expect(res.status).toBe(403);
+      });
+
+      it('139. Public user can read active public service category', async () => {
+        const res = await readDoc(`tenants/${tenantA}/public_service_categories/cat_1`, null);
+        expect(res.status).toBe(200);
+      });
+
+      it('140. Client direct write to public service categories is denied', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/public_service_categories/cat_hack`,
+          { id: 'cat_hack', nameAr: 'تزوير' },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('141. Service audit trail is readable by OWNER, denied to Staff and Manager', async () => {
+        const ownerRes = await readDoc(`tenants/${tenantA}/service_audit/audit_1`, userOwnerA);
+        expect(ownerRes.status).toBe(200);
+
+        const mgrRes = await readDoc(`tenants/${tenantA}/service_audit/audit_1`, userManagerA);
+        expect(mgrRes.status).toBe(403);
+
+        const staffRes = await readDoc(`tenants/${tenantA}/service_audit/audit_1`, userStaffA);
+        expect(staffRes.status).toBe(403);
+      });
+
+      it('142. Client direct write to service audit trail is denied', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/service_audit/audit_tamper`,
+          { operation: 'HACKED' },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+    });
+
+    // =========================================================================
+    // PHASE 3.1.1: PUBLIC CATALOG SERVICES STRICT AUTHORIZATION MATRIX
+    // =========================================================================
+    describe('Phase 3.1.1: Public Services Strict Read Authorization Matrix', () => {
+      beforeEach(async () => {
+        // Seed active category
+        await seedDoc(`tenants/${tenantA}/public_service_categories/cat_active`, {
+          id: 'cat_active',
+          tenantId: tenantA,
+          nameAr: 'تصنيف نشط',
+          isActive: true,
+        });
+
+        // Seed inactive category
+        await seedDoc(`tenants/${tenantA}/public_service_categories/cat_inactive`, {
+          id: 'cat_inactive',
+          tenantId: tenantA,
+          nameAr: 'تصنيف معطل',
+          isActive: false,
+        });
+      });
+
+      it('143. Public service: fully published + active + active category + active tenant -> 200', async () => {
+        await seedDoc(`tenants/${tenantA}/public_services/srv_fully_published`, {
+          id: 'srv_fully_published',
+          tenantId: tenantA,
+          categoryId: 'cat_active',
+          nameAr: 'خدمة منشورة تماماً',
+          status: 'PUBLISHED',
+          isVisible: true,
+          isActive: true,
+          isArchived: false,
+          isCategoryActive: true,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/public_services/srv_fully_published`, null);
+        expect(res.status).toBe(200);
+      });
+
+      it('144. Public service: active but unpublished (status: DRAFT) -> 403', async () => {
+        await seedDoc(`tenants/${tenantA}/public_services/srv_draft`, {
+          id: 'srv_draft',
+          tenantId: tenantA,
+          categoryId: 'cat_active',
+          nameAr: 'خدمة مسودة',
+          status: 'DRAFT',
+          isVisible: true,
+          isActive: true,
+          isArchived: false,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/public_services/srv_draft`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('145. Public service: published but hidden (isVisible: false) -> 403', async () => {
+        await seedDoc(`tenants/${tenantA}/public_services/srv_hidden`, {
+          id: 'srv_hidden',
+          tenantId: tenantA,
+          categoryId: 'cat_active',
+          nameAr: 'خدمة مخفية',
+          status: 'PUBLISHED',
+          isVisible: false,
+          isActive: true,
+          isArchived: false,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/public_services/srv_hidden`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('146. Public service: published but archived (isArchived: true) -> 403', async () => {
+        await seedDoc(`tenants/${tenantA}/public_services/srv_archived`, {
+          id: 'srv_archived',
+          tenantId: tenantA,
+          categoryId: 'cat_active',
+          nameAr: 'خدمة مؤرشفة',
+          status: 'PUBLISHED',
+          isVisible: true,
+          isActive: true,
+          isArchived: true,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/public_services/srv_archived`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('147. Public service: inactive service (isActive: false) -> 403', async () => {
+        await seedDoc(`tenants/${tenantA}/public_services/srv_inactive`, {
+          id: 'srv_inactive',
+          tenantId: tenantA,
+          categoryId: 'cat_active',
+          nameAr: 'خدمة معطلة',
+          status: 'PUBLISHED',
+          isVisible: true,
+          isActive: false,
+          isArchived: false,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/public_services/srv_inactive`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('148. Public service: associated category is inactive -> 403', async () => {
+        await seedDoc(`tenants/${tenantA}/public_services/srv_inactive_cat`, {
+          id: 'srv_inactive_cat',
+          tenantId: tenantA,
+          categoryId: 'cat_inactive',
+          nameAr: 'خدمة تحت تصنيف معطل',
+          status: 'PUBLISHED',
+          isVisible: true,
+          isActive: true,
+          isArchived: false,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/public_services/srv_inactive_cat`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('149. Public service: associated category does not exist -> 403', async () => {
+        await seedDoc(`tenants/${tenantA}/public_services/srv_missing_cat`, {
+          id: 'srv_missing_cat',
+          tenantId: tenantA,
+          categoryId: 'cat_non_existent',
+          nameAr: 'خدمة تصنيف مفقود',
+          status: 'PUBLISHED',
+          isVisible: true,
+          isActive: true,
+          isArchived: false,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/public_services/srv_missing_cat`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('150. Public service: tenant is inactive -> 403', async () => {
+        await seedDoc(`tenants/${tenantB}/public_service_categories/cat_active_b`, {
+          id: 'cat_active_b',
+          tenantId: tenantB,
+          nameAr: 'تصنيف متجر معطل',
+          isActive: true,
+        });
+        await seedDoc(`tenants/${tenantB}/public_services/srv_tenant_b`, {
+          id: 'srv_tenant_b',
+          tenantId: tenantB,
+          categoryId: 'cat_active_b',
+          nameAr: 'خدمة متجر غير نشط',
+          status: 'PUBLISHED',
+          isVisible: true,
+          isActive: true,
+          isArchived: false,
+        });
+
+        const res = await readDoc(`tenants/${tenantB}/public_services/srv_tenant_b`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('150b. Public service: category deactivation while service is published revokes public access -> 403', async () => {
+        // Initially active category and service
+        await seedDoc(`tenants/${tenantA}/public_service_categories/cat_to_deactivate`, {
+          id: 'cat_to_deactivate',
+          tenantId: tenantA,
+          nameAr: 'تصنيف سيتم تعطيله',
+          isActive: true,
+        });
+        await seedDoc(`tenants/${tenantA}/public_services/srv_dynamic_deact`, {
+          id: 'srv_dynamic_deact',
+          tenantId: tenantA,
+          categoryId: 'cat_to_deactivate',
+          nameAr: 'خدمة ستصبح غير متاحة',
+          status: 'PUBLISHED',
+          isVisible: true,
+          isActive: true,
+          isArchived: false,
+          isCategoryActive: true,
+        });
+
+        // 1. Initially accessible
+        const resInitial = await readDoc(`tenants/${tenantA}/public_services/srv_dynamic_deact`, null);
+        expect(resInitial.status).toBe(200);
+
+        // 2. Category is deactivated in database
+        await seedDoc(`tenants/${tenantA}/public_service_categories/cat_to_deactivate`, {
+          id: 'cat_to_deactivate',
+          tenantId: tenantA,
+          nameAr: 'تصنيف سيتم تعطيله',
+          isActive: false,
+        });
+
+        // 3. Document read is immediately blocked by rule cross-document category verification
+        const resAfter = await readDoc(`tenants/${tenantA}/public_services/srv_dynamic_deact`, null);
+        expect(resAfter.status).toBe(403);
+      });
+
+      it('151. Tenant member can read public service document even if unpublished -> 200', async () => {
+        await seedDoc(`tenants/${tenantA}/public_services/srv_member_peek`, {
+          id: 'srv_member_peek',
+          tenantId: tenantA,
+          categoryId: 'cat_active',
+          nameAr: 'خدمة يراها العضو',
+          status: 'DRAFT',
+          isVisible: false,
+          isActive: false,
+          isArchived: false,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/public_services/srv_member_peek`, userManagerA);
+        expect(res.status).toBe(200);
+      });
+
+      it('152. Platform admin can read public service document unconditionally -> 200', async () => {
+        await seedDoc(`tenants/${tenantA}/public_services/srv_admin_peek`, {
+          id: 'srv_admin_peek',
+          tenantId: tenantA,
+          categoryId: 'cat_active',
+          nameAr: 'خدمة يراها المشرف العام',
+          status: 'DRAFT',
+          isVisible: false,
+          isActive: false,
+          isArchived: false,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/public_services/srv_admin_peek`, userSuperAdmin);
+        expect(res.status).toBe(200);
+      });
+
+      it('153. Anonymous read of internal operational /services/{serviceId} is strictly REJECTED -> 403', async () => {
+        await seedDoc(`tenants/${tenantA}/services/srv_internal_confidential`, {
+          id: 'srv_internal_confidential',
+          tenantId: tenantA,
+          nameAr: 'خدمة داخلية سرية',
+          costOfGoodsHalalas: 5000,
+        });
+
+        const res = await readDoc(`tenants/${tenantA}/services/srv_internal_confidential`, null);
+        expect(res.status).toBe(403);
+      });
+
+      it('154. Direct client write to /public_services/{serviceId} is strictly REJECTED -> 403', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/public_services/srv_tamper`,
+          {
+            id: 'srv_tamper',
+            tenantId: tenantA,
+            nameAr: 'محاولة اختراق',
+            status: 'PUBLISHED',
+          },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('154b. Public collection query with all query-compatible eligibility filters SUCCEEDS -> 200', async () => {
+        const res = await queryCollection(`tenants/${tenantA}`, 'public_services', null, [
+          { field: 'status', op: 'EQUAL', value: 'PUBLISHED' },
+          { field: 'isVisible', op: 'EQUAL', value: true },
+          { field: 'isActive', op: 'EQUAL', value: true },
+          { field: 'isArchived', op: 'EQUAL', value: false },
+          { field: 'isCategoryActive', op: 'EQUAL', value: true },
+        ]);
+        expect(res.status).toBe(200);
+      });
+
+      it('154c. Public collection query attempting to query ineligible documents (e.g. status: DRAFT) is REJECTED -> 403', async () => {
+        const res = await queryCollection(`tenants/${tenantA}`, 'public_services', null, [
+          { field: 'status', op: 'EQUAL', value: 'DRAFT' },
+          { field: 'isVisible', op: 'EQUAL', value: true },
+          { field: 'isActive', op: 'EQUAL', value: true },
+          { field: 'isArchived', op: 'EQUAL', value: false },
+          { field: 'isCategoryActive', op: 'EQUAL', value: true },
+        ]);
+        expect(res.status).toBe(403);
+      });
     });
   });
 });

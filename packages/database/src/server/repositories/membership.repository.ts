@@ -966,6 +966,16 @@ export class MembershipRepository {
   }
 
   /**
+   * Retrieves all membership records for a tenant.
+   */
+  async listMemberships(tenantId: string): Promise<MembershipDoc[]> {
+    const snap = await this.db.collection(firestorePaths.memberships(tenantId)).get();
+    return snap.docs
+      .map((d) => MembershipDocSchema.parse(d.data()))
+      .filter((m) => m.tenantId === tenantId);
+  }
+
+  /**
    * Retrieves the membership summary mutex document for a tenant.
    */
   async getMembershipSummary(tenantId: string): Promise<MembershipSummaryDoc | null> {

@@ -31,6 +31,7 @@ import {
   type SubscriptionAuditDoc,
 } from '../../subscription.schema';
 import { TrustedSystemContext } from './trusted-context';
+import { TenantBootstrapService } from '../tenant-bootstrap.service';
 
 /**
  * Standard error codes for tenant provisioning operations.
@@ -403,6 +404,31 @@ export class TenantRepository {
     }
     const slugData = TenantSlugDocSchema.parse(slugSnap.data());
     return this.getTenantById(slugData.tenantId);
+  }
+
+  /**
+   * Provisions a tenant and automatically bootstraps foundational resources:
+   * Main branch, Accounting settings, Fiscal Year & Periods, 22 Default Accounts,
+   * Company Settings, Tax Settings, and SEO Settings.
+   */
+  async createTenantWithBootstrap(
+    input: unknown,
+    authContext?: TenantAuthorizationContext
+  ): Promise<TenantProvisioningResult> {
+    const result = await this.createTenant(input, authContext);
+    const parsedInput = CreateTenantInputSchema.parse(input);
+
+    const bootstrapService = new TenantBootstrapService(this.db);
+    await bootstrapService.bootstrapTenant(result.tenantId, {
+      name: parsedInput.name,
+      ownerUid: result.ownerUid,
+      crNumber: parsedInput.crNumber,
+      vatNumber: parsedInput.vatNumber,
+      billingEmail: parsedInput.billingEmail,
+      nowIso: result.createdAt,
+    });
+
+    return result;
   }
 
   /**

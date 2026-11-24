@@ -16,5 +16,6 @@ export {
   TenantRepository,
   TenantProvisioningError,
   TenantProvisioningErrorCode,
+  TenantBootstrapService,
 } from '@rashx/database/server';
 

@@ -73,6 +73,38 @@ describe('Firestore Canonical Paths & Validation', () => {
     expect(firestorePaths.publicService(tid, 'srv_haircut')).toBe(
       'tenants/tenant_riyadh_salon/public_services/srv_haircut'
     );
+    expect(firestorePaths.serviceCategories(tid)).toBe(
+      'tenants/tenant_riyadh_salon/service_categories'
+    );
+    expect(firestorePaths.serviceCategory(tid, 'cat_hair')).toBe(
+      'tenants/tenant_riyadh_salon/service_categories/cat_hair'
+    );
+    expect(firestorePaths.publicServiceCategories(tid)).toBe(
+      'tenants/tenant_riyadh_salon/public_service_categories'
+    );
+    expect(firestorePaths.publicServiceCategory(tid, 'cat_hair')).toBe(
+      'tenants/tenant_riyadh_salon/public_service_categories/cat_hair'
+    );
+    expect(firestorePaths.serviceAuditTrail(tid)).toBe(
+      'tenants/tenant_riyadh_salon/service_audit'
+    );
+    expect(firestorePaths.serviceAuditRecord(tid, 'audit_123')).toBe(
+      'tenants/tenant_riyadh_salon/service_audit/audit_123'
+    );
+    expect(firestorePaths.providers(tid)).toBe('tenants/tenant_riyadh_salon/providers');
+    expect(firestorePaths.provider(tid, 'prov_123')).toBe(
+      'tenants/tenant_riyadh_salon/providers/prov_123'
+    );
+    expect(firestorePaths.publicProviders(tid)).toBe('tenants/tenant_riyadh_salon/public_providers');
+    expect(firestorePaths.publicProvider(tid, 'prov_123')).toBe(
+      'tenants/tenant_riyadh_salon/public_providers/prov_123'
+    );
+    expect(firestorePaths.commissionPolicies(tid)).toBe(
+      'tenants/tenant_riyadh_salon/commission_policies'
+    );
+    expect(firestorePaths.commissionPolicy(tid, 'pol_456')).toBe(
+      'tenants/tenant_riyadh_salon/commission_policies/pol_456'
+    );
     expect(firestorePaths.appointments(tid)).toBe('tenants/tenant_riyadh_salon/appointments');
     expect(firestorePaths.appointment(tid, 'apt_999')).toBe(
       'tenants/tenant_riyadh_salon/appointments/apt_999'

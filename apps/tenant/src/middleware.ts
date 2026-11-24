@@ -30,6 +30,17 @@ import { resolveHostname } from '@rashx/database';
  *    stale cache bypass.
  */
 export function middleware(request: NextRequest): NextResponse {
+  const { pathname } = request.nextUrl;
+
+  // 0. Immediately bypass Next.js internal static assets and public static files
+  if (
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico' ||
+    /\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|woff|woff2|ttf|eot)$/i.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
   // 1. Strip client-supplied routing headers to eliminate header spoofing
   const requestHeaders = new Headers(request.headers);
   requestHeaders.delete('x-rashx-tenant-slug');
