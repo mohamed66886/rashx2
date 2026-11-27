@@ -261,6 +261,8 @@ export class ServiceRepository {
         assignedBranchIds,
         assignedProviderIds,
         commissionPolicyId: validated.commissionPolicyId ?? null,
+        resourceRequirement: validated.resourceRequirement ?? 'OPTIONAL',
+        allowedResourceTypes: validated.allowedResourceTypes ?? [],
         displayOrder: validated.displayOrder ?? 0,
         isActive,
         createdAt: nowIso,
@@ -642,6 +644,14 @@ export class ServiceRepository {
         assignedBranchIds,
         assignedProviderIds,
         commissionPolicyId,
+        resourceRequirement:
+          validated.resourceRequirement !== undefined
+            ? validated.resourceRequirement
+            : currentDoc.resourceRequirement ?? 'OPTIONAL',
+        allowedResourceTypes:
+          validated.allowedResourceTypes !== undefined
+            ? validated.allowedResourceTypes
+            : currentDoc.allowedResourceTypes ?? [],
         displayOrder:
           validated.displayOrder !== undefined ? validated.displayOrder : currentDoc.displayOrder,
         isActive,

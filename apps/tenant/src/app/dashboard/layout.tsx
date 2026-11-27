@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { getTenantSubscriptionSession } from '@/lib/tenant-auth';
-import { TenantBootstrapService } from '@rashx/database/server';
+import { getDashboardSession } from '@/lib/dashboard-session';
+import { ensureTenantBootstrapReady } from '@/lib/bootstrap-guard';
 import { LogoutButton } from './logout-button';
 import { DashboardNav } from './dashboard-nav';
 import { DashboardHeader } from './dashboard-header';
@@ -10,12 +10,18 @@ export const dynamic = 'force-dynamic';
 
 const FONT = "'Ping AR + LT','IBM Plex Sans Arabic',Tahoma,sans-serif";
 
+const roleLabels: Record<string, string> = {
+  OWNER: 'مالك المنشأة',
+  MANAGER: 'مدير الصالون',
+  STAFF: 'مقدم خدمة / فريق العمل',
+};
+
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const sessionData = await getTenantSubscriptionSession();
+  const sessionData = await getDashboardSession();
 
   if (!sessionData) {
     redirect('/login');
@@ -28,19 +34,10 @@ export default async function DashboardLayout({
     redirect('/subscription-expired');
   }
 
-  // Strict Server Guard: verify tenant foundational bootstrap is READY
-  const bootstrapService = new TenantBootstrapService();
-  let bootstrapStatus = await bootstrapService.getBootstrapStatus(tenant.tenantId);
-  if (!bootstrapStatus || bootstrapStatus.status !== 'READY') {
-    try {
-      const recon = await bootstrapService.reconcileTenant(tenant.tenantId);
-      bootstrapStatus = recon.bootstrapStatus;
-    } catch (err) {
-      console.error('[DashboardLayout] Failed to reconcile tenant bootstrap:', err);
-    }
-  }
+  // Strict Server Guard: tenant foundational bootstrap must be READY (cached once seen READY)
+  const bootstrapReady = await ensureTenantBootstrapReady(tenant.tenantId);
 
-  if (!bootstrapStatus || bootstrapStatus.status !== 'READY') {
+  if (!bootstrapReady) {
     return (
       <div dir="rtl" style={{ fontFamily: FONT }} className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FAF9F8] p-6 text-[#54453D]">
         <div aria-hidden="true" className="absolute -right-48 -top-52 h-[520px] w-[520px] rounded-full bg-[#F0C5AE]" />
@@ -67,34 +64,17 @@ export default async function DashboardLayout({
     );
   }
 
-  const roleLabels: Record<string, string> = {
-    OWNER: 'مالك المنشأة',
-    MANAGER: 'مدير الصالون',
-    STAFF: 'مقدم خدمة / فريق العمل',
-  };
-  const userName = user.displayName || user.email;
+  const userName = user.displayName || user.email || 'المستخدم';
   const roleLabel = roleLabels[membership.role] || membership.role;
 
   return (
-    <div dir="rtl" style={{ fontFamily: FONT }} className="flex min-h-screen flex-col bg-[#FAF9F8] text-[#54453D] lg:flex-row">
-      {/* Sidebar (desktop) + top bar & drawer (mobile) */}
-      <DashboardNav
-        tenantName={tenant.name}
-        tenantSlug={tenant.slug}
-        userName={userName}
-        roleLabel={roleLabel}
-        logout={<LogoutButton />}
-      />
+    <div dir="rtl" style={{ fontFamily: FONT }} className="flex min-h-dvh bg-[#FAF9F8] text-[#54453D]">
+      {/* rail + section panel (desktop) · bottom tabs + sheet (mobile) */}
+      <DashboardNav tenantName={tenant.name} tenantSlug={tenant.slug} userName={userName} roleLabel={roleLabel} logout={<LogoutButton />} />
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Desktop top bar: breadcrumb, quick search (Ctrl/⌘+K), copy link, user menu */}
-        <DashboardHeader userName={userName} roleLabel={roleLabel} tenantSlug={tenant.slug} logout={<LogoutButton variant="menu" />} />
-
-        <main className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
-
-        <footer className="border-t border-[#E6DDD6] bg-white px-6 py-4 text-center text-xs text-[#6B5B52]">
-          منظومة راش إكس (RASHX) — لوحة التحكم التشغيلية للصالون © {new Date().getFullYear()}
-        </footer>
+      <div className="flex min-w-0 flex-1 flex-col pb-[76px] lg:pb-0">
+        <DashboardHeader userName={userName} roleLabel={roleLabel} tenantName={tenant.name} tenantSlug={tenant.slug} logout={<LogoutButton variant="menu" />} />
+        <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pb-8 pt-2 sm:px-6 lg:px-8">{children}</main>
       </div>
     </div>
   );

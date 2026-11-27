@@ -4,6 +4,30 @@ import { revalidatePath } from 'next/cache';
 import { getTenantSubscriptionSession } from '@/lib/tenant-auth';
 import { CompanyRepository } from '@/lib/firebase-server';
 
+function formatErrorMessage(err: any, fallbackMessage: string): string {
+  if (err?.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+    const first = err.errors[0];
+    if (first.message) {
+      return first.message;
+    }
+  }
+  if (typeof err?.message === 'string') {
+    const trimmed = err.message.trim();
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed) && parsed[0]?.message) {
+          return parsed[0].message;
+        }
+      } catch {
+        // Fall back
+      }
+    }
+    return err.message;
+  }
+  return fallbackMessage;
+}
+
 export async function saveCompanyProfileAction(
   formData: FormData
 ): Promise<{ success: boolean; error?: string }> {
@@ -20,7 +44,11 @@ export async function saveCompanyProfileAction(
   const legalNameEn = (formData.get('legalNameEn') as string) || undefined;
   const legalForm = (formData.get('legalForm') as any) || 'SOLE_PROPRIETORSHIP';
   const crNumber = formData.get('crNumber') as string;
-  const unifiedEstablishmentNumber = (formData.get('unifiedEstablishmentNumber') as string) || undefined;
+  const rawUnified = formData.get('unifiedEstablishmentNumber');
+  const unifiedEstablishmentNumber =
+    typeof rawUnified === 'string' && rawUnified.trim() !== ''
+      ? rawUnified.trim()
+      : null;
   const phone = formData.get('phone') as string;
   const email = formData.get('email') as string;
 
@@ -50,7 +78,7 @@ export async function saveCompanyProfileAction(
     revalidatePath('/dashboard/settings/profile');
     return { success: true };
   } catch (err: any) {
-    return { success: false, error: err.message || 'حدث خطأ أثناء حفظ الملف القانوني' };
+    return { success: false, error: formatErrorMessage(err, 'حدث خطأ أثناء حفظ الملف القانوني') };
   }
 }
 
@@ -67,7 +95,11 @@ export async function saveTaxSettingsAction(
   }
 
   const vatStatus = formData.get('vatStatus') as any;
-  const vatNumber = (formData.get('vatNumber') as string) || undefined;
+  const rawVat = formData.get('vatNumber');
+  const vatNumber =
+    typeof rawVat === 'string' && rawVat.trim() !== ''
+      ? rawVat.trim()
+      : null;
   const isTaxInclusivePricing = formData.get('isTaxInclusivePricing') === 'true';
 
   try {
@@ -81,7 +113,7 @@ export async function saveTaxSettingsAction(
     revalidatePath('/dashboard/settings/tax');
     return { success: true };
   } catch (err: any) {
-    return { success: false, error: err.message || 'حدث خطأ أثناء حفظ الإعدادات الضريبية' };
+    return { success: false, error: formatErrorMessage(err, 'حدث خطأ أثناء حفظ الإعدادات الضريبية') };
   }
 }
 

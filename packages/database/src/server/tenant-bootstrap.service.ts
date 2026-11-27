@@ -28,9 +28,9 @@ import { DEFAULT_OPERATING_HOURS } from './repositories/branch.repository';
 export interface BootstrapOptions {
   name: string;
   ownerUid: string;
-  crNumber?: string;
-  vatNumber?: string;
-  billingEmail?: string;
+  crNumber?: string | null;
+  vatNumber?: string | null;
+  billingEmail?: string | null;
   nowIso?: string;
   fiscalYearStartMonth?: number;
 }

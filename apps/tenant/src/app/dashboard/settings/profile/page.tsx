@@ -1,42 +1,31 @@
 import { redirect } from 'next/navigation';
-import { getTenantSubscriptionSession } from '@/lib/tenant-auth';
+import { getDashboardSession } from '@/lib/dashboard-session';
 import { CompanyRepository, TenantBootstrapService } from '@/lib/firebase-server';
 import { CompanyProfileForm } from './company-profile-form';
-import { RxSymbol } from '../_components/rx-symbol';
-import { SettingsShell } from '../_components/settings-ui';
+import { PageHeader, PageIcon, SettingsShell } from '../_components/settings-ui';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CompanyProfilePage() {
-  const session = await getTenantSubscriptionSession();
-  if (!session) {
-    redirect('/login');
-  }
+  const session = await getDashboardSession(); // shared with the layout → no second lookup
+  if (!session) redirect('/login');
 
   const { tenant } = session;
   const compRepo = new CompanyRepository();
   let profile = await compRepo.getCompanyProfile(tenant.tenantId);
 
   if (!profile) {
-    const bootstrap = new TenantBootstrapService();
-    await bootstrap.reconcileTenant(tenant.tenantId);
+    await new TenantBootstrapService().reconcileTenant(tenant.tenantId);
     profile = await compRepo.getCompanyProfile(tenant.tenantId);
   }
 
   return (
     <SettingsShell>
-      <header className="flex items-center gap-5 rounded-xl bg-(--rx-peach) p-5 sm:p-6">
-        <div className="grid size-16 shrink-0 place-items-center rounded-xl bg-white">
-          <RxSymbol size={34} />
-        </div>
-        <div>
-          <h2 className="text-xl font-extrabold">ملف المنشأة القانوني</h2>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-(--rx-ink)/80">
-            السجل التجاري، الشكل القانوني، الرقم الموحد 700، والعنوان الوطني المسجل لدى البريد السعودي (SPL).
-          </p>
-        </div>
-      </header>
-
+      <PageHeader
+        title="ملف المنشأة القانوني"
+        desc="السجل التجاري، الشكل القانوني، الرقم الموحد 700، والعنوان الوطني المسجل لدى البريد السعودي (SPL)."
+        icon={<PageIcon><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M3 21h18M8 8h2M8 12h2M8 16h2" /></PageIcon>}
+      />
       <CompanyProfileForm profile={profile} />
     </SettingsShell>
   );

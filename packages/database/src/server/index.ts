@@ -126,6 +126,81 @@ export {
   type ServiceListFilter,
 } from './repositories/service.repository';
 
+// Phase 4: Customer Management & Core Booking Engine
+export {
+  CustomerRepository,
+  CustomerError,
+  CustomerErrorCode,
+  type CustomerActor,
+  type CustomerListOptions,
+} from './repositories/customer.repository';
+
+export {
+  BookingRepository,
+  BookingError,
+  BookingErrorCode,
+  type BookingActor,
+  type BookingListFilters,
+  type BookingDateRangeFilters,
+} from './repositories/booking.repository';
+
+export { AvailabilityService } from './availability.service';
+
+// Phase 4.1: Salon Daily Operations Engine
+export {
+  ResourceRepository,
+  ResourceError,
+  ResourceErrorCode,
+  type ResourceActor,
+  type ResourceListFilters,
+  type EligibleResourceAvailability,
+} from './repositories/resource.repository';
+
+export {
+  QueueRepository,
+  QueueError,
+  QueueErrorCode,
+  type QueueActor,
+  type QueueCallResult,
+} from './repositories/queue.repository';
+
+export {
+  DailyOperationsService,
+  OperationsError,
+  OperationsErrorCode,
+  type OperationsActor,
+  type OperationalWarning,
+  type WalkInRegistrationResult,
+  type DailyOperationsSnapshot,
+} from './operations.service';
+
+export {
+  PosSessionRepository,
+  PosSessionError,
+  PosSessionErrorCode,
+  type PosActor,
+} from './repositories/pos-session.repository';
+
+export {
+  PosRepository,
+  PosError,
+  PosErrorCode,
+} from './repositories/pos.repository';
+
+// Phase 4.3: Inventory, Suppliers & Purchasing Repositories
+export {
+  InventoryRepository,
+  InventoryError,
+  InventoryErrorCode,
+  type InventoryActor,
+} from './repositories/inventory.repository';
+
+export {
+  PurchasingRepository,
+  PurchasingError,
+  PurchasingErrorCode,
+} from './repositories/purchasing.repository';
+
 // Authoritative Tenant Resolution & Context (Server-only)
 export {
   TenantResolver,

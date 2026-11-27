@@ -11,6 +11,14 @@ export default function AppDashboardPage() {
         <p className="text-sm text-[#54453D]/70 mb-4">
           Central Organization Hub & Multi-Tenant Management
         </p>
+        <div className="mb-4">
+          <a
+            href="/book"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#54453D] text-white text-xs font-bold hover:bg-[#54453D]/90 transition-all shadow-xs"
+          >
+            <span>📅</span> حجز موعد جديد كعميل (Booking Engine)
+          </a>
+        </div>
         <div className="text-xs text-[#54453D]/50 border-t border-[#54453D]/10 pt-4">
           Manage your subscription, branches, billing, and linked salons.
         </div>

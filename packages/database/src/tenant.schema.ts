@@ -9,17 +9,45 @@ export type SubscriptionTier = z.infer<typeof SubscriptionTierEnum>;
 
 /**
  * Saudi Commercial Registration (CR) Number: exactly 10 digits.
+ * Automatically normalizes Arabic-Indic digits, spaces, and hyphens.
  */
-export const SaudiCrNumberSchema = z
-  .string()
-  .regex(/^\d{10}$/, 'Commercial Registration (CR) number must be exactly 10 digits');
+export const SaudiCrNumberSchema = z.preprocess(
+  (val) => {
+    if (typeof val === 'string') {
+      return val
+        .trim()
+        .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632))
+        .replace(/[\s-]/g, '');
+    }
+    return val;
+  },
+  z
+    .string()
+    .regex(/^\d{10}$/, 'رقم السجل التجاري يجب أن يتكون من 10 أرقام')
+);
 
 /**
  * Saudi VAT Number: exactly 15 digits, starting and ending according to ZATCA rules (starts with 3).
+ * Automatically normalizes Arabic-Indic digits, spaces, and hyphens.
  */
-export const SaudiVatNumberSchema = z
-  .string()
-  .regex(/^3\d{14}$/, 'Saudi VAT number must be exactly 15 digits starting with 3');
+export const SaudiVatNumberSchema = z.preprocess(
+  (val) => {
+    if (val === null || val === undefined) return null;
+    if (typeof val === 'string') {
+      const cleaned = val
+        .trim()
+        .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632))
+        .replace(/[\s-]/g, '');
+      return cleaned === '' ? null : cleaned;
+    }
+    return val;
+  },
+  z
+    .string()
+    .regex(/^3\d{14}$/, 'الرقم الضريبي يجب أن يتكون من 15 رقماً ويبدأ بالرقم 3')
+    .nullable()
+    .optional()
+);
 
 export const CommercialRegistrationStatusEnum = z.enum([
   'PENDING_REVIEW',

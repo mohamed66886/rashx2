@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import type { ReactNode } from 'react';
 import type { CompanyProfileDoc } from '@rashx/database';
 import { saveCompanyProfileAction } from '../actions';
-import { Field, FormMessage, SaveBar, Section, inputCls, ltrInputCls } from '../_components/settings-ui';
+import { Field, RadioCard, Row, inputCls, ltrInputCls } from '../_components/settings-ui';
+import { SettingsForm, useFormValues } from '../_components/settings-form';
 
 const LEGAL_FORMS = [
   { value: 'SOLE_PROPRIETORSHIP', label: 'مؤسسة فردية' },
@@ -12,225 +13,203 @@ const LEGAL_FORMS = [
   { value: 'OTHER', label: 'شكل نظامي آخر' },
 ] as const;
 
-export function CompanyProfileForm({ profile }: { profile: CompanyProfileDoc | null }) {
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; isError: boolean } | null>(null);
+const FORM_ID = 'company-profile-form';
+const WATCH = [
+  'legalNameAr', 'legalNameEn', 'legalForm', 'crNumber', 'unifiedEstablishmentNumber',
+  'buildingNumber', 'additionalNumber', 'streetName', 'district', 'city', 'postalCode', 'unitNumber',
+] as const;
 
-  const [legalNameAr, setLegalNameAr] = useState(profile?.legalNameAr || '');
-  const [legalNameEn, setLegalNameEn] = useState(profile?.legalNameEn || '');
-  const [legalForm, setLegalForm] = useState<string>(profile?.legalForm || 'SOLE_PROPRIETORSHIP');
-  const [crNumber, setCrNumber] = useState(profile?.crNumber || '');
-  const [unified, setUnified] = useState(profile?.unifiedEstablishmentNumber || '');
-  const [building, setBuilding] = useState(profile?.nationalAddress?.buildingNumber || '1234');
-  const [street, setStreet] = useState(profile?.nationalAddress?.streetName || '');
-  const [district, setDistrict] = useState(profile?.nationalAddress?.district || '');
-  const [city, setCity] = useState(profile?.nationalAddress?.city || '');
-  const [postal, setPostal] = useState(profile?.nationalAddress?.postalCode || '12211');
-  const [additional, setAdditional] = useState(profile?.nationalAddress?.additionalNumber || '');
-  const [unit, setUnit] = useState(profile?.nationalAddress?.unitNumber || '');
-  const [phone, setPhone] = useState(profile?.phone || '');
-  const [email, setEmail] = useState(profile?.email || '');
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setMessage(null);
-
-    const formData = new FormData(e.currentTarget);
-    const result = await saveCompanyProfileAction(formData);
-
-    setLoading(false);
-    if (result.success) {
-      setMessage({ text: 'تم حفظ وتحديث ملف المنشأة بنجاح!', isError: false });
-    } else {
-      setMessage({ text: result.error || 'فشل الحفظ', isError: true });
+// same rule as before, now run on the FormData at submit time (no per-keystroke state)
+function validate(fd: FormData): string | null {
+  const unified = String(fd.get('unifiedEstablishmentNumber') ?? '').trim();
+  if (unified) {
+    const normalized = unified.replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632)).replace(/[\s-]/g, '');
+    if (!/^7\d{9}$/.test(normalized)) {
+      return 'الرقم الموحد للمنشأة (700) يجب أن يتكون من 10 أرقام ويبدأ بالرقم 7 (أو اتركه فارغاً)';
     }
   }
+  return null;
+}
 
-  const formLabel = LEGAL_FORMS.find((f) => f.value === legalForm)?.label;
-  const dash = '—';
-
+/**
+ * Layout is driven by the width of the card the fields sit in (container queries),
+ * not by the screen width. The same form is therefore correct on a phone, a tablet,
+ * and a desktop where the side column and the section titles eat part of the width.
+ */
+function Fields({ children }: { children: ReactNode }) {
   return (
-    <form onSubmit={handleSubmit} className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
-      <div className="space-y-5">
-        <FormMessage message={message} />
+    <div className="@container w-full min-w-0">
+      <div className="grid gap-4 *:min-w-0">{children}</div>
+    </div>
+  );
+}
 
-        <Section title="بيانات المنشأة" desc="كما هي مسجلة في السجل التجاري.">
-          <div className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="الاسم التجاري الرسمي (بالعربية)" required htmlFor="legalNameAr">
-                <input
-                  id="legalNameAr"
-                  name="legalNameAr"
-                  value={legalNameAr}
-                  onChange={(e) => setLegalNameAr(e.target.value)}
-                  required
-                  className={inputCls}
-                />
-              </Field>
-              <Field label="الاسم التجاري الرسمي (بالإنجليزية)" htmlFor="legalNameEn">
-                <input
-                  id="legalNameEn"
-                  name="legalNameEn"
-                  dir="ltr"
-                  value={legalNameEn}
-                  onChange={(e) => setLegalNameEn(e.target.value)}
-                  className={ltrInputCls}
-                />
-              </Field>
-            </div>
+// two columns once the card is ~512px wide, one column below that
+const pair = 'grid gap-4 *:min-w-0 @lg:grid-cols-2';
 
-            <fieldset>
-              <legend className="mb-1.5 text-[13px] font-bold">
-                الشكل القانوني <span className="text-(--rx-danger)">*</span>
-              </legend>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {LEGAL_FORMS.map((f) => (
-                  <label key={f.value} className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="legalForm"
-                      value={f.value}
-                      checked={legalForm === f.value}
-                      onChange={() => setLegalForm(f.value)}
-                      className="peer sr-only"
-                    />
-                    <span className="flex h-full min-h-14 items-center justify-center rounded-lg border border-(--rx-line) bg-white px-3 py-2 text-center text-[13px] font-medium leading-5 transition-colors hover:border-(--rx-ink)/40 peer-checked:border-(--rx-ink) peer-checked:bg-(--rx-peach) peer-checked:font-bold peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-(--rx-blue)">
-                      {f.label}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="رقم السجل التجاري" required htmlFor="crNumber" aside="10 أرقام">
-                <input
-                  id="crNumber"
-                  name="crNumber"
-                  dir="ltr"
-                  inputMode="numeric"
-                  value={crNumber}
-                  onChange={(e) => setCrNumber(e.target.value)}
-                  required
-                  maxLength={10}
-                  className={ltrInputCls}
-                />
-              </Field>
-              <Field label="الرقم الموحد للمنشأة (700)" htmlFor="unifiedEstablishmentNumber" aside="يبدأ بـ 7">
-                <input
-                  id="unifiedEstablishmentNumber"
-                  name="unifiedEstablishmentNumber"
-                  dir="ltr"
-                  inputMode="numeric"
-                  value={unified}
-                  onChange={(e) => setUnified(e.target.value)}
-                  maxLength={10}
-                  placeholder="7XXXXXXXXX"
-                  className={ltrInputCls}
-                />
-              </Field>
-            </div>
-          </div>
-        </Section>
-
-        <Section
-          title="العنوان الوطني"
-          desc="بنفس ترتيب العنوان المسجّل لدى البريد السعودي (SPL)."
-          tone="cream"
-        >
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-6">
-            <div className="col-span-2 sm:col-span-2">
-              <Field label="رقم المبنى" required htmlFor="buildingNumber">
-                <input id="buildingNumber" name="buildingNumber" dir="ltr" inputMode="numeric" value={building} onChange={(e) => setBuilding(e.target.value)} required maxLength={4} className={ltrInputCls} />
-              </Field>
-            </div>
-            <div className="col-span-2 sm:col-span-4">
-              <Field label="اسم الشارع" required htmlFor="streetName">
-                <input id="streetName" name="streetName" value={street} onChange={(e) => setStreet(e.target.value)} required className={inputCls} />
-              </Field>
-            </div>
-            <div className="col-span-2 sm:col-span-3">
-              <Field label="الحي" required htmlFor="district">
-                <input id="district" name="district" value={district} onChange={(e) => setDistrict(e.target.value)} required className={inputCls} />
-              </Field>
-            </div>
-            <div className="col-span-2 sm:col-span-3">
-              <Field label="المدينة" required htmlFor="city">
-                <input id="city" name="city" value={city} onChange={(e) => setCity(e.target.value)} required className={inputCls} />
-              </Field>
-            </div>
-            <div className="sm:col-span-2">
-              <Field label="الرمز البريدي" required htmlFor="postalCode" aside="5 أرقام">
-                <input id="postalCode" name="postalCode" dir="ltr" inputMode="numeric" value={postal} onChange={(e) => setPostal(e.target.value)} required maxLength={5} className={ltrInputCls} />
-              </Field>
-            </div>
-            <div className="sm:col-span-2">
-              <Field label="الرقم الإضافي" htmlFor="additionalNumber" aside="4 أرقام">
-                <input id="additionalNumber" name="additionalNumber" dir="ltr" inputMode="numeric" value={additional} onChange={(e) => setAdditional(e.target.value)} maxLength={4} className={ltrInputCls} />
-              </Field>
-            </div>
-            <div className="col-span-2">
-              <Field label="رقم الوحدة" htmlFor="unitNumber">
-                <input id="unitNumber" name="unitNumber" dir="ltr" value={unit} onChange={(e) => setUnit(e.target.value)} className={ltrInputCls} />
-              </Field>
-            </div>
-          </div>
-        </Section>
-
-        <Section title="بيانات التواصل الرسمية">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="رقم الهاتف" required htmlFor="phone">
-              <input id="phone" name="phone" dir="ltr" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required className={ltrInputCls} />
-            </Field>
-            <Field label="البريد الإلكتروني" required htmlFor="email">
-              <input id="email" name="email" dir="ltr" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={ltrInputCls} />
-            </Field>
-          </div>
-        </Section>
-
-        <SaveBar loading={loading} label="حفظ بيانات المنشأة" note="التعديل متاح لمالك المنشأة فقط." />
-      </div>
-
-      {/* Live registry card */}
-      <aside aria-label="معاينة بطاقة المنشأة" className="space-y-3 lg:sticky lg:top-6">
-        <div className="overflow-hidden rounded-xl border border-(--rx-ink)">
+/** Only this component re-renders while typing. */
+function LivePreview({ initial }: { initial: Record<(typeof WATCH)[number], string> }) {
+  const v = useFormValues(FORM_ID, WATCH, initial);
+  const dash = '—';
+  const formLabel = LEGAL_FORMS.find((f) => f.value === v.legalForm)?.label;
+  return (
+    // narrow column (desktop side panel / phone) => stacked · wide (tablet, full-width) => side by side
+    <div className="@container w-full min-w-0">
+      <div className="grid gap-4 *:min-w-0 @xl:grid-cols-2">
+        <div className="overflow-hidden rounded-2xl">
           <div className="bg-(--rx-ink) px-5 py-4 text-white">
-            <p className="text-[11px] text-white/60">بطاقة المنشأة</p>
-            <p className="mt-1 min-h-7 text-lg font-extrabold leading-7">{legalNameAr || dash}</p>
-            <p dir="ltr" className="min-h-5 text-left text-xs text-white/70">{legalNameEn || ' '}</p>
+            <p className="m-0 text-[11px] text-white/70">بطاقة المنشأة</p>
+            <p className="mt-1 min-h-7 break-words text-lg font-bold leading-7">{v.legalNameAr || dash}</p>
+            <p dir="ltr" className="m-0 min-h-5 break-words text-left text-xs text-white/75">{v.legalNameEn || ' '}</p>
           </div>
-          <dl className="divide-y divide-(--rx-line) bg-white text-sm">
-            <div className="flex items-center justify-between gap-3 px-5 py-3">
-              <dt className="text-xs text-(--rx-ink)/60">الشكل القانوني</dt>
-              <dd className="font-bold">{formLabel}</dd>
-            </div>
-            <div className="flex items-center justify-between gap-3 px-5 py-3">
-              <dt className="text-xs text-(--rx-ink)/60">السجل التجاري</dt>
-              <dd dir="ltr" className="font-mono font-bold tracking-wider">{crNumber || dash}</dd>
-            </div>
-            <div className="flex items-center justify-between gap-3 px-5 py-3">
-              <dt className="text-xs text-(--rx-ink)/60">الرقم الموحد</dt>
-              <dd dir="ltr" className="font-mono font-bold tracking-wider">{unified || dash}</dd>
-            </div>
+          <dl className="m-0 bg-white text-sm">
+            {[
+              ['الشكل القانوني', formLabel, false],
+              ['السجل التجاري', v.crNumber || dash, true],
+              ['الرقم الموحد', v.unifiedEstablishmentNumber || dash, true],
+            ].map(([k, val, mono]) => (
+              <div key={String(k)} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-5 py-3">
+                <dt className="text-xs text-(--rx-muted)">{k}</dt>
+                <dd dir={mono ? 'ltr' : undefined} className={`m-0 min-w-0 break-words font-bold ${mono ? 'font-mono tracking-wider' : ''}`}>{val}</dd>
+              </div>
+            ))}
           </dl>
         </div>
 
-        <div className="rounded-xl bg-(--rx-peach) p-5">
-          <p className="text-[11px] font-bold text-(--rx-ink)/70">العنوان الوطني</p>
+        <div className="rounded-2xl bg-(--rx-peach) p-5">
+          <p className="m-0 text-[11px] font-bold">العنوان الوطني</p>
           <p dir="ltr" className="mt-2 text-left font-mono text-2xl font-bold tracking-[0.2em]">
-            {building || '----'}
-            <span className="mx-1 text-base tracking-normal opacity-50">/</span>
-            {additional || '----'}
+            {v.buildingNumber || '----'}
+            <span className="mx-1 text-base tracking-normal opacity-60">/</span>
+            {v.additionalNumber || '----'}
           </p>
-          <p className="mt-3 min-h-12 text-sm font-medium leading-6">
-            {[street, district].filter(Boolean).join('، ') || dash}
+          <p className="mb-0 mt-3 min-h-12 break-words text-sm font-medium leading-6">
+            {[v.streetName, v.district].filter(Boolean).join('، ') || dash}
             <br />
-            {[city, postal].filter(Boolean).join(' ') || ' '}
-            {unit ? ` · وحدة ${unit}` : ''}
+            {[v.city, v.postalCode].filter(Boolean).join(' ') || ' '}
+            {v.unitNumber ? ` · وحدة ${v.unitNumber}` : ''}
           </p>
         </div>
-      </aside>
-    </form>
+      </div>
+    </div>
+  );
+}
+
+export function CompanyProfileForm({ profile }: { profile: CompanyProfileDoc | null }) {
+  const a = profile?.nationalAddress;
+  const legalForm = profile?.legalForm || 'SOLE_PROPRIETORSHIP';
+  const init = {
+    legalNameAr: profile?.legalNameAr || '',
+    legalNameEn: profile?.legalNameEn || '',
+    legalForm,
+    crNumber: profile?.crNumber || '',
+    unifiedEstablishmentNumber: profile?.unifiedEstablishmentNumber || '',
+    buildingNumber: a?.buildingNumber || '1234',
+    additionalNumber: a?.additionalNumber || '',
+    streetName: a?.streetName || '',
+    district: a?.district || '',
+    city: a?.city || '',
+    postalCode: a?.postalCode || '12211',
+    unitNumber: a?.unitNumber || '',
+  };
+
+  return (
+    <SettingsForm
+      id={FORM_ID}
+      action={saveCompanyProfileAction}
+      validate={validate}
+      successText="تم حفظ وتحديث ملف المنشأة بنجاح!"
+      saveLabel="حفظ بيانات المنشأة"
+      note="التعديل متاح لمالك المنشأة فقط."
+      aside={<LivePreview initial={init} />}
+    >
+      <Row title="بيانات المنشأة" desc="كما هي مسجلة في السجل التجاري.">
+        <Fields>
+          <div className={pair}>
+            <Field label="الاسم التجاري الرسمي (بالعربية)" required htmlFor="legalNameAr">
+              <input id="legalNameAr" name="legalNameAr" defaultValue={init.legalNameAr} required className={inputCls} />
+            </Field>
+            <Field label="الاسم التجاري الرسمي (بالإنجليزية)" htmlFor="legalNameEn">
+              <input id="legalNameEn" name="legalNameEn" dir="ltr" defaultValue={init.legalNameEn} className={ltrInputCls} />
+            </Field>
+          </div>
+
+          <fieldset className="m-0 min-w-0 border-0 p-0">
+            <legend className="mb-1.5 p-0 text-[13px] font-bold">الشكل القانوني <span className="text-(--rx-danger)" aria-hidden="true">*</span></legend>
+            {/* 2 per row by default, all 4 in one row when there is room */}
+            <div className="grid grid-cols-2 gap-2 *:min-w-0 @2xl:grid-cols-4">
+              {LEGAL_FORMS.map((f) => (
+                <RadioCard key={f.value} name="legalForm" value={f.value} defaultChecked={legalForm === f.value} title={f.label} compact />
+              ))}
+            </div>
+          </fieldset>
+
+          <div className={pair}>
+            <Field label="رقم السجل التجاري" required htmlFor="crNumber" aside="10 أرقام">
+              <input id="crNumber" name="crNumber" dir="ltr" inputMode="numeric" defaultValue={init.crNumber} required maxLength={10} className={ltrInputCls} />
+            </Field>
+            <Field label="الرقم الموحد للمنشأة (700)" htmlFor="unifiedEstablishmentNumber" aside="اختياري — يبدأ بـ 7">
+              <input id="unifiedEstablishmentNumber" name="unifiedEstablishmentNumber" dir="ltr" inputMode="numeric" defaultValue={init.unifiedEstablishmentNumber} maxLength={10} placeholder="7XXXXXXXXX" className={ltrInputCls} />
+            </Field>
+          </div>
+        </Fields>
+      </Row>
+
+      <Row title="العنوان الوطني" desc="بنفس ترتيب العنوان المسجّل لدى البريد السعودي (SPL).">
+        {/*
+          narrow : [مبنى | إضافي]  [شارع]  [حي | مدينة]  [بريدي | وحدة]
+          wide   : [مبنى | إضافي | شارع شارع]  [حي حي | مدينة مدينة]  [بريدي بريدي | وحدة وحدة]
+          ترتيب الـ DOM = ترتيب التنقل بالـ Tab = ترتيب القراءة في الحالتين.
+        */}
+        <div className="@container w-full min-w-0">
+          <div className="grid grid-cols-2 gap-4 *:min-w-0 @xl:grid-cols-4">
+            <Field label="رقم المبنى" required htmlFor="buildingNumber" aside="4 أرقام">
+              <input id="buildingNumber" name="buildingNumber" dir="ltr" inputMode="numeric" defaultValue={init.buildingNumber} required maxLength={4} className={ltrInputCls} />
+            </Field>
+            <Field label="الرقم الإضافي" htmlFor="additionalNumber" aside="4 أرقام">
+              <input id="additionalNumber" name="additionalNumber" dir="ltr" inputMode="numeric" defaultValue={init.additionalNumber} maxLength={4} className={ltrInputCls} />
+            </Field>
+            <div className="col-span-2">
+              <Field label="اسم الشارع" required htmlFor="streetName">
+                <input id="streetName" name="streetName" defaultValue={init.streetName} required className={inputCls} />
+              </Field>
+            </div>
+            <div className="@xl:col-span-2">
+              <Field label="الحي" required htmlFor="district">
+                <input id="district" name="district" defaultValue={init.district} required className={inputCls} />
+              </Field>
+            </div>
+            <div className="@xl:col-span-2">
+              <Field label="المدينة" required htmlFor="city">
+                <input id="city" name="city" defaultValue={init.city} required className={inputCls} />
+              </Field>
+            </div>
+            <div className="@xl:col-span-2">
+              <Field label="الرمز البريدي" required htmlFor="postalCode" aside="5 أرقام">
+                <input id="postalCode" name="postalCode" dir="ltr" inputMode="numeric" defaultValue={init.postalCode} required maxLength={5} className={ltrInputCls} />
+              </Field>
+            </div>
+            <div className="@xl:col-span-2">
+              <Field label="رقم الوحدة" htmlFor="unitNumber">
+                <input id="unitNumber" name="unitNumber" dir="ltr" defaultValue={init.unitNumber} className={ltrInputCls} />
+              </Field>
+            </div>
+          </div>
+        </div>
+      </Row>
+
+      <Row title="بيانات التواصل الرسمية">
+        <Fields>
+          <div className={pair}>
+            <Field label="رقم الهاتف" required htmlFor="phone">
+              <input id="phone" name="phone" dir="ltr" type="tel" defaultValue={profile?.phone || ''} required className={ltrInputCls} />
+            </Field>
+            <Field label="البريد الإلكتروني" required htmlFor="email">
+              <input id="email" name="email" dir="ltr" type="email" defaultValue={profile?.email || ''} required className={ltrInputCls} />
+            </Field>
+          </div>
+        </Fields>
+      </Row>
+    </SettingsForm>
   );
 }

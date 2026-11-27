@@ -41,4 +41,19 @@ export * from './service-category.schema';
 export * from './service-pricing';
 export * from './service-audit.schema';
 
+// Phase 4: Customer Management & Core Booking Engine
+export * from './customer.schema';
+export * from './booking.schema';
+export * from './availability.types';
+
+// Phase 4.1: Salon Daily Operations Engine (Resources, Queue, Calling, Walk-ins)
+export * from './resource.schema';
+export * from './queue.schema';
+
+// Phase 4.2: POS, Invoicing & Payment Management
+export * from './pos.schema';
+
+// Phase 4.3: Inventory, Suppliers & Purchasing Management
+export * from './inventory.schema';
+
 export const DATABASE_PACKAGE_INITIALIZED = true as const;

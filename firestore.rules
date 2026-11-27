@@ -564,12 +564,73 @@ service cloud.firestore {
       }
 
       /**
+       * Phase 4: Tenant Customers (/tenants/{tenantId}/customers/{customerId})
+       * Private customer records within tenant. Contains normalized phone, email, privateNotes.
+       * Read: Strictly OWNER, MANAGER, or platform admin (prevents STAFF from bypassing privateNotes masking).
+       * Direct client writes are strictly forbidden (Admin SDK CustomerRepository only).
+       */
+      match /customers/{customerId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 4: Customer Phone Identity Mutex (/tenants/{tenantId}/customer_identities/{phone})
+       * Concurrency mutex document guaranteeing unique phone per tenant.
+       * Client direct reads and writes are strictly forbidden (Server Admin SDK only).
+       */
+      match /customer_identities/{phone} {
+        allow read, write: if false;
+      }
+
+      /**
+       * Phase 4.1: Walk-in Guest Customer Idempotency Mutex (/tenants/{tenantId}/customer_guest_idempotency/{key})
+       * Client direct reads and writes are strictly forbidden (Server Admin SDK only).
+       */
+      match /customer_guest_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      /**
+       * Phase 4: Canonical Bookings (/tenants/{tenantId}/bookings/{bookingId})
+       * Operational booking records.
+       * Read: OWNER, MANAGER, the assigned provider, the booking customer, or platform admin.
+       * Direct client writes are strictly forbidden (All creations, rescheduling, cancellation,
+       * and status transitions must execute atomically via BookingRepository).
+       */
+      match /bookings/{bookingId} {
+        allow read: if isTenantManager(tenantId)
+          || (isTenantMemberActive(tenantId) && resource.data.providerId == request.auth.uid)
+          || (isAuthenticated() && resource.data.customerId == request.auth.uid)
+          || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 4: Booking Idempotency Mutex (/tenants/{tenantId}/booking_idempotency/{key})
+       * Prevents duplicate booking creation on client network retries.
+       * Client direct reads and writes are strictly forbidden (Server Admin SDK only).
+       */
+      match /booking_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      /**
+       * Phase 4: Booking Audit Trail (/tenants/{tenantId}/booking_audit/{auditId})
+       * Immutable chronological ledger. Read: OWNER and Platform Admin. Write: Server-only.
+       */
+      match /booking_audit/{auditId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
        * Slot Locks (/tenants/{tenantId}/slot_locks/{lockId})
-       * Ephemeral hold documents during checkout.
+       * Concurrency lock documents representing discrete 15-minute time slices.
+       * Client direct reads and writes are strictly forbidden (Server Admin SDK only).
        */
       match /slot_locks/{lockId} {
-        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
-        allow write: if false;
+        allow read, write: if false;
       }
 
       /**
@@ -580,6 +641,79 @@ service cloud.firestore {
        */
       match /schedule_locks/{staffUid} {
         allow read, write: if false;
+      }
+
+      /**
+       * Phase 4.1: Salon Configurable Resources (/tenants/{tenantId}/resources/{resourceId})
+       * Read: Active tenant members or platform admin.
+       * Write: Strictly forbidden for direct clients (Server Admin SDK ResourceRepository only).
+       */
+      match /resources/{resourceId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 4.1: Resource Slot Locks (/tenants/{tenantId}/resource_slot_locks/{lockId})
+       * Client direct reads and writes are strictly forbidden (Server Admin SDK only).
+       */
+      match /resource_slot_locks/{lockId} {
+        allow read, write: if false;
+      }
+
+      /**
+       * Phase 4.1: Resource Schedule Mutex Locks (/tenants/{tenantId}/resource_schedule_locks/{resourceId})
+       * Client direct reads and writes are strictly forbidden (Server Admin SDK only).
+       */
+      match /resource_schedule_locks/{resourceId} {
+        allow read, write: if false;
+      }
+
+      /**
+       * Phase 4.1: Operational Queue Entries (/tenants/{tenantId}/queue_entries/{bookingId})
+       * Derived operational projection synced atomically with canonical bookings.
+       * Read restricted to OWNER, MANAGER, or platform admin (STAFF accesses sanitized views server-side).
+       * Direct client writes strictly forbidden (Server Admin SDK QueueRepository only).
+       */
+      match /queue_entries/{bookingId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 4.1: Queue Concurrency Mutex (/tenants/{tenantId}/queue_locks/{branchDateKey})
+       * Client direct reads and writes are strictly forbidden (Server Admin SDK only).
+       */
+      match /queue_locks/{branchDateKey} {
+        allow read, write: if false;
+      }
+
+      /**
+       * Phase 4.1: Queue Call History (/tenants/{tenantId}/queue_calls/{callId})
+       * Immutable log of customer calls, recalls, and no-responses.
+       * Read: OWNER, MANAGER, or platform admin. Direct client writes strictly forbidden.
+       */
+      match /queue_calls/{callId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      /**
+       * Phase 4.1: Queue Call Idempotency Mutex (/tenants/{tenantId}/queue_call_idempotency/{key})
+       * Client direct reads and writes are strictly forbidden (Server Admin SDK only).
+       */
+      match /queue_call_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      /**
+       * Phase 4.1: Operations Audit Trail (/tenants/{tenantId}/operations_audit/{auditId})
+       * Immutable chronological ledger for resources, queue, walk-ins, and calling events.
+       * Read: OWNER and Platform Admin. Write: Server-only.
+       */
+      match /operations_audit/{auditId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
       }
 
       /**
@@ -715,6 +849,177 @@ service cloud.firestore {
        * Write: Server Admin SDK only.
        */
       match /accounting_audit/{auditId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      // =========================================================================
+      // Phase 4.2: POS, Invoicing, Payments, Refunds & Cash Sessions
+      // Zero client writes allowed — all financial mutations via Admin SDK only.
+      // =========================================================================
+
+      match /pos_sessions/{sessionId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /pos_active_session_locks/{lockId} {
+        allow read, write: if false;
+      }
+
+      match /pos_cash_movements/{movementId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /pos_cash_movement_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      match /pos_sales/{saleId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /pos_booking_locks/{bookingId} {
+        allow read, write: if false;
+      }
+
+      match /pos_sale_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      match /invoices/{invoiceId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /counters/{counterId} {
+        allow read, write: if false;
+      }
+
+      match /payments/{paymentId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /payment_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      match /refunds/{refundId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /refund_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      match /payment_method_configs/{methodCode} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /pos_accounting_outbox/{outboxId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /pos_audit/{auditId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      // =========================================================================
+      // Phase 4.3: Inventory, Suppliers & Purchasing Management (Server-Only Writes)
+      // =========================================================================
+      match /product_categories/{categoryId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /products/{productId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /product_sku_locks/{skuKey} {
+        allow read, write: if false;
+      }
+
+      match /product_barcode_locks/{barcodeKey} {
+        allow read, write: if false;
+      }
+
+      match /inventory_balances/{balanceId} {
+        allow read: if isTenantMemberActive(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /stock_movements/{movementId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /stock_movement_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      match /suppliers/{supplierId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /purchase_orders/{poId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /goods_receipts/{receiptId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /goods_receipt_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      match /supplier_invoices/{invoiceId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /supplier_payments/{paymentId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /supplier_payment_idempotency/{key} {
+        allow read, write: if false;
+      }
+
+      match /stock_transfers/{transferId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /stock_adjustments/{adjustmentId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /stock_counts/{countId} {
+        allow read: if isTenantManager(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /inventory_accounting_outbox/{outboxId} {
+        allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
+        allow write: if false;
+      }
+
+      match /inventory_audit/{auditId} {
         allow read: if isTenantOwner(tenantId) || isPlatformAdmin();
         allow write: if false;
       }

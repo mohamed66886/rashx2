@@ -2494,6 +2494,133 @@ describe('Cloud Firestore Security Rules — Final Integrity Suite', () => {
         ]);
         expect(res.status).toBe(403);
       });
+
+      // =======================================================================
+      // PHASE 4: CUSTOMER MANAGEMENT & CORE BOOKING ENGINE RULES
+      // =======================================================================
+      it('155. Direct client create to /customers/{customerId} is strictly REJECTED -> 403', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/customers/cust_tamper`,
+          {
+            id: 'cust_tamper',
+            tenantId: tenantA,
+            fullName: 'عميل مزيف',
+            normalizedPhone: '+966500000001',
+          },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('156. Direct client write to /customer_identities/{phone} is strictly REJECTED -> 403', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/customer_identities/+966500000001`,
+          {
+            normalizedPhone: '+966500000001',
+            customerId: 'cust_tamper',
+            tenantId: tenantA,
+          },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('157. Direct client create to /bookings/{bookingId} is strictly REJECTED -> 403', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/bookings/bk_tamper`,
+          {
+            id: 'bk_tamper',
+            tenantId: tenantA,
+            serviceId: 'srv_1',
+            providerId: 'prov_1',
+            customerId: 'cust_1',
+          },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('158. Direct client write to /slot_locks/{lockId} is strictly REJECTED -> 403', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/slot_locks/prov_1_2026-11-25_1000`,
+          {
+            id: 'prov_1_2026-11-25_1000',
+            status: 'LOCKED',
+          },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('159. Active member of tenantA cannot read customers in tenantB -> 403', async () => {
+        await seedDoc(`tenants/${tenantB}/customers/cust_b_secret`, {
+          id: 'cust_b_secret',
+          tenantId: tenantB,
+          fullName: 'عميل في صالون آخر',
+          normalizedPhone: '+966500000002',
+        });
+
+        const res = await readDoc(`tenants/${tenantB}/customers/cust_b_secret`, userOwnerA);
+        expect(res.status).toBe(403);
+      });
+
+      it('160. Active member of tenantA cannot read bookings in tenantB -> 403', async () => {
+        await seedDoc(`tenants/${tenantB}/bookings/bk_b_secret`, {
+          id: 'bk_b_secret',
+          tenantId: tenantB,
+          customerId: 'cust_b',
+          providerId: 'prov_b',
+        });
+
+        const res = await readDoc(`tenants/${tenantB}/bookings/bk_b_secret`, userOwnerA);
+        expect(res.status).toBe(403);
+      });
+
+      // =========================================================================
+      // Phase 4.3: Inventory, Suppliers & Purchasing Security
+      // =========================================================================
+
+      it('161. Direct client write to /inventory_balances/{id} is strictly REJECTED even for OWNER -> 403', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/inventory_balances/b1__p1`,
+          { id: 'b1__p1', quantityOnHand: 999 },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('162. Direct client write to /stock_movements/{id} is strictly REJECTED -> 403', async () => {
+        const res = await writeDoc(
+          `tenants/${tenantA}/stock_movements/m1`,
+          { id: 'm1', quantity: 50 },
+          userOwnerA
+        );
+        expect(res.status).toBe(403);
+      });
+
+      it('163. Direct client write to /purchase_orders, /goods_receipts, /supplier_payments, /stock_transfers is REJECTED -> 403', async () => {
+        for (const col of ['purchase_orders', 'goods_receipts', 'supplier_payments', 'stock_transfers']) {
+          const res = await writeDoc(`tenants/${tenantA}/${col}/doc1`, { id: 'doc1' }, userOwnerA);
+          expect(res.status).toBe(403);
+        }
+      });
+
+      it('164. STAFF cannot read confidential /suppliers or /stock_movements -> 403', async () => {
+        await seedDoc(`tenants/${tenantA}/suppliers/sup1`, { id: 'sup1', tenantId: tenantA });
+        await seedDoc(`tenants/${tenantA}/stock_movements/mov1`, { id: 'mov1', tenantId: tenantA });
+
+        const supRes = await readDoc(`tenants/${tenantA}/suppliers/sup1`, userStaffA);
+        expect(supRes.status).toBe(403);
+
+        const movRes = await readDoc(`tenants/${tenantA}/stock_movements/mov1`, userStaffA);
+        expect(movRes.status).toBe(403);
+      });
+
+      it('165. Cross-tenant read of /products and /inventory_balances is REJECTED -> 403', async () => {
+        await seedDoc(`tenants/${tenantB}/products/prod_b`, { id: 'prod_b', tenantId: tenantB });
+        const res = await readDoc(`tenants/${tenantB}/products/prod_b`, userOwnerA);
+        expect(res.status).toBe(403);
+      });
     });
   });
 });

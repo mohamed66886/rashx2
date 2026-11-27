@@ -1,42 +1,37 @@
 import { redirect } from 'next/navigation';
-import { getTenantSubscriptionSession } from '@/lib/tenant-auth';
+import { getDashboardSession } from '@/lib/dashboard-session';
 import { CompanyRepository, TenantBootstrapService } from '@/lib/firebase-server';
 import { TaxForm } from './tax-form';
-import { SettingsShell } from '../_components/settings-ui';
+import { PageHeader, PageIcon, SettingsShell } from '../_components/settings-ui';
 
 export const dynamic = 'force-dynamic';
 
 export default async function TaxSettingsPage() {
-  const session = await getTenantSubscriptionSession();
-  if (!session) {
-    redirect('/login');
-  }
+  const session = await getDashboardSession();
+  if (!session) redirect('/login');
 
   const { tenant } = session;
   const compRepo = new CompanyRepository();
   let taxSettings = await compRepo.getTaxSettings(tenant.tenantId);
 
   if (!taxSettings) {
-    const bootstrap = new TenantBootstrapService();
-    await bootstrap.reconcileTenant(tenant.tenantId);
+    await new TenantBootstrapService().reconcileTenant(tenant.tenantId);
     taxSettings = await compRepo.getTaxSettings(tenant.tenantId);
   }
 
   return (
     <SettingsShell>
-      <header className="flex flex-col gap-4 rounded-xl bg-(--rx-blue) p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-        <div>
-          <h2 className="text-xl font-extrabold">الضريبة والفواتير</h2>
-          <p className="mt-1 max-w-xl text-sm leading-6 text-(--rx-ink)/85">
-            حالة التسجيل الضريبي، الرقم الضريبي المعتمد، وطريقة احتساب الضريبة في الفواتير.
-          </p>
-        </div>
-        <div className="flex shrink-0 items-baseline gap-1 self-start rounded-xl sm:self-auto bg-white px-6 py-3" aria-label="نسبة الضريبة 15 بالمئة">
-          <span className="text-5xl font-extrabold leading-none">15</span>
-          <span className="text-2xl font-bold">%</span>
-        </div>
-      </header>
-
+      <PageHeader
+        title="الضريبة والفواتير"
+        desc="حالة التسجيل الضريبي، الرقم الضريبي المعتمد، وطريقة احتساب الضريبة في الفواتير."
+        icon={<PageIcon><path d="M19 5L5 19M7.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM16.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" /></PageIcon>}
+        badge={
+          <div className="hidden shrink-0 items-baseline gap-1 rounded-2xl bg-(--rx-blue) px-5 py-2.5 sm:flex" aria-label="نسبة الضريبة 15 بالمئة">
+            <span className="text-4xl font-bold leading-none">15</span>
+            <span className="text-xl font-bold">%</span>
+          </div>
+        }
+      />
       <TaxForm taxSettings={taxSettings} />
     </SettingsShell>
   );

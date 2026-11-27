@@ -134,3 +134,34 @@ export async function getTenantSubscriptionSession() {
   };
 }
 
+/**
+ * Resolves the authoritative Operations/RBAC actor for Server Components & Actions,
+ * attaching `assignedBranchIds` from any linked employee record for branch-level isolation.
+ */
+export async function resolveOperationsActor(session: TenantSession) {
+  let assignedBranchIds: readonly string[] | undefined;
+
+  if (session.membership.role !== 'OWNER') {
+    const db = getFirebaseAdminFirestore();
+    const empSnap = await db
+      .collection(firestorePaths.employees(session.tenant.tenantId))
+      .where('linkedUid', '==', session.user.uid)
+      .limit(1)
+      .get();
+
+    if (!empSnap.empty) {
+      const empData = empSnap.docs[0]?.data();
+      if (Array.isArray(empData?.assignedBranchIds) && empData.assignedBranchIds.length > 0) {
+        assignedBranchIds = empData.assignedBranchIds as string[];
+      }
+    }
+  }
+
+  return {
+    uid: session.user.uid,
+    role: session.membership.role,
+    assignedBranchIds,
+  };
+}
+
+

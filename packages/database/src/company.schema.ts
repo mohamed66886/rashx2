@@ -3,10 +3,26 @@ import { SaudiCrNumberSchema, SaudiVatNumberSchema } from './tenant.schema';
 
 /**
  * Saudi Unified Establishment Number (700 series): 10 digits starting with 7.
+ * Supports normalization of Arabic-Indic digits, spaces, and hyphens, and handles null/empty string as nullable.
  */
-export const SaudiUnifiedEstablishmentNumberSchema = z
-  .string()
-  .regex(/^7\d{9}$/, 'Unified Establishment Number must be exactly 10 digits starting with 7');
+export const SaudiUnifiedEstablishmentNumberSchema = z.preprocess(
+  (val) => {
+    if (val === null || val === undefined) return null;
+    if (typeof val === 'string') {
+      const cleaned = val
+        .trim()
+        .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632))
+        .replace(/[\s-]/g, '');
+      return cleaned === '' ? null : cleaned;
+    }
+    return val;
+  },
+  z
+    .string()
+    .regex(/^7\d{9}$/, 'الرقم الموحد للمنشأة (700) يجب أن يتكون من 10 أرقام ويبدأ بالرقم 7')
+    .nullable()
+    .optional()
+);
 
 /**
  * Saudi VAT Registration Status Model
@@ -70,7 +86,7 @@ export const CompanyProfileDocSchema = z
     crNumber: SaudiCrNumberSchema,
     crIssueDate: z.string().optional(),
     crExpiryDate: z.string().optional(),
-    unifiedEstablishmentNumber: SaudiUnifiedEstablishmentNumberSchema.optional(),
+    unifiedEstablishmentNumber: SaudiUnifiedEstablishmentNumberSchema.nullable().optional(),
     country: z.string().default('SA'),
     region: z.string().max(100).optional(),
     city: z.string().max(100).default('الرياض'),

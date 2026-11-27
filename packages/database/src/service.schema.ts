@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { TaxModeEnum } from './service-pricing';
+import { ResourceTypeEnum, ServiceResourceRequirementEnum } from './resource.schema';
 
 export const ServiceStatusEnum = z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']);
 export type ServiceStatus = z.infer<typeof ServiceStatusEnum>;
@@ -177,6 +178,8 @@ export const ServiceDocSchema = z
     assignedBranchIds: z.array(z.string().min(1)).min(1, 'يجب تحديد فرع واحد على الأقل'),
     assignedProviderIds: z.array(z.string().min(1)).default([]),
     commissionPolicyId: z.string().nullable().default(null),
+    resourceRequirement: ServiceResourceRequirementEnum.default('OPTIONAL'),
+    allowedResourceTypes: z.array(ResourceTypeEnum).default([]),
     displayOrder: z.number().int().nonnegative().default(0),
     isActive: z.boolean().default(true),
     createdAt: z.string().datetime({ message: 'createdAt must be an ISO 8601 string' }),
@@ -271,6 +274,8 @@ export const CreateCatalogServiceInputSchema = z
     assignedBranchIds: z.array(z.string().min(1)).optional(),
     assignedProviderIds: z.array(z.string().min(1)).optional().default([]),
     commissionPolicyId: z.string().nullable().optional(),
+    resourceRequirement: ServiceResourceRequirementEnum.optional().default('OPTIONAL'),
+    allowedResourceTypes: z.array(ResourceTypeEnum).optional().default([]),
     displayOrder: z.number().int().nonnegative().optional().default(0),
     isActive: z.boolean().optional().default(true),
   })
@@ -324,6 +329,8 @@ export const UpdateCatalogServiceInputSchema = z
     assignedBranchIds: z.array(z.string().min(1)).optional(),
     assignedProviderIds: z.array(z.string().min(1)).optional(),
     commissionPolicyId: z.string().nullable().optional(),
+    resourceRequirement: ServiceResourceRequirementEnum.optional(),
+    allowedResourceTypes: z.array(ResourceTypeEnum).optional(),
     displayOrder: z.number().int().nonnegative().optional(),
     isActive: z.boolean().optional(),
   })

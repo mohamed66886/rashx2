@@ -114,6 +114,30 @@ export const firestorePaths = {
   appointment: (tenantId: string, appointmentId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/appointments/${validateSegment('appointmentId', appointmentId)}` as const,
 
+  // Phase 4: Customers & Bookings Core Engine
+  tenantCustomers: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/customers` as const,
+  tenantCustomer: (tenantId: string, customerId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/customers/${validateSegment('customerId', customerId)}` as const,
+
+  tenantCustomerIdentities: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/customer_identities` as const,
+  tenantCustomerIdentity: (tenantId: string, phone: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/customer_identities/${validateSegment('phone', phone)}` as const,
+
+  bookings: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/bookings` as const,
+  booking: (tenantId: string, bookingId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/bookings/${validateSegment('bookingId', bookingId)}` as const,
+
+  bookingIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/booking_idempotency/${validateSegment('key', key)}` as const,
+
+  bookingAuditTrail: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/booking_audit` as const,
+  bookingAuditRecord: (tenantId: string, auditId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/booking_audit/${validateSegment('auditId', auditId)}` as const,
+
   slotLocks: (tenantId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/slot_locks` as const,
   slotLock: (tenantId: string, lockId: string) =>
@@ -123,6 +147,119 @@ export const firestorePaths = {
     `tenants/${validateSegment('tenantId', tenantId)}/schedule_locks` as const,
   scheduleLock: (tenantId: string, staffUid: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/schedule_locks/${validateSegment('staffUid', staffUid)}` as const,
+
+  // Phase 4.1: Salon Daily Operations Engine (Resources, Queue, Calling, Guest Idempotency, Operations Audit)
+  resources: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/resources` as const,
+  resource: (tenantId: string, resourceId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/resources/${validateSegment('resourceId', resourceId)}` as const,
+
+  resourceSlotLocks: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/resource_slot_locks` as const,
+  resourceSlotLock: (tenantId: string, lockId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/resource_slot_locks/${validateSegment('lockId', lockId)}` as const,
+
+  resourceScheduleLocks: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/resource_schedule_locks` as const,
+  resourceScheduleLock: (tenantId: string, resourceId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/resource_schedule_locks/${validateSegment('resourceId', resourceId)}` as const,
+
+  queueEntries: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/queue_entries` as const,
+  queueEntry: (tenantId: string, bookingId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/queue_entries/${validateSegment('bookingId', bookingId)}` as const,
+
+  queueLocks: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/queue_locks` as const,
+  queueLock: (tenantId: string, branchDateKey: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/queue_locks/${validateSegment('branchDateKey', branchDateKey)}` as const,
+
+  queueCalls: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/queue_calls` as const,
+  queueCall: (tenantId: string, callId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/queue_calls/${validateSegment('callId', callId)}` as const,
+
+  queueCallIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/queue_call_idempotency/${validateSegment('key', key)}` as const,
+
+  customerGuestIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/customer_guest_idempotency/${validateSegment('key', key)}` as const,
+
+  operationsAuditTrail: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/operations_audit` as const,
+  operationsAuditRecord: (tenantId: string, auditId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/operations_audit/${validateSegment('auditId', auditId)}` as const,
+
+  // Phase 4.2: POS, Invoicing & Payment Management
+  posSessions: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_sessions` as const,
+  posSession: (tenantId: string, sessionId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_sessions/${validateSegment('sessionId', sessionId)}` as const,
+
+  posActiveSessionLocks: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_active_session_locks` as const,
+  posActiveSessionLock: (tenantId: string, lockId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_active_session_locks/${validateSegment('lockId', lockId)}` as const,
+
+  posCashMovements: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_cash_movements` as const,
+  posCashMovement: (tenantId: string, movementId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_cash_movements/${validateSegment('movementId', movementId)}` as const,
+
+  posCashMovementIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_cash_movement_idempotency/${validateSegment('key', key)}` as const,
+
+  posSales: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_sales` as const,
+  posSale: (tenantId: string, saleId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_sales/${validateSegment('saleId', saleId)}` as const,
+
+  posBookingLocks: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_booking_locks` as const,
+  posBookingLock: (tenantId: string, bookingId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_booking_locks/${validateSegment('bookingId', bookingId)}` as const,
+
+  posSaleIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_sale_idempotency/${validateSegment('key', key)}` as const,
+
+  invoices: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/invoices` as const,
+  invoice: (tenantId: string, invoiceId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/invoices/${validateSegment('invoiceId', invoiceId)}` as const,
+
+  invoiceSequence: (tenantId: string, scopeKey: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/counters/invoice_seq_${validateSegment('scopeKey', scopeKey)}` as const,
+
+  payments: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/payments` as const,
+  payment: (tenantId: string, paymentId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/payments/${validateSegment('paymentId', paymentId)}` as const,
+
+  paymentIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/payment_idempotency/${validateSegment('key', key)}` as const,
+
+  refunds: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/refunds` as const,
+  refund: (tenantId: string, refundId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/refunds/${validateSegment('refundId', refundId)}` as const,
+
+  refundIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/refund_idempotency/${validateSegment('key', key)}` as const,
+
+  paymentMethodConfigs: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/payment_method_configs` as const,
+  paymentMethodConfig: (tenantId: string, methodCode: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/payment_method_configs/${validateSegment('methodCode', methodCode)}` as const,
+
+  posAccountingOutbox: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_accounting_outbox` as const,
+  posAccountingOutboxItem: (tenantId: string, outboxId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_accounting_outbox/${validateSegment('outboxId', outboxId)}` as const,
+
+  posAuditTrail: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_audit` as const,
+  posAuditRecord: (tenantId: string, auditId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/pos_audit/${validateSegment('auditId', auditId)}` as const,
 
   auditLogs: (tenantId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/audit_logs` as const,
@@ -241,5 +378,98 @@ export const firestorePaths = {
     `tenants/${validateSegment('tenantId', tenantId)}/hr_audit` as const,
   hrAuditRecord: (tenantId: string, auditId: string) =>
     `tenants/${validateSegment('tenantId', tenantId)}/hr_audit/${validateSegment('auditId', auditId)}` as const,
+
+  // Phase 4.3: Inventory, Suppliers & Purchasing Management
+  productCategories: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/product_categories` as const,
+  productCategory: (tenantId: string, categoryId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/product_categories/${validateSegment('categoryId', categoryId)}` as const,
+
+  products: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/products` as const,
+  product: (tenantId: string, productId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/products/${validateSegment('productId', productId)}` as const,
+
+  productSkuLocks: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/product_sku_locks` as const,
+  productSkuLock: (tenantId: string, skuKey: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/product_sku_locks/${validateSegment('skuKey', skuKey)}` as const,
+
+  productBarcodeLocks: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/product_barcode_locks` as const,
+  productBarcodeLock: (tenantId: string, barcodeKey: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/product_barcode_locks/${validateSegment('barcodeKey', barcodeKey)}` as const,
+
+  inventoryBalances: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/inventory_balances` as const,
+  inventoryBalance: (tenantId: string, balanceId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/inventory_balances/${validateSegment('balanceId', balanceId)}` as const,
+
+  stockMovements: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/stock_movements` as const,
+  stockMovement: (tenantId: string, movementId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/stock_movements/${validateSegment('movementId', movementId)}` as const,
+
+  stockMovementIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/stock_movement_idempotency/${validateSegment('key', key)}` as const,
+
+  suppliers: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/suppliers` as const,
+  supplier: (tenantId: string, supplierId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/suppliers/${validateSegment('supplierId', supplierId)}` as const,
+
+  purchaseOrders: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/purchase_orders` as const,
+  purchaseOrder: (tenantId: string, purchaseOrderId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/purchase_orders/${validateSegment('purchaseOrderId', purchaseOrderId)}` as const,
+
+  purchaseOrderSequence: (tenantId: string, year: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/counters/po_seq_${validateSegment('year', year)}` as const,
+
+  goodsReceipts: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/goods_receipts` as const,
+  goodsReceipt: (tenantId: string, receiptId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/goods_receipts/${validateSegment('receiptId', receiptId)}` as const,
+
+  goodsReceiptIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/goods_receipt_idempotency/${validateSegment('key', key)}` as const,
+
+  supplierInvoices: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/supplier_invoices` as const,
+  supplierInvoice: (tenantId: string, invoiceId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/supplier_invoices/${validateSegment('invoiceId', invoiceId)}` as const,
+
+  supplierPayments: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/supplier_payments` as const,
+  supplierPayment: (tenantId: string, paymentId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/supplier_payments/${validateSegment('paymentId', paymentId)}` as const,
+
+  supplierPaymentIdempotency: (tenantId: string, key: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/supplier_payment_idempotency/${validateSegment('key', key)}` as const,
+
+  stockTransfers: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/stock_transfers` as const,
+  stockTransfer: (tenantId: string, transferId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/stock_transfers/${validateSegment('transferId', transferId)}` as const,
+
+  stockAdjustments: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/stock_adjustments` as const,
+  stockAdjustment: (tenantId: string, adjustmentId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/stock_adjustments/${validateSegment('adjustmentId', adjustmentId)}` as const,
+
+  stockCounts: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/stock_counts` as const,
+  stockCount: (tenantId: string, countId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/stock_counts/${validateSegment('countId', countId)}` as const,
+
+  inventoryAccountingOutbox: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/inventory_accounting_outbox` as const,
+  inventoryAccountingOutboxItem: (tenantId: string, outboxId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/inventory_accounting_outbox/${validateSegment('outboxId', outboxId)}` as const,
+
+  inventoryAuditTrail: (tenantId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/inventory_audit` as const,
+  inventoryAuditRecord: (tenantId: string, auditId: string) =>
+    `tenants/${validateSegment('tenantId', tenantId)}/inventory_audit/${validateSegment('auditId', auditId)}` as const,
 };
 

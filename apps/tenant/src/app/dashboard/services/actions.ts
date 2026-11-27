@@ -126,6 +126,8 @@ export async function createServiceAction(
         commissionPolicyId,
         displayOrder,
         isActive,
+        resourceRequirement: 'OPTIONAL' as const,
+        allowedResourceTypes: [],
       },
       user.uid,
       membership.role,
